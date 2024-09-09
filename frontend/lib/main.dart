@@ -46,27 +46,30 @@ class App extends StatelessWidget {
                   ],
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 15,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SquareCardBox(
                       title: '날씨',
-                      // height: 170,
                     ),
                     SquareCardBox(
-                      title: '운세',
-                      // height: 170,
+                      title: '오늘의 운세',
                       backgroundColor: Color(0xFF2D3765),
                       textColor: Colors.white,
+                      imageUrl: 'assets/images/luck.png',
                     ),
                   ],
                 ),
                 SizedBox(
                   height: 15,
                 ),
-                CardBox(title: '자주가는목적지', height: 180),
+                Column(
+                  children: [
+                    CardBox(title: '자주가는목적지', height: 180),
+                  ],
+                ),
                 SizedBox(
                   height: 15,
                 ),
@@ -77,23 +80,18 @@ class App extends StatelessWidget {
                   height: 15,
                 ),
                 CardBox(
-                  title: '현재 위치 ㅇㅇ동 장소 추천',
+                  title: '현재 위치 --동 장소 추천',
                 ),
                 SizedBox(
                   height: 15,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Button(
-                      text: 'Transfer',
-                      bgColor: Color(0xFFF1B33B),
-                      textColor: Colors.black,
-                    ),
-                    Button(
-                      text: 'Request',
-                      bgColor: Color(0xFF1F2123),
-                      textColor: Colors.white,
+                    CustomButton(
+                      text: '길찾기',
+                      borderColor: Color(0xFF7FC818),
+                      textColor: Color(0xFF7FC818),
                     ),
                   ],
                 ),
