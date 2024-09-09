@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class CardBox extends StatelessWidget {
   final String title;
-  final double width;
   final double height;
   final Color backgroundColor;
   final Color textColor;
@@ -10,7 +9,6 @@ class CardBox extends StatelessWidget {
   const CardBox({
     super.key,
     required this.title,
-    this.width = 350,
     this.height = 150,
     this.backgroundColor = Colors.white,
     this.textColor = Colors.black,
@@ -19,7 +17,6 @@ class CardBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: width,
       height: height,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
