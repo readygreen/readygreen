@@ -1,4 +1,4 @@
-package com.ssafy.readygreen.complication
+package com.ddubucks.readygreen.complication
 
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
