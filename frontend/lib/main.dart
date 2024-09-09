@@ -19,7 +19,7 @@ class App extends StatelessWidget {
         body: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: 20,
+              horizontal: 30,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,20 +48,16 @@ class App extends StatelessWidget {
                 SizedBox(
                   height: 5,
                 ),
-                Row(),
-                SizedBox(
-                  height: 10,
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SquareCardBox(
                       title: '날씨',
-                      height: 170,
+                      // height: 170,
                     ),
                     SquareCardBox(
                       title: '운세',
-                      height: 170,
+                      // height: 170,
                       backgroundColor: Color(0xFF2D3765),
                       textColor: Colors.white,
                     ),
