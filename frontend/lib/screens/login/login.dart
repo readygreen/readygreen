@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:readygreen/screens/main/main_page.dart'; // 메인 페이지를 임포트
+import 'package:readygreen/screens/home/home.dart'; // 메인 페이지를 임포트
 
 class LoginPage extends StatelessWidget {
   @override
