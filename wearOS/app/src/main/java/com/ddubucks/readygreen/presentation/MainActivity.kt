@@ -4,7 +4,7 @@
  * changes to the libraries and their usages.
  */
 
-package com.ssafy.readygreen.presentation
+package com.ddubucks.readygreen.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
-import com.ssafy.readygreen.R
-import com.ssafy.readygreen.presentation.theme.ReadygreenTheme
+import com.ddubucks.readygreen.R
+import com.ddubucks.readygreen.presentation.theme.ReadygreenTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

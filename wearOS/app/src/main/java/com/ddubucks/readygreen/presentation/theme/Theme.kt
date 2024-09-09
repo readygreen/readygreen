@@ -1,4 +1,4 @@
-package com.ssafy.readygreen.presentation.theme
+package com.ddubucks.readygreen.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.wear.compose.material.MaterialTheme
