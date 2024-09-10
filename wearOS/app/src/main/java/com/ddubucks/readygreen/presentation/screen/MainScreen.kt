@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Text
-import com.ddubucks.readygreen.presentation.components.ButtonIconListScreen
+import com.ddubucks.readygreen.presentation.components.MainButtonList
 import com.ddubucks.readygreen.presentation.theme.Black
 import h1Style
 
@@ -33,6 +33,6 @@ fun MainScreen(navController: NavHostController) {
             modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
         )
 
-        ButtonIconListScreen(navController = navController)
+        MainButtonList(navController = navController)
     }
 }

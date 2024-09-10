@@ -8,7 +8,7 @@ import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.model.ButtonIconModel
 
 @Composable
-fun ButtonIconListScreen(navController: NavHostController) {
+fun MainButtonList(navController: NavHostController) {
     val buttonList = listOf(
         ButtonIconModel(R.drawable.favorite_icon, "자주가는 목적지"),
         ButtonIconModel(R.drawable.voice_search_icon, "음성검색"),
