@@ -10,17 +10,24 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   int _selectedIndex = 0;
 
-  void _onItemTapped(int index) {
+  // 페이지 이동을 위한 함수
+  void _onItemTapped(BuildContext context, int index) {
     setState(() {
       _selectedIndex = index;
     });
+
+    if (index == 0) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else if (index == 2) {
+      Navigator.pushReplacementNamed(context, '/map');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
+      onTap: (index) => _onItemTapped(context, index),
       type: BottomNavigationBarType.fixed,
       iconSize: 24,
       selectedItemColor: const Color(0xFF7FC818),
