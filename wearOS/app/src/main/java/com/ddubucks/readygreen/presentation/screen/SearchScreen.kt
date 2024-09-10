@@ -6,18 +6,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Text
-import com.ddubucks.readygreen.presentation.components.ButtonIconListScreen
 import com.ddubucks.readygreen.presentation.theme.Black
 import h1Style
 
-
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun SearchScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -26,13 +22,12 @@ fun MainScreen(navController: NavHostController) {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "언제그린",
+            text = "음성검색",
             color = Color.Yellow,
-            fontSize = 22.sp,
+            fontSize = 14.sp,
             style = h1Style,
             modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
         )
 
-        ButtonIconListScreen(navController = navController)
     }
 }

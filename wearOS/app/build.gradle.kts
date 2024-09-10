@@ -63,7 +63,15 @@ dependencies {
     implementation(libs.horologist.compose.tools)
     implementation(libs.horologist.tiles)
     implementation(libs.watchface.complications.data.source.ktx)
+    implementation(libs.navigation.compose)
 
+    val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
+    implementation(composeBom)
+
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+
+    // wearOS 설정
     implementation("androidx.wear.compose:compose-material:1.1.0")
     implementation("androidx.wear.compose:compose-foundation:1.1.0")
     implementation("androidx.wear.compose:compose-navigation:1.1.0")

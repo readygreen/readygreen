@@ -1,4 +1,3 @@
-// Theme.kt
 package com.ddubucks.readygreen.presentation.theme
 
 import androidx.wear.compose.material.Colors
