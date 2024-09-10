@@ -63,6 +63,11 @@ dependencies {
     implementation(libs.horologist.compose.tools)
     implementation(libs.horologist.tiles)
     implementation(libs.watchface.complications.data.source.ktx)
+
+    implementation("androidx.wear.compose:compose-material:1.1.0")
+    implementation("androidx.wear.compose:compose-foundation:1.1.0")
+    implementation("androidx.wear.compose:compose-navigation:1.1.0")
+
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
