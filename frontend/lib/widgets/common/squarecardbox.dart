@@ -32,7 +32,7 @@ class SquareCardBox extends StatelessWidget {
           horizontal: 20,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // 텍스트는 왼쪽 정렬
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
@@ -48,8 +48,8 @@ class SquareCardBox extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Image.asset(
                   imageUrl!,
-                  width: 100,
-                  height: 100,
+                  width: deviceWidth / 4,
+                  height: deviceWidth / 4,
                   fit: BoxFit.cover,
                 ),
               ),

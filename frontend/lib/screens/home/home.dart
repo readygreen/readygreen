@@ -4,18 +4,20 @@ import 'package:readygreen/widgets/common/cardbox.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
 import 'package:readygreen/bottom_navigation.dart';
 
-class MainPage extends StatefulWidget {
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
-  _MainPageState createState() => _MainPageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  List<Widget> _pages = [
+  final List<Widget> _pages = [
     const MainScreenContent(),
-    Center(child: Text('검색 화면', style: TextStyle(fontSize: 24))),
-    Center(child: Text('설정 화면', style: TextStyle(fontSize: 24))),
+    const Center(child: Text('검색 화면', style: TextStyle(fontSize: 24))),
+    const Center(child: Text('설정 화면', style: TextStyle(fontSize: 24))),
   ];
 
   void _onItemTapped(int index) {
@@ -29,7 +31,7 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9F9),
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigation(),
+      bottomNavigationBar: const BottomNavigation(),
     );
   }
 }
