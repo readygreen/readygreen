@@ -17,9 +17,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
     });
 
     if (index == 0) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushNamed(context, '/home');
     } else if (index == 2) {
-      Navigator.pushReplacementNamed(context, '/map');
+      Navigator.pushNamed(context, '/map');
     }
   }
 
@@ -30,6 +30,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       onTap: (index) => _onItemTapped(context, index),
       type: BottomNavigationBarType.fixed,
       iconSize: 24,
+      backgroundColor: Colors.white,
       selectedItemColor: const Color(0xFF7FC818),
       unselectedItemColor: const Color(0xFF7A7A7A),
       selectedLabelStyle: const TextStyle(fontSize: 12),
