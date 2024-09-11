@@ -1,4 +1,4 @@
-package com.ddubucks.readygreen.model
+package com.ddubucks.readygreen.data.model
 
 data class ButtonIconModel(
     val icon: Int,

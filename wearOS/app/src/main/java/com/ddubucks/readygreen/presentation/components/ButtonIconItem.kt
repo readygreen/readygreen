@@ -11,7 +11,7 @@ import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
-import com.ddubucks.readygreen.model.ButtonIconModel
+import com.ddubucks.readygreen.data.model.ButtonIconModel
 import com.ddubucks.readygreen.presentation.theme.DarkGray
 
 @Composable

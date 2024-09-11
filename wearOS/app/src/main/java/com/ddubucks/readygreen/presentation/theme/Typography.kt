@@ -15,3 +15,9 @@ val h1Style = TextStyle(
     fontWeight = FontWeight.Bold,
     fontSize = 30.sp
 )
+
+val h3Style = TextStyle(
+    fontFamily = customFontFamily,
+    fontWeight = FontWeight.Bold,
+    fontSize = 30.sp
+)

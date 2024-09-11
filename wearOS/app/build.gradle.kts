@@ -71,10 +71,15 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
 
-    // wearOS 설정
+    // wearOS
     implementation("androidx.wear.compose:compose-material:1.1.0")
     implementation("androidx.wear.compose:compose-foundation:1.1.0")
     implementation("androidx.wear.compose:compose-navigation:1.1.0")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")  // JSON 파싱을 위한 GSON
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")  // 로그 인터셉터 (디버깅용)
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
