@@ -1,7 +1,7 @@
 package com.ddubucks.readygreen.data.repository
 
 import com.ddubucks.readygreen.data.model.BookmarkModel
-import com.ddubucks.readygreen.utils.RetrofitClient
+import com.ddubucks.readygreen.core.network.RetrofitClient
 
 class BookmarkRepository {
 
