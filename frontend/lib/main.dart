@@ -23,7 +23,7 @@ class App extends StatelessWidget {
         '/': (context) => const StartLoadingPage(),
         '/login': (context) => const LoginPage(),
         '/home': (context) => const HomePage(),
-        '/map': (context) => const NaverMapApp(),
+        '/map': (context) => const MapPage(),
       },
     );
   }
