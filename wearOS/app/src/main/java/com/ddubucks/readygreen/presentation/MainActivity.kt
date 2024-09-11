@@ -1,9 +1,3 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter and
- * https://github.com/android/wear-os-samples/tree/main/ComposeAdvanced to find the most up to date
- * changes to the libraries and their usages.
- */
-
 package com.ddubucks.readygreen.presentation
 
 import android.os.Bundle
@@ -25,7 +19,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import com.ddubucks.readygreen.R
-import com.ddubucks.readygreen.presentation.theme.ReadygreenTheme
+import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp(greetingName: String) {
-    ReadygreenTheme {
+    ReadyGreenTheme {
         Box(
             modifier = Modifier
                 .fillMaxSize()
