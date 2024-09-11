@@ -29,5 +29,6 @@ fun FavoritesScreen() {
             modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
         )
 
+
     }
 }

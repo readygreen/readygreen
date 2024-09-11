@@ -24,7 +24,6 @@ fun SearchScreen() {
         Text(
             text = "음성검색",
             color = Color.Yellow,
-            fontSize = 14.sp,
             style = h1Style,
             modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
         )
