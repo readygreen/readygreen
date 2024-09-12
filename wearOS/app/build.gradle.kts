@@ -71,6 +71,10 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
 
+    // TODO flutter build.gradle에 추가
+    // Data Layer (모바일 연결)
+    implementation("com.google.android.gms:play-services-wearable:18.0.0")
+
     // wearOS
     implementation("androidx.wear.compose:compose-material:1.1.0")
     implementation("androidx.wear.compose:compose-foundation:1.1.0")

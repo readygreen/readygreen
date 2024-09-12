@@ -28,9 +28,8 @@ fun MainScreen(navController: NavHostController) {
         Text(
             text = "언제그린",
             color = Color.Yellow,
-            fontSize = 22.sp,
             style = h1Style,
-            modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
+            modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
         )
 
         MainButtonList(navController = navController)

@@ -7,10 +7,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.presentation.theme.Black
-import h1Style
+import h3Style
+
 
 @Composable
 fun SearchScreen() {
@@ -24,10 +24,8 @@ fun SearchScreen() {
         Text(
             text = "음성검색",
             color = Color.Yellow,
-            fontSize = 14.sp,
-            style = h1Style,
+            style = h3Style,
             modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
         )
-
     }
 }
