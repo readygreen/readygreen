@@ -21,3 +21,7 @@ val h3Style = TextStyle(
     fontWeight = FontWeight.Bold,
     fontSize = 14.sp
 )
+
+val pStyle = TextStyle(
+    fontSize = 14.sp
+)
