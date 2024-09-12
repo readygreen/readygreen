@@ -43,7 +43,7 @@ fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.c
 //            }
 //        }
 
-        // 더미데이터
+        // TODO 더미데이터 삭제
         val buttonList = listOf(
             ButtonIconModel(R.drawable.bookmark_home, "집"),
             ButtonIconModel(R.drawable.bookmark_office, "회사"),
