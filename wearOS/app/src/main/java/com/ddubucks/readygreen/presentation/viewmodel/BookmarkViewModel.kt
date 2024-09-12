@@ -11,10 +11,8 @@ import kotlinx.coroutines.launch
 
 class BookmarkViewModel : ViewModel() {
 
-    // BookmarkRepository를 직접 생성
     private val repository = BookmarkRepository()
 
-    // 데이터 상태를 Flow로 관리
     private val _bookMark = MutableStateFlow<List<BookmarkModel>>(emptyList())
     val bookmark: StateFlow<List<BookmarkModel>> get() = _bookMark
 

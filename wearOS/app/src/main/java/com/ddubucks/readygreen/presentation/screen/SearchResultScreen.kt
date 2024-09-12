@@ -19,17 +19,17 @@ import com.ddubucks.readygreen.presentation.components.ButtonItem
 import com.ddubucks.readygreen.presentation.theme.Black
 import h3Style
 
-
 @Composable
 fun SearchResultScreen(viewModel: SearchViewModel) {
+
     val voiceResult by viewModel.voiceResult.collectAsState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally,  // 중앙 정렬
+        verticalArrangement = Arrangement.Center  // 수직 중앙 정렬
     ) {
         Text(
             text = "검색 결과",
@@ -38,7 +38,7 @@ fun SearchResultScreen(viewModel: SearchViewModel) {
             modifier = Modifier.padding(bottom = 14.dp, top = 16.dp)
         )
 
-        // 음성인식 결과를 버튼에 출력
+        // 음성 인식 결과
         val buttonList = listOf(
             ButtonModel(voiceResult)
         )

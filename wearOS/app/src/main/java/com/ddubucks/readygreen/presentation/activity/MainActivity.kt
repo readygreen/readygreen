@@ -13,7 +13,6 @@ import com.ddubucks.readygreen.presentation.screen.MainScreen
 import com.ddubucks.readygreen.presentation.screen.MapScreen
 import com.ddubucks.readygreen.presentation.screen.SearchScreen
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
-import com.ddubucks.readygreen.presentation.viewmodel.BookmarkViewModel
 
 class MainActivity : ComponentActivity() {
 
