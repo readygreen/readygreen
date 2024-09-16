@@ -13,11 +13,15 @@ val customFontFamily = FontFamily(
 val h1Style = TextStyle(
     fontFamily = customFontFamily,
     fontWeight = FontWeight.Bold,
-    fontSize = 30.sp
+    fontSize = 22.sp
 )
 
 val h3Style = TextStyle(
     fontFamily = customFontFamily,
     fontWeight = FontWeight.Bold,
-    fontSize = 30.sp
+    fontSize = 14.sp
+)
+
+val pStyle = TextStyle(
+    fontSize = 14.sp
 )

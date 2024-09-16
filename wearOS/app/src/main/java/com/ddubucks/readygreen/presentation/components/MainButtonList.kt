@@ -20,7 +20,7 @@ fun MainButtonList(navController: NavHostController) {
             ButtonIconItem(item = item, onClick = {
                 when (item.label) {
                     "자주가는 목적지" -> {
-                        navController.navigate("favoriteScreen")
+                        navController.navigate("bookmarkScreen")
                     }
                     "음성검색" -> {
                         navController.navigate("searchScreen")
