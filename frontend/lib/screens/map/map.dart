@@ -4,8 +4,24 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:readygreen/bottom_navigation.dart';
 import 'package:readygreen/widgets/map/search.dart';
+import 'package:readygreen/widgets/map/locationbutton.dart';
+import 'package:readygreen/widgets/map/draggable_favorites.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:readygreen/widgets/map/speechsearch.dart';
 
-void main() => runApp(const MapPage());
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: MapPage(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -21,6 +37,24 @@ class _MapPageState extends State<MapPage> {
       Completer<GoogleMapController>();
 
   final Location _location = Location();
+  stt.SpeechToText? _speech;
+  bool _isListening = false;
+  String _voiceInput = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeSpeech();
+  }
+
+  // SpeechToText 초기화
+  Future<void> _initializeSpeech() async {
+    _speech = stt.SpeechToText();
+    bool available = await _speech!.initialize();
+    if (!available) {
+      print("Speech recognition not available");
+    }
+  }
 
   // 위치 정보를 받아오는 함수
   Future<void> _currentLocation() async {
@@ -41,7 +75,7 @@ class _MapPageState extends State<MapPage> {
     controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
         target: LatLng(currentLocation.latitude!, currentLocation.longitude!),
-        zoom: 16.0,
+        zoom: 17.0,
       ),
     ));
   }
@@ -49,11 +83,53 @@ class _MapPageState extends State<MapPage> {
   // SearchBar의 검색 결과 제출 함수
   void _onSearchSubmitted(String query) {
     // 여기에 검색 결과를 처리하는 로직을 작성할거임 ..
+    print('검색어: $query');
   }
 
-  // 음성 검색 기능을 처리하는 함수
-  void _onVoiceSearch() {
-    // 음성 검색 로직을 여기에 작성할거임 ..
+  // 음성 인식 기능을 처리하는 함수
+  void _onVoiceSearch() async {
+    if (_speech == null) {
+      print("Speech recognition not initialized");
+      return;
+    }
+
+    if (!_isListening) {
+      bool available = await _speech!.initialize(
+        onStatus: (status) => print('onStatus: $status'),
+        onError: (error) => print('onError: $error'),
+      );
+
+      if (available) {
+        setState(() => _isListening = true);
+        // 음성 검색 중 UI 표시
+        SpeechSearchDialog.show(context, _voiceInput, 'assets/images/mic.png');
+
+        // 타임아웃 설정 (5초 후 강제로 종료 일단 안꺼져서 임시로 ㅜㅜ ..)
+        Future.delayed(const Duration(seconds: 5), () {
+          if (_isListening) {
+            _speech!.stop();
+            setState(() => _isListening = false);
+            SpeechSearchDialog.hide(context);
+            print('타임아웃으로 음성 인식 종료');
+          }
+        });
+
+        _speech!.listen(
+          onResult: (val) => setState(() {
+            _voiceInput = val.recognizedWords;
+            print('음성 인식 결과: $_voiceInput');
+            _onSearchSubmitted(_voiceInput); // 음성 입력을 검색에 사용
+            SpeechSearchDialog.hide(context); // 음성 인식 완료 시 다이얼로그 닫기
+          }),
+        );
+      } else {
+        setState(() => _isListening = false);
+      }
+    } else {
+      setState(() => _isListening = false);
+      _speech!.stop();
+      SpeechSearchDialog.hide(context); // 음성 검색 중 UI 닫기
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -64,143 +140,48 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return MaterialApp(
-      home: Scaffold(
-        body: Stack(
-          children: [
-            // Google Map
-            GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 14.0,
-              ),
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              compassEnabled: true,
-              zoomControlsEnabled: false,
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: Stack(
+        children: [
+          // Google Map
+          GoogleMap(
+            onMapCreated: _onMapCreated,
+            initialCameraPosition: CameraPosition(
+              target: _center,
+              zoom: 17.0,
             ),
-            // Search bar
-            Positioned(
-              top: 30,
-              left: 25,
-              right: 25,
-              child: MapSearchBar(
-                onSearchSubmitted: _onSearchSubmitted,
-                onVoiceSearch: _onVoiceSearch,
-              ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
+            compassEnabled: true,
+            zoomControlsEnabled: false,
+          ),
+          // Search bar
+          Positioned(
+            top: 30,
+            left: 25,
+            right: 25,
+            child: MapSearchBar(
+              onSearchSubmitted: _onSearchSubmitted,
+              onVoiceSearch: _onVoiceSearch,
             ),
-            // 위치버튼
-            Positioned(
-              top: 620,
-              right: 10,
-              child: GestureDetector(
-                onTap: () {
-                  _currentLocation();
-                },
-                child: Container(
-                  width: screenWidth * (40 / 360),
-                  height: screenWidth * (40 / 360),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25.0),
-                    color: Colors.white,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(screenWidth * (6 / 360)),
-                    child: const Icon(Icons.my_location),
-                  ),
-                ),
-              ),
+          ),
+          // 위치버튼
+          Positioned(
+            top: 620,
+            right: 10,
+            child: LocationButton(
+              onTap: _currentLocation,
+              screenWidth: screenWidth,
             ),
-            // DraggableScrollableSheet(즐겨찾기 드래그)
-            DraggableScrollableSheet(
-              initialChildSize: 0.04,
-              minChildSize: 0.04, // 최소 높이
-              maxChildSize: 0.85, // 최대 높이
-              builder:
-                  (BuildContext context, ScrollController scrollController) {
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 6.0,
-                        spreadRadius: 2.0,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // 드래그 인디케이터
-                      Container(
-                        margin: const EdgeInsets.only(top: 10),
-                        width: 40,
-                        height: 5,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // 즐겨찾기 목록
-                      Expanded(
-                        child: ListView(
-                          controller: scrollController, // 리스트가 스크롤 가능하도록 설정
-                          children: const [
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 10),
-                              child: Text(
-                                '자주 가는 목적지',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            ListTile(
-                              // 임시로 데이터 입력해서 출력함
-                              leading: Icon(Icons.business),
-                              title: Text('삼성화재 유성 연수원'),
-                              subtitle: Text('대전 유성구 동서대로 98-39'),
-                              trailing: ElevatedButton(
-                                onPressed: null, // 길찾기 기능 추가 가능
-                                child: Text('길찾기'),
-                              ),
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.location_pin),
-                              title: Text('멀티캠퍼스 역삼'),
-                              subtitle: Text('서울 강남구 테헤란로 212'),
-                              trailing: ElevatedButton(
-                                onPressed: null,
-                                child: Text('길찾기'),
-                              ),
-                            ),
-                            ListTile(
-                              leading: Icon(Icons.home),
-                              title: Text('어쩌구저쩌구 아파트'),
-                              subtitle: Text('대전광역시 어쩌구동 어쩌구'),
-                              trailing: ElevatedButton(
-                                onPressed: null,
-                                child: Text('길찾기'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
-        bottomNavigationBar: const BottomNavigation(),
+          ),
+          // DraggableScrollableSheet(즐겨찾기 드래그)
+          DraggableFavorites(
+            scrollController: ScrollController(),
+          ),
+        ],
       ),
+      bottomNavigationBar: const BottomNavigation(),
     );
   }
 }
