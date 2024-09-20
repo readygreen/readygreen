@@ -9,11 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class WeatherResponse {
-    private String time;
-    private float temperature;
-    private int sky;
-    private int rainy;
-
-
+public class WeatherParsingDTO {
+    private String category;
+    private String obsrValue;
 }
