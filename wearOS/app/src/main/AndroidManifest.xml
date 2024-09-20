@@ -7,6 +7,8 @@
     <uses-feature android:name="android.hardware.type.watch" />
     <!-- WAKE_LOCK -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- 음성인식 -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"

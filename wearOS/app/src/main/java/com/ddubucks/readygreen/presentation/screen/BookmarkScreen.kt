@@ -34,7 +34,7 @@ fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.c
             text = "자주가는 목적지",
             style = h3Style,
             color = Color.Yellow,
-            modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
+            modifier = Modifier.padding(bottom = 10.dp, top = 30.dp)
         )
 
 //        ScalingLazyColumn {
@@ -43,7 +43,7 @@ fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.c
 //            }
 //        }
 
-        // 더미데이터
+        // TODO 더미데이터 삭제
         val buttonList = listOf(
             ButtonIconModel(R.drawable.bookmark_home, "집"),
             ButtonIconModel(R.drawable.bookmark_office, "회사"),
