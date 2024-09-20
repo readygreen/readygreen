@@ -7,8 +7,13 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+<<<<<<< HEAD
+.idea/gradle.xml
+.idea/misc.xml
+=======
 /.idea/misc.xml
 /.idea/gradle.xml
+>>>>>>> 3e1d6e5d19d6235c10287f31d8c70af31c0e9611
 .DS_Store
 /build
 /captures
