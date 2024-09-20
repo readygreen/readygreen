@@ -1,7 +1,7 @@
 package com.ddubucks.readygreen.security;
 
 
-import com.ddubucks.readygreen.dto.AuthDto;
+import com.ddubucks.readygreen.dto.AuthDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,7 +38,7 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
 
         System.out.println("--CustomAuthenticationFilter.java--");
         // 요청(Request)에서 전달된 JSON 데이터를 AuthDto 객체로 변환
-        AuthDto authDto = objectMapper.readValue(request.getReader(), AuthDto.class);
+        AuthDTO authDto = objectMapper.readValue(request.getReader(), AuthDTO.class);
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 authDto.getEmail(), authDto.getSocialId()

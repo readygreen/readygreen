@@ -1,6 +1,6 @@
 package com.ddubucks.readygreen.service;
 
-import com.ddubucks.readygreen.dto.SignupRequest;
+import com.ddubucks.readygreen.dto.SignupRequestDTO;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.model.member.Role;
 import com.ddubucks.readygreen.repository.MemberRepository;
@@ -14,12 +14,12 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public void signup(SignupRequest signupRequest) {
+    public void signup(SignupRequestDTO signupRequestDTO) {
         memberRepository.save(Member.builder()
-                .email(signupRequest.getEmail())
-                .nickname(signupRequest.getNickname())
-                .socialId(signupRequest.getSocialId())
-                .socialType(signupRequest.getSocialType())
+                .email(signupRequestDTO.getEmail())
+                .nickname(signupRequestDTO.getNickname())
+                .socialId(signupRequestDTO.getSocialId())
+                .socialType(signupRequestDTO.getSocialType())
                 .role(Role.USER)
                 .build());
     }
