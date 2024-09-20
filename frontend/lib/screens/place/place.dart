@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-class MyPage extends StatelessWidget {
-  const MyPage({Key? key}) : super(key: key);
+class PlacePage extends StatelessWidget {
+  const PlacePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Page'),
+        title: Text('Place Page'),
       ),
       body: Center(
         child: Text(
-          'This is My Page',
+          'This is the Place Page',
           style: TextStyle(fontSize: 24),
         ),
       ),

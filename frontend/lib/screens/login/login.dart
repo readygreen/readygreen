@@ -1,40 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:readygreen/screens/home/home.dart'; // 메인 페이지를 임포트
+import 'package:readygreen/main.dart'; // 메인 페이지를 임포트
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  void _login() {
+    // 로그인 성공 시 MainPage로 이동
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MainPage()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("로그인")),
+      appBar: AppBar(
+        title: Text('Login'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const TextField(
-              decoration: InputDecoration(
-                labelText: '아이디',
-                border: OutlineInputBorder(),
-              ),
+          children: <Widget>[
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Username'),
             ),
-            const SizedBox(height: 16),
-            const TextField(
+            TextFormField(
+              decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
-              decoration: InputDecoration(
-                labelText: '비밀번호',
-                border: OutlineInputBorder(),
-              ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // 로그인 성공 시 메인 페이지로 이동
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => const HomePage()));
-              },
-              child: const Text("로그인"),
+              onPressed: _login, // 로그인 버튼 클릭 시 MainPage로 이동
+              child: Text('Login'),
             ),
           ],
         ),
