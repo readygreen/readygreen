@@ -1,9 +1,9 @@
 package com.ddubucks.readygreen.model.feedback;
 
+import com.ddubucks.readygreen.model.BaseEntity;
+import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import com.ddubucks.readygreen.model.member.Member;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "feedback")
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Feedback {
+public class Feedback extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +31,6 @@ public class Feedback {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FeedbackType type;  // 분류 (info, update, add)
-
-    @Column(name = "create_date", nullable = false)
-    private LocalDateTime createDate;  // 생성일자
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
