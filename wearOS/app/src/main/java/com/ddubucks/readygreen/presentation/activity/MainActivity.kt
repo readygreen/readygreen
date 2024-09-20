@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.presentation.activity
 
+import SearchViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,13 +11,13 @@ import androidx.navigation.compose.rememberNavController
 import com.ddubucks.readygreen.presentation.screen.BookmarkScreen
 import com.ddubucks.readygreen.presentation.screen.MainScreen
 import com.ddubucks.readygreen.presentation.screen.MapScreen
+import com.ddubucks.readygreen.presentation.screen.SearchResultScreen
 import com.ddubucks.readygreen.presentation.screen.SearchScreen
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
-import com.ddubucks.readygreen.presentation.viewmodel.BookmarkViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private val bookmarkViewModel: BookmarkViewModel by viewModels()
+    private val searchViewModel: SearchViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +31,15 @@ class MainActivity : ComponentActivity() {
                     composable("mainScreen") { MainScreen(navController) }
                     // BookmarkScreen
                     composable("bookmarkScreen") { BookmarkScreen() }
-                    composable("searchScreen") { SearchScreen() }
+                    // SearchScreen
+                    composable("searchScreen") { SearchScreen(navController, viewModel = searchViewModel) }
+                    composable("searchResultScreen/{voiceResults}") { backStackEntry ->
+                        val voiceResults = backStackEntry.arguments?.getString("voiceResults")?.split(",") ?: emptyList()
+                        SearchResultScreen(voiceResults = voiceResults) {
+                            navController.navigate("searchScreen")
+                        }
+                    }
+                    // MapScreen
                     composable("mapScreen") { MapScreen() }
                 }
             }
