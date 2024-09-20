@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.Text
 import com.airbnb.lottie.compose.*
@@ -21,22 +22,23 @@ import com.ddubucks.readygreen.presentation.theme.Black
 import h3Style
 import pStyle
 
+
 @Composable
-fun SearchScreen(viewModel: SearchViewModel) {
+fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
 
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
+    val mike by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
 
-    // 음성 인식 결과를 저장할 변수
-    var voiceInput by remember { mutableStateOf("목적지를 말씀해주세요") }
+    // 음성 인식 결과 리스트
+    var voiceResults by remember { mutableStateOf(emptyList<String>()) }
 
-    // ActivityResultLauncher를 사용하여 음성 인식 결과를 받기 위한 설정
     val speechLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult(),
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val spokenText: String? = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.get(0)
-            voiceInput = spokenText ?: "인식 실패"
-            viewModel.updateVoiceResult(voiceInput)
+            val newResult = spokenText ?: "인식 실패"
+            voiceResults = voiceResults + newResult  // 리스트에 결과 추가
+            viewModel.updateVoiceResult(newResult)
         }
     }
 
@@ -57,7 +59,7 @@ fun SearchScreen(viewModel: SearchViewModel) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Black),  // 배경색 설정
+            .background(Black),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -69,25 +71,29 @@ fun SearchScreen(viewModel: SearchViewModel) {
         )
 
         Text(
-            text = voiceInput,  // 음성 인식 결과
+            text = if (voiceResults.isEmpty()) "목적지를 말씀해주세요" else voiceResults.last(),
             style = pStyle,
             modifier = Modifier.padding(bottom = 5.dp)
         )
 
         LottieAnimation(
-            composition = composition,
+            composition = mike,
             iterations = LottieConstants.IterateForever,
             modifier = Modifier
                 .size(140.dp)
                 .fillMaxWidth()
         )
 
-        // 음성 인식을 다시 시작
+        // SearchResultScreen으로 네비게이션
         Button(
-            onClick = { startSpeechRecognition() },
+            onClick = {
+                // voiceResults를 NavController로 넘길 수 있도록 인코딩
+                val resultList = voiceResults.joinToString(",")
+                navController.navigate("searchResultScreen/$resultList")
+            },
             modifier = Modifier.padding(top = 20.dp)
         ) {
-            Text("음성 다시 입력")
+            Text("결과 확인하기")
         }
     }
 }
