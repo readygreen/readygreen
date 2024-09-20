@@ -128,16 +128,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-<<<<<<< HEAD
-  get:
-    dependency: "direct main"
-    description:
-      name: get
-      sha256: e4e7335ede17452b391ed3b2ede016545706c01a02292a6c97619705e7d2a85e
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.6.6"
-=======
   geocoding:
     dependency: "direct main"
     description:
@@ -226,7 +216,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.0"
->>>>>>> 1f2e0628e2371e73268941950a8bb0a49d957d3a
   google_maps:
     dependency: transitive
     description:
