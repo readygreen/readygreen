@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
-import 'package:readygreen/bottom_navigation.dart';
+import 'package:location/location.dart' as loc;
+import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:google_maps_webservice/places.dart';
+import 'package:readygreen/widgets/map/map_autocomplete.dart';
 import 'package:readygreen/widgets/map/search.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/draggable_favorites.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:readygreen/widgets/map/speechsearch.dart';
+import 'package:readygreen/screens/map/mapsearchresult.dart';
 
 void main() => runApp(const MyApp());
 
@@ -36,10 +38,18 @@ class _MapPageState extends State<MapPage> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
-  final Location _location = Location();
+  final loc.Location _location = loc.Location(); // loc.Location으로 변경
   stt.SpeechToText? _speech;
   bool _isListening = false;
   String _voiceInput = '';
+
+  final Set<Marker> _markers = {}; // 마커 목록 추가
+
+  final places =
+      GoogleMapsPlaces(apiKey: 'AIzaSyDwyviOI57Suh4mCp_ncISKBbloI5eIayo');
+  //apikey 나중에 숨겨놔야함 ..
+
+  List<Prediction> _autoCompleteResults = []; // 자동완성 결과 저장
 
   @override
   void initState() {
@@ -52,20 +62,20 @@ class _MapPageState extends State<MapPage> {
     _speech = stt.SpeechToText();
     bool available = await _speech!.initialize();
     if (!available) {
-      print("Speech recognition not available");
+      print("음성인식 X");
     }
   }
 
   // 위치 정보를 받아오는 함수
   Future<void> _currentLocation() async {
     final GoogleMapController controller = await _controller.future;
-    LocationData currentLocation;
-    var location = Location();
+    loc.LocationData currentLocation;
+    var location = loc.Location(); // loc.Location으로 변경
 
     try {
       currentLocation = await location.getLocation();
     } catch (e) {
-      currentLocation = LocationData.fromMap({
+      currentLocation = loc.LocationData.fromMap({
         'latitude': _center.latitude,
         'longitude': _center.longitude,
       });
@@ -80,10 +90,62 @@ class _MapPageState extends State<MapPage> {
     ));
   }
 
+  // 자동완성 결과를 가져오는 함수
+  Future<void> _getAutoCompleteResults(String query) async {
+    if (query.isEmpty) return;
+
+    loc.LocationData currentLocation = await _location.getLocation();
+
+    // Google Places API로 자동완성 요청
+    final response = await places.autocomplete(
+      query,
+      location: Location(
+          lat: currentLocation.latitude!, lng: currentLocation.longitude!),
+      radius: 5000,
+      // 5km 반경 내의 결과를 필터링 해주는데 .... 반경을 지정해주는게 낫나 ? 모든 결과를 하면 자꾸 미국이 나와 ㅋㅋ...;;
+      // 우리는 뚜벅이들을 위한거니까 반경을 정해주는것도 괜찮은것같은데 필터링 안먹히는듯 ..;;?
+      language: 'ko',
+    );
+
+    if (response.isOkay) {
+      setState(() {
+        _autoCompleteResults = response.predictions;
+      });
+    } else {
+      print('자동완성 실패: ${response.errorMessage}');
+    }
+  }
+
   // SearchBar의 검색 결과 제출 함수
-  void _onSearchSubmitted(String query) {
-    // 여기에 검색 결과를 처리하는 로직을 작성할거임 ..
-    print('검색어: $query');
+  void _onSearchSubmitted(String query) async {
+    if (query.isEmpty) return;
+
+    // Google Places API로 검색
+    final response = await places.searchByText(query);
+
+    if (response.isOkay) {
+      final result = response.results.first;
+      final location = result.geometry!.location;
+
+      // 지도 이동 및 마커 추가
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newLatLng(
+        LatLng(location.lat, location.lng),
+      ));
+
+      setState(() {
+        _markers.add(
+          Marker(
+            markerId: MarkerId(result.placeId),
+            position: LatLng(location.lat, location.lng),
+            infoWindow: InfoWindow(title: result.name),
+          ),
+        );
+        _autoCompleteResults.clear();
+      });
+    } else {
+      print('검색 실패: ${response.errorMessage}');
+    }
   }
 
   // 음성 인식 기능을 처리하는 함수
@@ -101,10 +163,9 @@ class _MapPageState extends State<MapPage> {
 
       if (available) {
         setState(() => _isListening = true);
-        // 음성 검색 중 UI 표시
         SpeechSearchDialog.show(context, _voiceInput, 'assets/images/mic.png');
 
-        // 타임아웃 설정 (5초 후 강제로 종료 일단 안꺼져서 임시로 ㅜㅜ ..)
+        // 타임아웃 설정 (5초 후 강제로 종료)
         Future.delayed(const Duration(seconds: 5), () {
           if (_isListening) {
             _speech!.stop();
@@ -151,10 +212,11 @@ class _MapPageState extends State<MapPage> {
               target: _center,
               zoom: 17.0,
             ),
-            myLocationEnabled: true,
+            myLocationEnabled: true, // 현재 위치 파란 점 표시
             myLocationButtonEnabled: true,
             compassEnabled: true,
             zoomControlsEnabled: false,
+            markers: _markers, // 마커 표시
           ),
           // Search bar
           Positioned(
@@ -164,9 +226,15 @@ class _MapPageState extends State<MapPage> {
             child: MapSearchBar(
               onSearchSubmitted: _onSearchSubmitted,
               onVoiceSearch: _onVoiceSearch,
+              onSearchChanged: _getAutoCompleteResults, // 검색 입력 시 자동완성 결과 요청
             ),
           ),
-          // 위치버튼
+          // 자동완성 결과 표시
+          if (_autoCompleteResults.isNotEmpty)
+            AutoCompleteList(
+              autoCompleteResults: _autoCompleteResults,
+              onSearchSubmitted: _onSearchSubmitted,
+            ), // 위치버튼
           Positioned(
             top: 620,
             right: 10,
@@ -181,7 +249,6 @@ class _MapPageState extends State<MapPage> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavigation(),
     );
   }
 }
