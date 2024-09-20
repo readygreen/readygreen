@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:readygreen/screens/loading/start_loading.dart'; // 로딩 페이지 import
-import 'package:readygreen/screens/login/login.dart'; // 로그인 페이지
-import 'package:readygreen/screens/home/home.dart'; // 홈 페이지 import
-import 'package:readygreen/screens/map/map.dart'; // 지도 페이지 import
+import 'package:readygreen/screens/loading/start_loading.dart';
+import 'package:readygreen/screens/login/login.dart';
+import 'package:readygreen/screens/home/home.dart';
+import 'package:readygreen/screens/map/map.dart';
 
 void main() {
   runApp(const App());
