@@ -15,6 +15,7 @@ import com.ddubucks.readygreen.data.model.ButtonModel
 import com.ddubucks.readygreen.presentation.components.ButtonItem
 import com.ddubucks.readygreen.presentation.theme.Black
 import h3Style
+import pStyle
 
 @Composable
 fun SearchResultScreen(voiceResults: List<String>, onRetryClick: () -> Unit) {
@@ -32,6 +33,12 @@ fun SearchResultScreen(voiceResults: List<String>, onRetryClick: () -> Unit) {
             color = Color.Yellow,
             style = h3Style,
             modifier = Modifier.padding(bottom = 14.dp, top = 16.dp)
+        )
+
+        Text(
+            text = "목적지를 선택해주세요",
+            style = pStyle,
+            modifier = Modifier.padding(bottom = 5.dp)
         )
 
         ScalingLazyColumn(
