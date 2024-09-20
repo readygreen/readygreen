@@ -1,4 +1,4 @@
-package com.ssafy.readygreen.tile
+package com.ddubucks.readygreen.tile
 
 import android.content.Context
 import androidx.compose.runtime.Composable

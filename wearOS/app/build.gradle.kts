@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.ssafy.readygreen"
+    namespace = "com.ddubucks.readygreen"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ssafy.readygreen"
+        applicationId = "com.ddubucks.readygreen"
         minSdk = 30
         targetSdk = 34
         versionCode = 1

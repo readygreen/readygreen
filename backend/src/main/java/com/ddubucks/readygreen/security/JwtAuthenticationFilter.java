@@ -26,11 +26,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static String LOGIN_URL = "/api/*/auth/login";
     private static String SIGNUP_URL = "/api/*/auth";
+    private static String SWAGGER_URL = "/swagger-ui/**";
+    private static String DOCS_URL = "/v3/api-docs/**";
+    private static String HEALTH_URL = "/health/**";
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         return new AntPathRequestMatcher(SIGNUP_URL, "POST").matches(request) ||
-                new AntPathRequestMatcher(LOGIN_URL, "POST").matches(request);
+                new AntPathRequestMatcher(LOGIN_URL, "POST").matches(request) ||
+                new AntPathRequestMatcher(SWAGGER_URL).matches(request) ||
+                new AntPathRequestMatcher(DOCS_URL).matches(request) ||
+                new AntPathRequestMatcher(HEALTH_URL).matches(request);
     }
 
     @Override
