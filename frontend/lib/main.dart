@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:readygreen/screens/loading/start_loading.dart';
 import 'package:readygreen/screens/login/login.dart';
 import 'package:readygreen/screens/home/home.dart';
-<<<<<<< HEAD
 import 'package:readygreen/screens/point/point.dart';
 import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/screens/place/place.dart';
 import 'package:readygreen/screens/mypage/mypage.dart';
-// import 'package:readygreen/bottom_navigation.dart'; // BottomNavigation import
-=======
-import 'package:readygreen/screens/map/map.dart';
->>>>>>> 1f2e0628e2371e73268941950a8bb0a49d957d3a
 
 void main() {
   runApp(const App());
@@ -38,6 +33,8 @@ class App extends StatelessWidget {
 }
 
 class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -45,12 +42,12 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
-  static List<Widget> _widgetOptions = <Widget>[
-    HomePage(),
+  static final List<Widget> _widgetOptions = <Widget>[
+    const HomePage(),
     PointPage(),
-    MapPage(),
-    PlacePage(),
-    MyPage(),
+    const MapPage(),
+    const PlacePage(),
+    const MyPage(),
   ];
 
   void _onItemTapped(int index) {
