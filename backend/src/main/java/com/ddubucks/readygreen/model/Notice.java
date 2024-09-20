@@ -1,9 +1,8 @@
 package com.ddubucks.readygreen.model;
 
-import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
-
+import com.ddubucks.readygreen.model.member.Member;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,17 +16,21 @@ public class Notice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;  // 작성자 (관리자)
 
-    private String content;
+    @Column(nullable = false, length = 100)
+    private String title;  // 공지사항 제목
 
-    private LocalDateTime createdAt;
+    @Column(nullable = false, length = 225)
+    private String content;  // 공지사항 내용
 
-    private boolean isImportant;
+    @Column(name = "create_date", nullable = false)
+    private LocalDateTime createDate;  // 작성 날짜 및 시간
 
-    @ManyToOne
-    @JoinColumn(name = "author_id")
-    private Member author;
+    @Column(nullable = false)
+    private boolean isImportant;  // 공지사항의 중요 여부 (중요하면 맨 위에 표시)
 }

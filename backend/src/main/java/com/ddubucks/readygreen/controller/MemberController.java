@@ -1,6 +1,6 @@
 package com.ddubucks.readygreen.controller;
 
-import com.ddubucks.readygreen.dto.SignupRequest;
+import com.ddubucks.readygreen.dto.SignupRequestDTO;
 import com.ddubucks.readygreen.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping
-    public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<?> signup(@RequestBody SignupRequestDTO signupRequestDTO) {
         System.out.println("회원가입");
-        memberService.signup(signupRequest);
+        memberService.signup(signupRequestDTO);
         return ResponseEntity.ok("회원가입 성공");
     }
 
