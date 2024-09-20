@@ -39,10 +39,14 @@ dependencies:
   flutter_google_places: ^0.3.0
   google_maps_webservice: ^0.0.19
   location: ^6.0.2
+<<<<<<< HEAD
+  get: ^4.6.5
+=======
   geolocator: ^13.0.1
   geocoding: ^3.0.0
   http: ^0.13.6
   speech_to_text: ^7.0.0
+>>>>>>> 1f2e0628e2371e73268941950a8bb0a49d957d3a
 
 dev_dependencies:
   flutter_test:
