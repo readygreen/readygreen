@@ -74,23 +74,23 @@ class _MainPageState extends State<MainPage> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Home',
+            label: '홈',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_money),
-            label: 'Point',
+            label: '포인트',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
-            label: 'Map',
+            label: '지도',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.place),
-            label: 'Place',
+            label: '추천',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'MyPage',
+            label: '마이페이지',
           ),
         ],
       ),
