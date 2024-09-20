@@ -48,7 +48,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("api/*/admin/**").hasRole("ADMIN")
                         .requestMatchers("/error/**").permitAll()
+                        .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/*/auth").permitAll()
+                        .requestMatchers("/health/**").permitAll()
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
 
