@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.ddubucks.readygreen">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.readygreen.navermap">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -14,11 +14,8 @@
         android:icon="@mipmap/ic_launcher">
         <meta-data 
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIz"/>
+            android:value="AIzaSyDwyviOI57Suh4mCp_ncISKBbloI5eIayo"/>
         <meta-data android:name="flutterEmbedding" android:value="2" />
-        <meta-data 
-            android:name="com.google.android.gms.auth.api.signin.API_KEY"
-            android:value="715104781244-2lp2jjrqrs7tcrek65pqi6ls451k52u6.apps.googleusercontent.com"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -41,11 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-        android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-        android:exported="true"
-        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
-        android:configChanges="orientation|keyboardHidden" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
