@@ -24,8 +24,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final CustomAuthenticationFailureHandler authenticationFailureHandler;
 
-    private static String LOGIN_URL = "/api/*/auth/login";
-    private static String SIGNUP_URL = "/api/*/auth";
+    private static String LOGIN_URL = "/auth/login";
+    private static String SIGNUP_URL = "/auth";
     private static String SWAGGER_URL = "/swagger-ui/**";
     private static String DOCS_URL = "/v3/api-docs/**";
     private static String HEALTH_URL = "/health/**";
