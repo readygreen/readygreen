@@ -1,6 +1,6 @@
 package com.ddubucks.readygreen.service;
 
-import com.ddubucks.readygreen.dto.WeatherResponse;
+import com.ddubucks.readygreen.dto.WeatherResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -23,7 +23,7 @@ public class MainService {
     @Value("${WEATHER_SERVICE_KEY}")
     private String weatherKey;
 
-    public WeatherResponse weather(String x, String y) throws Exception {
+    public WeatherResponseDTO weather(String x, String y) throws Exception {
         LocalDateTime now = LocalDateTime.now();
 
         // 년, 월, 일, 시, 분을 추출하여 String으로 변환
@@ -66,7 +66,7 @@ public class MainService {
         System.out.println(items);
 
         // 파싱된 결과 저장을 위한 리스트
-        WeatherResponse weatherResponse = new WeatherResponse("",-1,-1,-1);
+        WeatherResponseDTO weatherResponseDTO = new WeatherResponseDTO("",-1,-1,-1);
 
         // items 배열에서 category와 obsrValue 파싱
         for (int i = 0; i < items.length(); i++) {
@@ -77,23 +77,23 @@ public class MainService {
             String fcstValue = item.getString("fcstValue");
             if(category.equals("SKY")){
                 if(fcstTime.substring(0,2).equals(time)){
-                    weatherResponse.setSky(Integer.parseInt(fcstValue));
+                    weatherResponseDTO.setSky(Integer.parseInt(fcstValue));
                 }
             }else if(category.equals("POP")){
                 if(fcstTime.substring(0,2).equals(time)){
-                    weatherResponse.setRainy(Integer.parseInt(fcstValue));
+                    weatherResponseDTO.setRainy(Integer.parseInt(fcstValue));
                 }
             }else if(category.equals("TMP")){
                 if(fcstTime.substring(0,2).equals(time)){
-                    weatherResponse.setTemperature(Float.parseFloat(fcstValue));
+                    weatherResponseDTO.setTemperature(Float.parseFloat(fcstValue));
                 }
             }
         }
-        System.out.println(weatherResponse);
+        System.out.println(weatherResponseDTO);
 
-        return weatherResponse;
+        return weatherResponseDTO;
     }
-    public List<WeatherResponse> weathers(String x, String y) throws Exception{
+    public List<WeatherResponseDTO> weathers(String x, String y) throws Exception{
         LocalDateTime now = LocalDateTime.now();
 
         // 년, 월, 일, 시, 분을 추출하여 String으로 변환
@@ -136,10 +136,10 @@ public class MainService {
         System.out.println(items);
 
         // 파싱된 결과 저장을 위한 리스트
-        List<WeatherResponse> weatherList = new ArrayList<>();
+        List<WeatherResponseDTO> weatherList = new ArrayList<>();
 
         String current = "";
-        WeatherResponse weatherResponse = null;
+        WeatherResponseDTO weatherResponseDTO = null;
         // items 배열에서 category와 obsrValue 파싱
         for (int i = 0; i < items.length(); i++) {
             JSONObject item = items.getJSONObject(i);
@@ -148,35 +148,35 @@ public class MainService {
             String fcstValue = item.getString("fcstValue");
             if(category.equals("SKY")){
                 if(fcstTime.substring(0,2).equals(current)){
-                    weatherResponse.setSky(Integer.parseInt(fcstValue));
+                    weatherResponseDTO.setSky(Integer.parseInt(fcstValue));
                 }else{
-                    if(weatherResponse!=null)
-                        weatherList.add(weatherResponse);
-                    weatherResponse = new WeatherResponse();
-                    weatherResponse.setTime(fcstTime.substring(0,2));
-                    weatherResponse.setSky(Integer.parseInt(fcstValue));
+                    if(weatherResponseDTO !=null)
+                        weatherList.add(weatherResponseDTO);
+                    weatherResponseDTO = new WeatherResponseDTO();
+                    weatherResponseDTO.setTime(fcstTime.substring(0,2));
+                    weatherResponseDTO.setSky(Integer.parseInt(fcstValue));
                     current = fcstTime.substring(0,2);
                 }
             }else if(category.equals("POP")){
                 if(fcstTime.substring(0,2).equals(current)){
-                    weatherResponse.setRainy(Integer.parseInt(fcstValue));
+                    weatherResponseDTO.setRainy(Integer.parseInt(fcstValue));
                 }else{
-                    if(weatherResponse!=null)
-                        weatherList.add(weatherResponse);
-                    weatherResponse = new WeatherResponse();
-                    weatherResponse.setTime(fcstTime.substring(0,2));
-                    weatherResponse.setRainy(Integer.parseInt(fcstValue));
+                    if(weatherResponseDTO !=null)
+                        weatherList.add(weatherResponseDTO);
+                    weatherResponseDTO = new WeatherResponseDTO();
+                    weatherResponseDTO.setTime(fcstTime.substring(0,2));
+                    weatherResponseDTO.setRainy(Integer.parseInt(fcstValue));
                     current = fcstTime.substring(0,2);
                 }
             }else if(category.equals("TMP")){
                 if(fcstTime.substring(0,2).equals(current)){
-                    weatherResponse.setTemperature(Float.parseFloat(fcstValue));
+                    weatherResponseDTO.setTemperature(Float.parseFloat(fcstValue));
                 }else{
-                    if(weatherResponse!=null)
-                        weatherList.add(weatherResponse);
-                    weatherResponse = new WeatherResponse();
-                    weatherResponse.setTime(fcstTime.substring(0,2));
-                    weatherResponse.setTemperature(Float.parseFloat(fcstValue));
+                    if(weatherResponseDTO !=null)
+                        weatherList.add(weatherResponseDTO);
+                    weatherResponseDTO = new WeatherResponseDTO();
+                    weatherResponseDTO.setTime(fcstTime.substring(0,2));
+                    weatherResponseDTO.setTemperature(Float.parseFloat(fcstValue));
                     current = fcstTime.substring(0,2);
                 }
             }
@@ -185,7 +185,7 @@ public class MainService {
             }
         }
 
-        weatherList.add(weatherResponse);
+        weatherList.add(weatherResponseDTO);
         System.out.println(weatherList);
 
         return weatherList;
