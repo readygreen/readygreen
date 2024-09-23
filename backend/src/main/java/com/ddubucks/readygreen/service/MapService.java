@@ -2,10 +2,14 @@ package com.ddubucks.readygreen.service;
 
 import com.ddubucks.readygreen.dto.MapResponseDTO;
 import com.ddubucks.readygreen.dto.RouteDTO;
+import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
 import com.ddubucks.readygreen.dto.RouteRequestDTO;
 import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +19,14 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class MapService {
+
+    private final static String TYPE = "Point";
 
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
@@ -28,9 +36,33 @@ public class MapService {
         // 경로 요청
         RouteDTO routeDto = route(routeRequestDTO);
 
+        List<Point> coordinates = getBlinkerCoordinate(routeDto);
+
         return MapResponseDTO.builder()
                 .routeDTO(route(routeRequestDTO))
                 .build();
+    }
+
+    private List<Point> getBlinkerCoordinate(RouteDTO routeDTO) {
+
+        List<Point> coordinates = new ArrayList<>();
+        GeometryFactory geometryFactory = new GeometryFactory();
+
+        for (FeatureDTO featureDTO : routeDTO.getFeatures()) {
+            if (TYPE.equals(featureDTO.getGeometry().getType()) && isValidTurnType(featureDTO.getProperties().getTurnType())) {
+                double[] c = (double[]) featureDTO.getGeometry().getCoordinates();
+
+                Point point = geometryFactory.createPoint(new Coordinate(c[0], c[1]));
+                coordinates.add(point);
+            }
+        }
+
+        return coordinates;
+
+    }
+
+    private static boolean isValidTurnType(int turnType) {
+        return 211 <= turnType && turnType <= 217;
     }
 
     @SneakyThrows

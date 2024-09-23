@@ -19,7 +19,7 @@ public class RouteDTO {
     @AllArgsConstructor
     @Getter
     @Setter
-    class FeatureDTO {
+    public class FeatureDTO {
         private String type;
         private GeometryDTO geometry;
         private PropertiesDTO properties;
@@ -29,7 +29,7 @@ public class RouteDTO {
     @AllArgsConstructor
     @Getter
     @Setter
-    class GeometryDTO {
+    public class GeometryDTO {
         private String type;
         private Object coordinates;
     }
@@ -38,7 +38,7 @@ public class RouteDTO {
     @AllArgsConstructor
     @Getter
     @Setter
-    class PropertiesDTO {
+    public class PropertiesDTO {
         private int index;
         private int pointIndex;
         private String name;
