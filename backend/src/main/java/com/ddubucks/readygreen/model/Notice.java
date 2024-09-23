@@ -1,9 +1,8 @@
 package com.ddubucks.readygreen.model;
 
+import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
-import com.ddubucks.readygreen.model.member.Member;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "notice")
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Notice {
+public class Notice extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,9 +26,6 @@ public class Notice {
 
     @Column(nullable = false, length = 225)
     private String content;  // 공지사항 내용
-
-    @Column(name = "create_date", nullable = false)
-    private LocalDateTime createDate;  // 작성 날짜 및 시간
 
     @Column(nullable = false)
     private boolean isImportant;  // 공지사항의 중요 여부 (중요하면 맨 위에 표시)

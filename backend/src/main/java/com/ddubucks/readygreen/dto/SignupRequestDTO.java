@@ -19,7 +19,7 @@ public class SignupRequestDTO {
     @Email(message = "Invalid email format")
     private String email;
 
-    @NotBlank(message = "Email cannot be empty")
+    @NotBlank(message = "Nickname cannot be empty")
     private String nickname;
 
     private String profileImg;

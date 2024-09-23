@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class AuthDTO {
+public class AuthRequestDTO {
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Invalid email format")
     private String email;

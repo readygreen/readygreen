@@ -29,7 +29,6 @@ public class NoticeService {
                 .title(requestDTO.getTitle())
                 .content(requestDTO.getContent())
                 .isImportant(requestDTO.isImportant())
-                .createDate(LocalDateTime.now())
                 .member(admin)
                 .build();
 
