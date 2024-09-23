@@ -14,7 +14,7 @@ class _StartLoadingPageState extends State<StartLoadingPage> {
   void initState() {
     super.initState();
     // 3초 뒤에 로그인 페이지로 이동
-    Timer(Duration(seconds: 3), () {
+    Timer(Duration(seconds: 1), () {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => LoginPage()));
     });
