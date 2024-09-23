@@ -20,6 +20,9 @@ import pStyle
 @Composable
 fun SearchResultScreen(voiceResults: List<String>, onRetryClick: () -> Unit) {
 
+    // 전달받은 검색 결과 로그 출력
+    Log.d("SearchResultScreen", "전달받은 검색 결과: $voiceResults")
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,17 +44,16 @@ fun SearchResultScreen(voiceResults: List<String>, onRetryClick: () -> Unit) {
             modifier = Modifier.padding(bottom = 5.dp)
         )
 
+        // 전달받은 검색 결과를 버튼으로 출력
         ScalingLazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Black),
+            modifier = Modifier.fillMaxSize().background(Black),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
             items(voiceResults) { result ->
                 ButtonItem(item = ButtonModel(result), onClick = {
-                    Log.d("SearchResultScreen", "버튼 클릭: $result")
+                    // 선택한 장소에 대한 처리 (예: 지도 화면으로 이동 등)
+                    Log.d("SearchResultScreen", "선택한 장소: $result")
                 })
             }
 
@@ -62,5 +64,4 @@ fun SearchResultScreen(voiceResults: List<String>, onRetryClick: () -> Unit) {
             }
         }
     }
-
 }

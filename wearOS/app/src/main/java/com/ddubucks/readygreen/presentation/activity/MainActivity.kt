@@ -1,6 +1,5 @@
 package com.ddubucks.readygreen.presentation.activity
 
-import SearchViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,6 +14,7 @@ import com.ddubucks.readygreen.presentation.screen.SearchResultScreen
 import com.ddubucks.readygreen.presentation.screen.SearchScreen
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
 import com.ddubucks.readygreen.presentation.viewmodel.LocationViewModel
+import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 
 class MainActivity : ComponentActivity() {
 

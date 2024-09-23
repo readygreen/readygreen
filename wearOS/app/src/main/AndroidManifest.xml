@@ -60,6 +60,11 @@
             android:name="com.google.android.wearable.standalone"
             android:value="true" />
 
+        <!-- Google Map -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
         <!-- MainActivity 설정 -->
         <activity
             android:name=".presentation.activity.MainActivity"
