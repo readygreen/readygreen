@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/screens/map/mapsearch.dart';
 
 class MapSearchBar extends StatelessWidget {
   final Function(String) onSearchSubmitted;
   final Function() onVoiceSearch;
   final Function(String) onSearchChanged;
+  final Function()? onTap;
 
   const MapSearchBar({
     super.key,
     required this.onSearchSubmitted,
     required this.onVoiceSearch,
     required this.onSearchChanged,
+    this.onTap,
   });
 
   @override
@@ -37,6 +40,7 @@ class MapSearchBar extends StatelessWidget {
                 hintText: '검색어를 입력하세요.',
                 border: InputBorder.none,
               ),
+              onTap: onTap,
               onChanged: onSearchChanged,
               onSubmitted: (value) {
                 onSearchSubmitted(value);
