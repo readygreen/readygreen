@@ -1,31 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:readygreen/main.dart'; // 메인 페이지를 임포트
-import 'package:readygreen/screens/login/signup.dart'; // 회원가입 페이지를 임포트
 
-class LoginPage extends StatefulWidget {
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
+class SignUpPage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController nicknameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  Future<void> _login() async {
+  Future<void> _signUp(BuildContext context) async {
     String email = emailController.text;
-    String password = passwordController.text;
+    String nickname = nicknameController.text;
+    String password = passwordController.text; // 소셜 ID에 password
+    String socialType = "GOOGLE"; // 소셜 로그인 타입 고정
 
-    if (email.isNotEmpty && password.isNotEmpty) {
+    if (email.isNotEmpty &&
+        nickname.isNotEmpty &&
+        passwordController.text.isNotEmpty) {
       // API 요청을 보내기 위한 URL
-      final String apiUrl =
-          "http://j11b108.p.ssafy.io/api/v1/api/v1/auth/login";
-
+      final String apiUrl = "http://j11b108.p.ssafy.io/api/v1/auth";
       // 요청 바디
       Map<String, String> requestBody = {
         'email': email,
+        'nickname': nickname,
         'socialId': password,
+        'socialType': socialType,
       };
 
       try {
@@ -40,18 +38,15 @@ class _LoginPageState extends State<LoginPage> {
 
         // 서버 응답 확인
         if (response.statusCode == 200) {
-          // 로그인 성공 시 MainPage로 이동
+          // 성공적으로 회원가입 처리된 경우
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('로그인 성공! 메인 페이지로 이동합니다.')),
+            SnackBar(content: Text('회원가입이 완료되었습니다! 로그인 페이지로 이동합니다.')),
           );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => MainPage()),
-          );
+          Navigator.pop(context); // 로그인 페이지로 돌아가기
         } else {
-          // 로그인 실패 시
+          // 회원가입 실패 시
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('로그인에 실패했습니다. 이메일과 비밀번호를 확인하세요.')),
+            SnackBar(content: Text('회원가입에 실패했습니다. 다시 시도해주세요.')),
           );
         }
       } catch (e) {
@@ -67,18 +62,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _navigateToSignUp() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SignUpPage()),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: Text('회원가입'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,19 +78,20 @@ class _LoginPageState extends State<LoginPage> {
               decoration: InputDecoration(labelText: '이메일'),
             ),
             TextFormField(
+              controller: nicknameController,
+              decoration: InputDecoration(labelText: '닉네임'),
+            ),
+            TextFormField(
               controller: passwordController,
               decoration: InputDecoration(labelText: '비밀번호'),
               obscureText: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _login, // 로그인 버튼 클릭 시 API 호출
-              child: Text('Login'),
-            ),
-            SizedBox(height: 10),
-            TextButton(
-              onPressed: _navigateToSignUp, // 회원가입 페이지로 이동
-              child: Text('회원가입'),
+              onPressed: () {
+                _signUp(context); // 회원가입 버튼 클릭 시 API 호출
+              },
+              child: Text('Sign Up'),
             ),
           ],
         ),
