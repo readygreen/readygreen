@@ -29,7 +29,6 @@ public class FeedbackService {
                 .content(requestDTO.getContent())
                 .type(requestDTO.getType())
                 .status(FeedbackStatus.NEW)
-                .createDate(LocalDateTime.now())
                 .member(member)
                 .build();
 
