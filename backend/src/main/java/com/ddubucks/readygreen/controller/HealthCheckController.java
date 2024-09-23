@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/health")
-@Tag(name = "Health Check", description = "APIs for checking the server health")
+@Tag(name = "Health Check", description = "헬스 체크 코드")
 public class HealthCheckController {
 
     @GetMapping("/")
-    @Operation(summary = "Health Check", description = "Checks if the server is running and returns a confirmation message.")
+    @Operation(summary = "Health Check", description = "헬스 체크")
     public ResponseEntity<String> healthCheck() {
         return new ResponseEntity<>("Server is running!", HttpStatus.OK);
     }

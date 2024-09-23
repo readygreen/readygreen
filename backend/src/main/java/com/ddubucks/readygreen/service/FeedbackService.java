@@ -53,7 +53,7 @@ public class FeedbackService {
                 .collect(Collectors.toList());
     }
 
-    // 관리자가 특정 타입의 건의사항만 조회 (예: REPORT 타입)
+    // 관리자가 특정 타입의 건의사항만 조회
     public List<FeedbackResponseDTO> getFeedbacksByType(FeedbackType type) {
         return feedbackRepository.findByType(type).stream()
                 .map(this::mapToResponseDTO)
@@ -88,7 +88,6 @@ public class FeedbackService {
         return mapToResponseDTO(feedback);
     }
 
-    // Helper method to convert entity to DTO
     private FeedbackResponseDTO mapToResponseDTO(Feedback feedback) {
         FeedbackResponseDTO responseDTO = new FeedbackResponseDTO();
         responseDTO.setId(feedback.getId());

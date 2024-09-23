@@ -36,7 +36,7 @@ public class Feedback extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private FeedbackStatus status;  // 상태 (신규, 승인, 반려)
 
-    private String reply;  // 관리자의 답장 (null일 수 있음)
+    private String reply;
 
     // Report일 경우에만 승인 또는 반려 처리가 필요함
     public boolean requiresApproval() {
