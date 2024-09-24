@@ -5,6 +5,7 @@ import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.model.member.Role;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,12 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public void signup(SignupRequestDTO signupRequestDTO) {
         memberRepository.save(Member.builder()
                 .email(signupRequestDTO.getEmail())
                 .nickname(signupRequestDTO.getNickname())
-                .socialId(signupRequestDTO.getSocialId())
+                .birth(signupRequestDTO.getBirth())
+                .socialId(passwordEncoder.encode(signupRequestDTO.getSocialId()))
                 .socialType(signupRequestDTO.getSocialType())
                 .role(Role.USER)
                 .build());

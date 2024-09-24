@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 public class CustomAuthenticationProvider implements AuthenticationProvider {
 
     private final UserDetailsService userDetailsService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -31,11 +33,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         // 사용자 자격 증명 검증 로직
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
         System.out.println("userDetails 검증완료");
 
-        if (isValidSocialId(userDetails.getPassword(), socialId)) {
-
+        if (isValidSocialId(socialId, userDetails.getPassword())) {
             System.out.println("인증 성공, 인증된 토큰 반환");
             // 인증 성공, 인증된 토큰 반환
             return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -44,8 +44,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         throw new BadCredentialsException("Invalid credentials");
     }
 
-    private boolean isValidSocialId(String password, String socialId) {
-        return password.equals(socialId);
+    private boolean isValidSocialId(String socialId, String password) {
+        return passwordEncoder.matches(socialId, password);
     }
 
     @Override
