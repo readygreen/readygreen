@@ -14,6 +14,7 @@ import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.data.model.ButtonModel
 import com.ddubucks.readygreen.presentation.components.ButtonItem
 import com.ddubucks.readygreen.presentation.theme.Black
+import com.ddubucks.readygreen.presentation.theme.Yellow
 import h3Style
 import pStyle
 
@@ -33,7 +34,7 @@ fun SearchResultScreen(voiceResults: List<String>, onRetryClick: () -> Unit) {
 
         Text(
             text = "검색 결과",
-            color = Color.Yellow,
+            color = Yellow,
             style = h3Style,
             modifier = Modifier.padding(bottom = 14.dp, top = 16.dp)
         )
@@ -46,7 +47,9 @@ fun SearchResultScreen(voiceResults: List<String>, onRetryClick: () -> Unit) {
 
         // 전달받은 검색 결과를 버튼으로 출력
         ScalingLazyColumn(
-            modifier = Modifier.fillMaxSize().background(Black),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Black),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

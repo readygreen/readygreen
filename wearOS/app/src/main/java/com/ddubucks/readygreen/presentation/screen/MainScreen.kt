@@ -15,6 +15,7 @@ import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.data.model.ButtonIconModel
 import com.ddubucks.readygreen.presentation.components.ButtonIconItem
 import com.ddubucks.readygreen.presentation.theme.Black
+import com.ddubucks.readygreen.presentation.theme.Yellow
 import h1Style
 
 @Composable
@@ -23,7 +24,9 @@ fun MainScreen(navController: NavHostController) {
     val buttonList = listOf(
         ButtonIconModel(R.drawable.bookmark_icon, "자주가는 목적지"),
         ButtonIconModel(R.drawable.voice_search_icon, "음성검색"),
-        ButtonIconModel(R.drawable.map_icon, "지도보기")
+        ButtonIconModel(R.drawable.map_icon, "지도보기"),
+        // TODO 길안내 시작 코드와 연결
+        ButtonIconModel(R.drawable.arrow_straight, "길안내")
     )
 
     Column(
@@ -36,7 +39,7 @@ fun MainScreen(navController: NavHostController) {
 
         Text(
             text = "언제그린",
-            color = Color.Yellow,
+            color = Yellow,
             style = h1Style,
             modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
         )
@@ -53,6 +56,10 @@ fun MainScreen(navController: NavHostController) {
                         }
                         "지도보기" -> {
                             navController.navigate("mapScreen")
+                        }
+                        // TODO 길안내 시작 코드와 연결
+                        "길안내" -> {
+                            navController.navigate("navigationScreen")
                         }
                     }
                 })

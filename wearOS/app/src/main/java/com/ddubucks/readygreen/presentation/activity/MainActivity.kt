@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.ddubucks.readygreen.presentation.screen.BookmarkScreen
 import com.ddubucks.readygreen.presentation.screen.MainScreen
 import com.ddubucks.readygreen.presentation.screen.MapScreen
+import com.ddubucks.readygreen.presentation.screen.NavigationScreen
 import com.ddubucks.readygreen.presentation.screen.SearchResultScreen
 import com.ddubucks.readygreen.presentation.screen.SearchScreen
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
@@ -45,6 +46,8 @@ class MainActivity : ComponentActivity() {
                     composable("mapScreen") {
                         MapScreen(locationViewModel = locationViewModel)
                     }
+                    // NavigationScreen
+                    composable("navigationScreen") { NavigationScreen() }
                 }
             }
         }

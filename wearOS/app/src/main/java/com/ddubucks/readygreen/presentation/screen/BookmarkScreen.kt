@@ -16,6 +16,7 @@ import androidx.wear.compose.material.items
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.data.model.ButtonIconModel
 import com.ddubucks.readygreen.presentation.components.ButtonIconItem
+import com.ddubucks.readygreen.presentation.theme.Yellow
 import com.ddubucks.readygreen.presentation.viewmodel.BookmarkViewModel
 import h3Style
 
@@ -33,7 +34,7 @@ fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.c
         Text(
             text = "자주가는 목적지",
             style = h3Style,
-            color = Color.Yellow,
+            color = Yellow,
             modifier = Modifier.padding(bottom = 10.dp, top = 30.dp)
         )
 

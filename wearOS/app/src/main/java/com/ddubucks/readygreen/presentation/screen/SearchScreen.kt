@@ -18,6 +18,7 @@ import androidx.wear.compose.material.Text
 import com.airbnb.lottie.compose.*
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.presentation.theme.Black
+import com.ddubucks.readygreen.presentation.theme.Yellow
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import h3Style
 import kotlinx.coroutines.delay
@@ -75,7 +76,7 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
     ) {
         Text(
             text = "음성검색",
-            color = Color.Yellow,
+            color = Yellow,
             style = h3Style,
             modifier = Modifier.padding(bottom = 14.dp, top = 16.dp)
         )
