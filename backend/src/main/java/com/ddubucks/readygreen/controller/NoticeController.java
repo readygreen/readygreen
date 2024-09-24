@@ -4,11 +4,10 @@ import com.ddubucks.readygreen.dto.NoticeResponseDTO;
 import com.ddubucks.readygreen.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/notice")
+@RequestMapping("/notice")
 @RequiredArgsConstructor
 public class NoticeController {
 

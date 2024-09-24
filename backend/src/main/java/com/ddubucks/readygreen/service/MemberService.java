@@ -6,6 +6,7 @@ import com.ddubucks.readygreen.model.member.Role;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,5 +31,17 @@ public class MemberService {
     @Transactional
     public void delete(String email) {
         memberRepository.deleteMemberByEmail(email);
+    }
+
+    public int getPoint(UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return member.getPoint();
+    }
+
+    public Member getMemberInfo(String email) {
+        return memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

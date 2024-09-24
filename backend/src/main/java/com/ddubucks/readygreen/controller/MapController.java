@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/map")
+@RequestMapping("/map")
 public class MapController {
 
     private final MapService mapService;
