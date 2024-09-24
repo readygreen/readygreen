@@ -32,9 +32,13 @@ public class MemberService {
 
     public int getPoint(UserDetails userDetails) {
         String email = userDetails.getUsername();
-        System.out.println(email);
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return member.getPoint();
+    }
+
+    public Member getMemberInfo(String email) {
+        return memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }
