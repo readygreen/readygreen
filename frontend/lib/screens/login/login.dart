@@ -22,8 +22,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (email.isNotEmpty && password.isNotEmpty) {
       // API 요청을 보내기 위한 URL
-      final String apiUrl =
-          "http://j11b108.p.ssafy.io/api/v1/api/v1/auth/login";
+      final String apiUrl = "http://j11b108.p.ssafy.io/api/v1/auth/login";
 
       // 요청 바디
       Map<String, String> requestBody = {

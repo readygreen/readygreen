@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/theme/appcolors.dart';
 import 'package:readygreen/screens/loading/start_loading.dart';
 import 'package:readygreen/screens/login/login.dart';
 import 'package:readygreen/screens/home/home.dart';
@@ -19,6 +20,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Navigation Example',
       theme: ThemeData(
+        fontFamily: 'CustomFont',
         primarySwatch: Colors.green,
       ),
       initialRoute: '/',
@@ -66,8 +68,8 @@ class _MainPageState extends State<MainPage> {
         type: BottomNavigationBarType.fixed,
         iconSize: 24,
         backgroundColor: Colors.white,
-        selectedItemColor: const Color(0xFF7FC818),
-        unselectedItemColor: const Color(0xFF7A7A7A),
+        selectedItemColor: AppColors.green,
+        unselectedItemColor: AppColors.greytext,
         selectedLabelStyle: const TextStyle(fontSize: 12),
         unselectedLabelStyle: const TextStyle(fontSize: 12),
         // elevation: 0,
