@@ -2,20 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class SignUpPage extends StatelessWidget {
+class SignUpPage extends StatefulWidget {
+  @override
+  _SignUpPageState createState() => _SignUpPageState();
+}
+
+class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  // 생년월일 변수를 추가합니다.
+  DateTime? selectedBirthDate;
 
   Future<void> _signUp(BuildContext context) async {
     String email = emailController.text;
     String nickname = nicknameController.text;
     String password = passwordController.text; // 소셜 ID에 password
-    String socialType = "GOOGLE"; // 소셜 로그인 타입 고정
+    String socialType = "BASIC"; // 소셜 로그인 타입 고정
+    String? birth = selectedBirthDate?.toIso8601String(); // 생년월일을 ISO 형식으로 변환
 
     if (email.isNotEmpty &&
         nickname.isNotEmpty &&
-        passwordController.text.isNotEmpty) {
+        passwordController.text.isNotEmpty &&
+        birth != null) {
       // API 요청을 보내기 위한 URL
       final String apiUrl = "http://j11b108.p.ssafy.io/api/v1/auth";
       // 요청 바디
@@ -24,6 +34,7 @@ class SignUpPage extends StatelessWidget {
         'nickname': nickname,
         'socialId': password,
         'socialType': socialType,
+        'birth': birth, // 생년월일을 추가
       };
 
       try {
@@ -62,6 +73,21 @@ class SignUpPage extends StatelessWidget {
     }
   }
 
+  // 생년월일 선택 메서드
+  Future<void> _selectBirthDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (pickedDate != null && pickedDate != selectedBirthDate) {
+      setState(() {
+        selectedBirthDate = pickedDate;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,6 +111,23 @@ class SignUpPage extends StatelessWidget {
               controller: passwordController,
               decoration: InputDecoration(labelText: '비밀번호'),
               obscureText: true,
+            ),
+            SizedBox(height: 16),
+            // 생년월일 선택 필드 추가
+            Row(
+              children: [
+                Text(
+                  selectedBirthDate == null
+                      ? '생년월일을 선택해주세요'
+                      : '생년월일: ${selectedBirthDate?.toLocal()}'.split(' ')[0],
+                  style: TextStyle(fontSize: 16),
+                ),
+                SizedBox(width: 16),
+                ElevatedButton(
+                  onPressed: () => _selectBirthDate(context),
+                  child: Text('생년월일 선택'),
+                ),
+              ],
             ),
             SizedBox(height: 20),
             ElevatedButton(

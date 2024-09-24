@@ -5,6 +5,7 @@ class SquareCardBox extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final String? imageUrl;
+  final Widget? child;
 
   const SquareCardBox({
     super.key,
@@ -12,6 +13,7 @@ class SquareCardBox extends StatelessWidget {
     this.backgroundColor = Colors.white,
     this.textColor = Colors.black,
     this.imageUrl,
+    this.child,
   });
 
   @override
@@ -39,12 +41,11 @@ class SquareCardBox extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: textColor,
+                color: textColor, // 명시적으로 색상 설정
               ),
             ),
             if (imageUrl != null)
               Align(
-                // 이미지만 가운데 정렬
                 alignment: Alignment.center,
                 child: Image.asset(
                   imageUrl!,
@@ -53,6 +54,7 @@ class SquareCardBox extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
+            if (child != null) child!,
           ],
         ),
       ),

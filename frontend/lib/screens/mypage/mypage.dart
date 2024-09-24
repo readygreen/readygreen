@@ -1,53 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:readygreen/widgets/common/cardbox.dart';
+import 'package:readygreen/widgets/common/squarecardbox.dart';
+import 'package:readygreen/widgets/common/bgcontainer.dart';
+import 'package:readygreen/theme/appcolors.dart';
 
 class MyPage extends StatelessWidget {
   const MyPage({Key? key}) : super(key: key);
 
+  // FlutterSecureStorage 인스턴스 생성
+  final storage = const FlutterSecureStorage();
+
+  // 로그아웃 처리 함수
+  Future<void> _handleLogout(BuildContext context) async {
+    // 저장된 로그인 토큰 삭제
+    await storage.delete(key: 'auth_token'); // 'auth_token' 키로 저장된 토큰 삭제
+
+    // 로그아웃 후 로그인 화면으로 이동
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      '/login', // 로그인 화면 경로로 이동
+      (Route<dynamic> route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    double deviceWidth = MediaQuery.of(context).size.width; // 기기 너비 가져오기
-    double cardSize = deviceWidth / 2.5; // 기기 너비의 반을 카드 크기로 설정
-    double largeSize = deviceWidth; // 기기 너비의 반을 카드 크기로 설정
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
       body: SingleChildScrollView(
-        // 스크롤 가능하게 설정
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: BackgroundContainer(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 50),
-              // 유저 정보 섹션
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.white,
-                ),
-                child: Row(
-                  children: [
-                    // 프로필 이미지
-                    // CircleAvatar(
-                    //   radius: 40,
-                    //   backgroundImage: NetworkImage(
-                    //       'https://example.com/profile.jpg'), // 임시 이미지
-                    // ),
-                    const SizedBox(width: 16),
-                    // 이름, 이메일, 생년월일
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text('이름: 차유림',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text('이메일: c4526@naver.com',
-                            style: TextStyle(fontSize: 16)),
-                        Text('생년월일: 1999. 10. 25',
-                            style: TextStyle(fontSize: 16)),
-                      ],
-                    ),
+              // 프로필 정보 섹션
+              CardBox(
+                title: '프로필 정보',
+                height: 160,
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    SizedBox(width: 16),
+                    Text('이름: 차유림',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('이메일: c4526@naver.com',
+                        style: TextStyle(fontSize: 16)),
+                    Text('생년월일: 1999. 10. 25', style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ),
@@ -57,92 +57,67 @@ class MyPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: _buildCard(
-                      icon: Icons.badge,
+                    child: SquareCardBox(
                       title: '내 배지',
-                      subtitle: '행운 만땅',
-                      cardSize: cardSize, // 크기 전달
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                      imageUrl: 'assets/images/badge.png', // 이미지 경로 수정
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _buildCard(
-                      icon: Icons.location_on,
+                    child: SquareCardBox(
                       title: '내 장소',
-                      subtitle: '상세보기',
-                      cardSize: cardSize, // 크기 전달
+                      backgroundColor: Colors.white,
+                      textColor: Colors.black,
+                      imageUrl: 'assets/images/place.png', // 이미지 경로 수정
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               // 고객지원 섹션
-              _buildSupportSection(largeSize: largeSize),
+
+              CardBox(
+                title: '고객지원',
+                height: 205, // 적절한 크기 조정
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 8),
+                    _buildSupportItem('공지사항'),
+                    _buildSupportItem('건의하기'),
+                    _buildSupportItem('내 건의함'),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
               // 로그아웃 및 회원탈퇴 섹션
-              _buildLogoutSection(largeSize: largeSize),
+              CardBox(
+                title: '설정',
+                height: 130,
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        _handleLogout(context); // 로그아웃 함수 호출
+                      },
+                      child: const Text('로그아웃', style: TextStyle(fontSize: 16)),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('회원탈퇴',
+                        style: TextStyle(fontSize: 16, color: AppColors.red)),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  // 카드 빌드 메서드
-  Widget _buildCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required double cardSize, // cardSize를 인자로 받음
-  }) {
-    return Container(
-      width: cardSize,
-      height: cardSize, // width와 height를 동일하게 설정
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 40),
-          const SizedBox(height: 8),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: const TextStyle(fontSize: 14, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // 고객지원 섹션
-  Widget _buildSupportSection({
-    required double largeSize,
-  }) {
-    return Container(
-      width: largeSize,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('고객지원',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          _buildSupportItem('공지사항'),
-          _buildSupportItem('건의하기'),
-          _buildSupportItem('내 건의함'),
-        ],
       ),
     );
   }
@@ -152,26 +127,6 @@ class MyPage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Text(title, style: const TextStyle(fontSize: 16)),
-    );
-  }
-
-  // 로그아웃 섹션
-  Widget _buildLogoutSection({required double largeSize}) {
-    return Container(
-      width: largeSize,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('로그아웃', style: TextStyle(fontSize: 16)),
-          SizedBox(height: 8),
-          Text('회원탈퇴', style: TextStyle(fontSize: 16, color: Colors.red)),
-        ],
-      ),
     );
   }
 }
