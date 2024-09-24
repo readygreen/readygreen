@@ -10,7 +10,7 @@ class BackgroundContainer extends StatelessWidget {
     super.key,
     this.child,
     this.backgroundColor = AppColors.greybg, // 배경색
-    this.padding = const EdgeInsets.all(25), // 기본 패딩 설정
+    this.padding = const EdgeInsets.symmetric(horizontal: 20), // 기본 패딩 설정
   });
 
   @override
