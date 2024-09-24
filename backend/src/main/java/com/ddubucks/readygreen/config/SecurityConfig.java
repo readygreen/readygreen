@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/error/**").permitAll()
                         .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth", "/auth/**").permitAll()
                         .requestMatchers("/health/**").permitAll()
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
