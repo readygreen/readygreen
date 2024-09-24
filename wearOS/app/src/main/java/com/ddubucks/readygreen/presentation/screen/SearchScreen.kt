@@ -91,16 +91,5 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
             iterations = LottieConstants.IterateForever,
             modifier = Modifier.size(140.dp)
         )
-
-        // 수동으로 결과 확인
-        Button(
-            onClick = {
-                val resultList = searchResults.joinToString(",")
-                navController.navigate("searchResultScreen/$resultList")
-            },
-            modifier = Modifier.padding(top = 20.dp)
-        ) {
-            Text("결과 확인하기")
-        }
     }
 }

@@ -34,11 +34,9 @@ class SearchViewModel(private val locationService: LocationService) : ViewModel(
                 val locationBias = if (currentLocation != null) {
                     "location=${currentLocation.latitude},${currentLocation.longitude}&radius=5000"
                 } else {
-                    // 기본 위치 설정 (서울)
-                    "location=37.5665,126.9780&radius=5000"
+                    "location=37.5665,126.9780&radius=5000" // 기본 위치 (서울)
                 }
 
-                // 쿼리 인코딩 (UTF-8)
                 val encodedQuery = URLEncoder.encode(query, "UTF-8")
                 val url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=$encodedQuery&$locationBias&key=${BuildConfig.MAPS_API_KEY}"
 
@@ -59,9 +57,6 @@ class SearchViewModel(private val locationService: LocationService) : ViewModel(
                             val json = JSONObject(responseBody)
                             val results = json.getJSONArray("results")
 
-                            Log.d("SearchViewModel", "검색 결과 개수: ${results.length()}")
-
-                            // 5개의 장소만 선택하여 리스트에 추가
                             val places = mutableListOf<String>()
                             for (i in 0 until minOf(results.length(), 5)) {
                                 val place = results.getJSONObject(i)
@@ -69,7 +64,6 @@ class SearchViewModel(private val locationService: LocationService) : ViewModel(
                                 places.add(name)
                             }
 
-                            // 검색 결과를 StateFlow에 업데이트
                             _searchResults.value = places
                             Log.d("SearchViewModel", "최종 선택된 장소: $places")
                         }

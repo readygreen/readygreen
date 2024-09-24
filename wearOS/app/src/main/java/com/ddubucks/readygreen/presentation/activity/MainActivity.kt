@@ -17,12 +17,13 @@ import com.ddubucks.readygreen.presentation.screen.SearchScreen
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
 import com.ddubucks.readygreen.presentation.viewmodel.LocationViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
+import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
-    private val searchViewModel: SearchViewModel by viewModels()
+    private val locationService: LocationService by lazy { LocationService(this) }
+    private val searchViewModel: SearchViewModel by viewModels { SearchViewModelFactory(locationService) }
     private val locationViewModel: LocationViewModel by viewModels()
-    private lateinit var locationService: LocationService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,14 +40,12 @@ class MainActivity : ComponentActivity() {
                     // SearchScreen
                     composable("searchScreen") {
                         SearchScreen(
-                            navController,
+                            navController = navController,
                             viewModel = searchViewModel,
                         )
                     }
                     composable("searchResultScreen/{voiceResults}") { backStackEntry ->
-                        val voiceResults =
-                            backStackEntry.arguments?.getString("voiceResults")?.split(",")
-                                ?: emptyList()
+                        val voiceResults = backStackEntry.arguments?.getString("voiceResults")?.split(",") ?: emptyList()
                         SearchResultScreen(voiceResults = voiceResults) {
                             navController.navigate("searchScreen")
                         }
