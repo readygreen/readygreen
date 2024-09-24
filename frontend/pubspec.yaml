@@ -100,7 +100,6 @@ flutter:
     - assets/images/luck.png
     - assets/images/mic.png
     - assets/images/badge.png
-<<<<<<< HEAD
     - assets/images/place.png
 
   fonts:
@@ -112,5 +111,3 @@ flutter:
     - family: LogoFont
       fonts:
         - asset: assets/fonts/Dunggeunmiso-B.ttf
-=======
->>>>>>> 04b44c709c5e4fc614a534e8cad11550030299eb
