@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "member")
 @Getter
@@ -27,12 +29,16 @@ public class Member extends BaseEntity {
 
     private String profileImg;
 
+    private LocalDate birth;
+
     @Column(nullable = false)
     private String socialId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
+
+    private int point;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
