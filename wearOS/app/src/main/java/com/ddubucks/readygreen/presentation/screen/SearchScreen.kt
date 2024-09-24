@@ -80,7 +80,6 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
             style = h3Style,
             modifier = Modifier.padding(bottom = 14.dp, top = 16.dp)
         )
-
         Text(
             text = if (voiceResults.isEmpty()) "목적지를 말씀해주세요" else voiceResults.last(),
             style = pStyle,

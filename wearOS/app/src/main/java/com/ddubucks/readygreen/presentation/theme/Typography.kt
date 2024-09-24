@@ -5,6 +5,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.ddubucks.readygreen.R
 
+// 폰트
+
 val TitleFontFamily = FontFamily(
     Font(R.font.hakgyoansim_dunggeunmiso_bold, FontWeight.Bold),
     Font(R.font.hakgyoansim_dunggeunmiso_regular, FontWeight.Normal)
@@ -15,6 +17,14 @@ val ContentFontFamily = FontFamily(
     Font(R.font.pretendard_bold, FontWeight.Bold),
     Font(R.font.pretendard_regular, FontWeight.Normal),
 )
+
+val NumberFontFamily = FontFamily(
+    Font(R.font.round_wind_extrabold, FontWeight.ExtraBold),
+    Font(R.font.round_wind_regular, FontWeight.Normal),
+)
+
+
+// 스타일
 
 val h1Style = TextStyle(
     fontFamily = TitleFontFamily,
@@ -35,7 +45,7 @@ val pStyle = TextStyle(
 )
 
 val secStyle = TextStyle(
-    fontFamily = ContentFontFamily,
+    fontFamily = NumberFontFamily,
     fontSize = 40.sp,
-    fontWeight = FontWeight.Black
+    fontWeight = FontWeight.ExtraBold
 )

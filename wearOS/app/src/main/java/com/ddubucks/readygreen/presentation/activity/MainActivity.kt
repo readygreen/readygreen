@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.ddubucks.readygreen.core.network.LocationService
 import com.ddubucks.readygreen.presentation.screen.BookmarkScreen
 import com.ddubucks.readygreen.presentation.screen.MainScreen
 import com.ddubucks.readygreen.presentation.screen.MapScreen
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
 
     private val searchViewModel: SearchViewModel by viewModels()
     private val locationViewModel: LocationViewModel by viewModels()
+    private lateinit var locationService: LocationService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,9 +37,16 @@ class MainActivity : ComponentActivity() {
                     // BookmarkScreen
                     composable("bookmarkScreen") { BookmarkScreen() }
                     // SearchScreen
-                    composable("searchScreen") { SearchScreen(navController, viewModel = searchViewModel) }
+                    composable("searchScreen") {
+                        SearchScreen(
+                            navController,
+                            viewModel = searchViewModel,
+                        )
+                    }
                     composable("searchResultScreen/{voiceResults}") { backStackEntry ->
-                        val voiceResults = backStackEntry.arguments?.getString("voiceResults")?.split(",") ?: emptyList()
+                        val voiceResults =
+                            backStackEntry.arguments?.getString("voiceResults")?.split(",")
+                                ?: emptyList()
                         SearchResultScreen(voiceResults = voiceResults) {
                             navController.navigate("searchScreen")
                         }

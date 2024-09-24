@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddubucks.readygreen.BuildConfig
+import com.ddubucks.readygreen.core.network.LocationService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,21 +14,32 @@ import org.json.JSONObject
 import java.io.IOException
 import java.net.URLEncoder
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(private val locationService: LocationService) : ViewModel() {
 
     private val _searchResults = MutableStateFlow<List<String>>(emptyList())
     val searchResults: StateFlow<List<String>> get() = _searchResults
 
     private val client = OkHttpClient()
 
+    init {
+        // 위치 업데이트 요청
+        locationService.requestLocationUpdates()
+    }
+
     // 장소 검색 API 호출
     fun searchPlaces(query: String) {
         viewModelScope.launch {
             try {
+                val currentLocation = locationService.locationFlow.value
+                val locationBias = if (currentLocation != null) {
+                    "location=${currentLocation.latitude},${currentLocation.longitude}&radius=5000"
+                } else {
+                    // 기본 위치 설정 (서울)
+                    "location=37.5665,126.9780&radius=5000"
+                }
+
                 // 쿼리 인코딩 (UTF-8)
                 val encodedQuery = URLEncoder.encode(query, "UTF-8")
-                // 필요 시 Location Bias 추가 (서울 중심 반경 5km)
-                val locationBias = "location=37.5665,126.9780&radius=5000"
                 val url = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=$encodedQuery&$locationBias&key=${BuildConfig.MAPS_API_KEY}"
 
                 val request = Request.Builder().url(url).build()
@@ -58,10 +70,7 @@ class SearchViewModel : ViewModel() {
                             }
 
                             // 검색 결과를 StateFlow에 업데이트
-                            viewModelScope.launch {
-                                _searchResults.value = places
-                            }
-
+                            _searchResults.value = places
                             Log.d("SearchViewModel", "최종 선택된 장소: $places")
                         }
                     }
