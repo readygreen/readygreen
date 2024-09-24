@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,6 +26,10 @@ public class SignupRequestDTO {
     private String nickname;
 
     private String profileImg;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "Birth cannot be empty")
+    private LocalDate birth;
 
     @NotBlank(message = "Social ID cannot be empty")
     private String socialId;
