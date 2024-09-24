@@ -86,6 +86,7 @@ dependencies {
     // TODO flutter build.gradle에 추가
     // Data Layer (모바일 연결)
     implementation("com.google.android.gms:play-services-wearable:18.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0")
 
     // wearOS
     implementation("androidx.wear.compose:compose-material:1.1.0")
@@ -100,10 +101,12 @@ dependencies {
     // Lottie
     implementation("com.airbnb.android:lottie-compose:6.0.0")
 
-    // GoogleMap
-    implementation("com.google.maps.android:maps-compose:4.3.3")
+    // GoogleMap'
+    implementation("com.google.maps.android:maps-compose:4.4.1")
     implementation("com.google.maps.android:maps-compose-utils:4.3.3")
     implementation("com.google.maps.android:maps-compose-widgets:4.3.3")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
 
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)

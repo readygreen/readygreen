@@ -18,6 +18,7 @@ import androidx.wear.compose.material.Text
 import com.airbnb.lottie.compose.*
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.presentation.theme.Black
+import com.ddubucks.readygreen.presentation.theme.Yellow
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import h3Style
 import kotlinx.coroutines.delay
@@ -75,11 +76,10 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
     ) {
         Text(
             text = "음성검색",
-            color = Color.Yellow,
+            color = Yellow,
             style = h3Style,
             modifier = Modifier.padding(bottom = 14.dp, top = 16.dp)
         )
-
         Text(
             text = if (voiceResults.isEmpty()) "목적지를 말씀해주세요" else voiceResults.last(),
             style = pStyle,
@@ -91,16 +91,5 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
             iterations = LottieConstants.IterateForever,
             modifier = Modifier.size(140.dp)
         )
-
-        // 수동으로 결과 확인
-        Button(
-            onClick = {
-                val resultList = searchResults.joinToString(",")
-                navController.navigate("searchResultScreen/$resultList")
-            },
-            modifier = Modifier.padding(top = 20.dp)
-        ) {
-            Text("결과 확인하기")
-        }
     }
 }

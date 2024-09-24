@@ -11,53 +11,63 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material.Text
+import com.ddubucks.readygreen.R
+import com.ddubucks.readygreen.data.model.ButtonIconModel
+import com.ddubucks.readygreen.data.model.PinModel
+import com.ddubucks.readygreen.presentation.components.createTrafficlightBitmap
 import com.ddubucks.readygreen.presentation.theme.Black
+import com.ddubucks.readygreen.presentation.theme.Yellow
 import com.ddubucks.readygreen.presentation.viewmodel.LocationViewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import h3Style
 import pStyle
 
 
 @Composable
 fun MapScreen(locationViewModel: LocationViewModel) {
-    // 현재 위치를 구독
-    val locationState = locationViewModel.locationFlow.collectAsState()
-
-    // 위치 업데이트 요청 (Composable 함수 안에서 실행)
-    LaunchedEffect(Unit) {
-        locationViewModel.startLocationUpdates()
+    val locationState = LatLng(36.354946759143, 127.29980994578)
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(locationState, 16f)
     }
+
+    val trafficlightList = listOf(
+        PinModel("red", 45, 36.3540567592, 127.29980994578),
+        PinModel("green", 46, 36.355946759143, 127.30080994578),
+        PinModel("green", 10, 36.35594559143, 127.29880994578)
+    )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Black),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Top // 수직 정렬을 상단으로 설정
     ) {
-        // 지도 타이틀
-        Text(
-            text = "지도",
-            color = Color.Yellow,
-            style = h3Style,
-            modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
-        )
-
-        // 현재 위치 출력 (if-else 사용)
-        if (locationState.value != null) {
-            val location = locationState.value!!
-            Text(
-                text = "현재 위치: ${location.latitude}, ${location.longitude}",
-                color = Color.White,
-                style = pStyle,
-                modifier = Modifier.padding(top = 16.dp)
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState
+        ) {
+            // 현재위치 마커
+            Marker(
+                state = MarkerState(position = locationState),
+                title = null,
+                snippet = null
             )
-        } else {
-            Text(
-                text = "위치 정보를 불러오는 중...",
-                style = pStyle,
-                color = Color.White,
-                modifier = Modifier.padding(top = 16.dp)
-            )
+            // 신호등 정보 마커
+            trafficlightList.forEach { pin ->
+                Marker(
+                    state = MarkerState(position = LatLng(pin.latitude, pin.longitude)),
+                    title = pin.state,
+                    snippet = "번호: ${pin.number}",
+                    icon = BitmapDescriptorFactory.fromBitmap(createTrafficlightBitmap(pin)) // 커스텀 비트맵 사용
+                )
+            }
         }
     }
 }
