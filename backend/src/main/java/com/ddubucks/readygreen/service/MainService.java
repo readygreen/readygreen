@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -15,6 +16,10 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
+import io.github.flashvayne.chatgpt.service.ChatgptService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +27,16 @@ public class MainService {
 
     @Value("${WEATHER_SERVICE_KEY}")
     private String weatherKey;
+    private final ChatgptService chatgptService;
 
+    public String getFortune(String prompt) {
+//        Map<String, Object> requestBody = new HashMap<>();
+//        requestBody.put("model", "gpt-3.5-turbo");
+//        requestBody.put("prompt", prompt);
+//        requestBody.put("max_tokens", 150);
+//        requestBody.put("temperature", 1.0);
+        return chatgptService.sendMessage(prompt);
+    }
     public WeatherResponseDTO weather(String x, String y) throws Exception {
         LocalDateTime now = LocalDateTime.now();
 

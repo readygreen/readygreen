@@ -38,31 +38,23 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi adminFeedbackApi() {
         return GroupedOpenApi.builder()
-                .group("Admin Feedback")
-                .pathsToMatch("/admin/feedback/**")
+                .group("관리자")
+                .pathsToMatch("/admin/**")
                 .build();
     }
 
     @Bean
-    public GroupedOpenApi adminNoticeApi() {
+    public GroupedOpenApi userFeedbackApi() {
         return GroupedOpenApi.builder()
-                .group("Admin Notice")
-                .pathsToMatch("/admin/notice/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi feedbackApi() {
-        return GroupedOpenApi.builder()
-                .group("Feedback")
-                .pathsToMatch("/feedback/**")
+                .group("건의함")
+                .pathsToMatch("/user/feedback/**")
                 .build();
     }
 
     @Bean
     public GroupedOpenApi healthCheckApi() {
         return GroupedOpenApi.builder()
-                .group("Health Check")
+                .group("헬스체크")
                 .pathsToMatch("/health/**")
                 .build();
     }
@@ -70,7 +62,7 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi mainApi() {
         return GroupedOpenApi.builder()
-                .group("Main")
+                .group("메인")
                 .pathsToMatch("/main/**")
                 .build();
     }
@@ -78,7 +70,7 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi mapApi() {
         return GroupedOpenApi.builder()
-                .group("Map")
+                .group("지도")
                 .pathsToMatch("/map/**")
                 .build();
     }
@@ -86,15 +78,15 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi memberApi() {
         return GroupedOpenApi.builder()
-                .group("Member")
-                .pathsToMatch("/member/**")
+                .group("멤버")
+                .pathsToMatch("/auth/**")
                 .build();
     }
 
     @Bean
     public GroupedOpenApi noticeApi() {
         return GroupedOpenApi.builder()
-                .group("Notice")
+                .group("공지사항")
                 .pathsToMatch("/notice/**")
                 .build();
     }
@@ -102,7 +94,7 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi pointApi() {
         return GroupedOpenApi.builder()
-                .group("Point")
+                .group("포인트")
                 .pathsToMatch("/point/**")
                 .build();
     }
