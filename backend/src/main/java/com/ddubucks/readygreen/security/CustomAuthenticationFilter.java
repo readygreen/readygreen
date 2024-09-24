@@ -17,7 +17,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 public class CustomAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final String LOGIN_URL = "/api/*/auth/login";
+    private static final String LOGIN_URL = "/auth/login";
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
