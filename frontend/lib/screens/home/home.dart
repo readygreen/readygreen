@@ -3,7 +3,7 @@ import 'package:readygreen/widgets/common/textbutton.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart'; // BackgroundContainer import
-import 'package:readygreen/theme/appcolors.dart';
+import 'package:readygreen/constants/appcolors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
