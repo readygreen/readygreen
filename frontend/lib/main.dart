@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:readygreen/theme/appcolors.dart';
+import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/loading/start_loading.dart';
 import 'package:readygreen/screens/login/login.dart';
 import 'package:readygreen/screens/home/home.dart';
