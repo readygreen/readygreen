@@ -43,6 +43,7 @@ dependencies:
   geocoding: ^3.0.0
   http: ^0.13.6
   speech_to_text: ^7.0.0
+  flutter_secure_storage: ^9.2.2
 
 dev_dependencies:
   flutter_test:
@@ -98,3 +99,4 @@ flutter:
   assets:
     - assets/images/luck.png
     - assets/images/mic.png
+    - assets/images/badge.png

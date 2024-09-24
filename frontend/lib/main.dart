@@ -25,7 +25,7 @@ class App extends StatelessWidget {
       routes: {
         '/': (context) => const StartLoadingPage(),
         '/login': (context) => LoginPage(),
-        // '/home': (context) => const MainScreen(), // MainScreen으로 변경
+        // '/home': (context) => const HomePage(), // MainScreen으로 변경
         // '/map': (context) => const MapPage(),
       },
     );
