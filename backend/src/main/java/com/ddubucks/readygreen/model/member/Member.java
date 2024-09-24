@@ -36,8 +36,6 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
-    private int point;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
