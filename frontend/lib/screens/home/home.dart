@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:readygreen/widgets/common/button.dart';
+import 'package:readygreen/widgets/common/textbutton.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
+import 'package:readygreen/widgets/common/bgcontainer.dart'; // BackgroundContainer import
+import 'package:readygreen/theme/appcolors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
+      // 기존 배경색 제거
       body: const MainScreenContent(), // 그냥 MainScreenContent만 출력
     );
   }
@@ -25,23 +27,24 @@ class MainScreenContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SingleChildScrollView(
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 30),
+    return BackgroundContainer(
+      // 배경 설정을 위한 BackgroundContainer 추가
+      child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 35),
+            const SizedBox(height: 35),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
+                  children: const [
                     Text(
                       '언제그린',
                       style: TextStyle(
-                        color: Color(0xFF7FC818),
+                        fontFamily: 'LogoFont',
+                        color: AppColors.green,
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                       ),
@@ -50,38 +53,44 @@ class MainScreenContent extends StatelessWidget {
                 )
               ],
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SquareCardBox(title: '날씨'),
-                SquareCardBox(
-                  title: '오늘의 운세',
-                  backgroundColor: Color(0xFF2D3765),
-                  textColor: Colors.white,
-                  imageUrl: 'assets/images/luck.png',
+                Expanded(
+                  child: SquareCardBox(
+                    title: '날씨',
+                    backgroundColor: AppColors.white,
+                    textColor: Colors.black,
+                    imageUrl: 'assets/images/badge.png', // 이미지 경로 수정
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SquareCardBox(
+                    title: '오늘의운세',
+                    backgroundColor: AppColors.darkblue,
+                    textColor: AppColors.white,
+                    imageUrl: 'assets/images/luck.png', // 이미지 경로 수정
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 16),
             Column(
-              children: [
+              children: const [
                 CardBox(title: '자주가는목적지', height: 180),
               ],
             ),
-            SizedBox(height: 15),
-            CardBox(title: '최근 목적지'),
-            SizedBox(height: 15),
-            CardBox(title: '현재 위치 --동 장소 추천'),
-            SizedBox(height: 15),
+            const SizedBox(height: 16),
+            const CardBox(title: '최근 목적지'),
+            const SizedBox(height: 16),
+            const CardBox(title: '현재 위치 --동 장소 추천'),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                CustomButton(
-                  text: '길찾기',
-                  borderColor: Color(0xFF7FC818),
-                  textColor: Color(0xFF7FC818),
-                ),
+              children: const [
+                CustomButton(),
               ],
             ),
           ],

@@ -5,6 +5,8 @@ class CardBox extends StatelessWidget {
   final double height;
   final Color backgroundColor;
   final Color textColor;
+  final Widget? child;
+  final Widget? children;
 
   const CardBox({
     super.key,
@@ -12,6 +14,8 @@ class CardBox extends StatelessWidget {
     this.height = 150,
     this.backgroundColor = Colors.white,
     this.textColor = Colors.black,
+    this.child,
+    this.children,
   });
 
   @override
@@ -45,6 +49,7 @@ class CardBox extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
+                if (child != null) child!,
               ],
             ),
           ],
