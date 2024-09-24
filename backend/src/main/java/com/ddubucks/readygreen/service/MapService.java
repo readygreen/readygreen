@@ -4,6 +4,8 @@ import com.ddubucks.readygreen.dto.MapResponseDTO;
 import com.ddubucks.readygreen.dto.RouteDTO;
 import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
 import com.ddubucks.readygreen.dto.RouteRequestDTO;
+import com.ddubucks.readygreen.model.Blinker;
+import com.ddubucks.readygreen.repository.BlinkerRepository;
 import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -28,6 +30,8 @@ public class MapService {
 
     private final static String TYPE = "Point";
 
+    private final BlinkerRepository blinkerRepository;
+
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
 
@@ -37,6 +41,8 @@ public class MapService {
         RouteDTO routeDto = route(routeRequestDTO);
 
         List<Point> coordinates = getBlinkerCoordinate(routeDto);
+
+        List<Blinker> blinkers = blinkerRepository.findAllByCoordinatesWithinRadius(coordinates, 5);
 
         return MapResponseDTO.builder()
                 .routeDTO(route(routeRequestDTO))
@@ -50,15 +56,13 @@ public class MapService {
 
         for (FeatureDTO featureDTO : routeDTO.getFeatures()) {
             if (TYPE.equals(featureDTO.getGeometry().getType()) && isValidTurnType(featureDTO.getProperties().getTurnType())) {
-                double[] c = (double[]) featureDTO.getGeometry().getCoordinates();
+                List<Double> c = (List<Double>) featureDTO.getGeometry().getCoordinates();
 
-                Point point = geometryFactory.createPoint(new Coordinate(c[0], c[1]));
+                Point point = geometryFactory.createPoint(new Coordinate(c.get(0), c.get(1)));
                 coordinates.add(point);
             }
         }
-
         return coordinates;
-
     }
 
     private static boolean isValidTurnType(int turnType) {
