@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/widgets/common/textbutton.dart';
 
 class DraggableFavorites extends StatelessWidget {
   final ScrollController scrollController;
@@ -54,15 +55,11 @@ class DraggableFavorites extends StatelessWidget {
                       ),
                     ),
                     ListTile(
-                      // 임시로 데이터 입력해서 출력함
-                      leading: Icon(Icons.business),
-                      title: Text('삼성화재 유성 연수원'),
-                      subtitle: Text('대전 유성구 동서대로 98-39'),
-                      trailing: ElevatedButton(
-                        onPressed: null, // 길찾기 기능 추가 가능
-                        child: Text('길찾기'),
-                      ),
-                    ),
+                        // 임시로 데이터 입력해서 출력함
+                        leading: Icon(Icons.business),
+                        title: Text('삼성화재 유성 연수원'),
+                        subtitle: Text('대전 유성구 동서대로 98-39'),
+                        trailing: CustomButton()),
                   ],
                 ),
               ),

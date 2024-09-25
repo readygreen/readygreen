@@ -11,11 +11,11 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-    // runApp() 호출 전 Flutter SDK 초기화
-    KakaoSdk.init(
-        nativeAppKey: 'cf5488929a2ad2db61f895c42f6926cc',
-        javaScriptAppKey: 'dc542207fe96b123abf798c0113bd537',
-    );
+  // runApp() 호출 전 Flutter SDK 초기화
+  KakaoSdk.init(
+    nativeAppKey: 'cf5488929a2ad2db61f895c42f6926cc',
+    javaScriptAppKey: 'dc542207fe96b123abf798c0113bd537',
+  );
   runApp(const App());
 }
 
@@ -35,7 +35,7 @@ class App extends StatelessWidget {
         '/': (context) => const StartLoadingPage(),
         '/login': (context) => LoginPage(),
         // '/home': (context) => const HomePage(), // MainScreen으로 변경
-        // '/map': (context) => const MapPage(),
+        '/map': (context) => const MapPage(),
       },
     );
   }

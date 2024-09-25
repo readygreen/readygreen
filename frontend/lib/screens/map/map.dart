@@ -34,29 +34,40 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   late GoogleMapController mapController;
-  final LatLng _center = const LatLng(36.354946759143, 127.29980994578);
+  LatLng _center = const LatLng(36.354946759143, 127.29980994578); // 임시좌표
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
 
   final loc.Location _location = loc.Location();
-  stt.SpeechToText? _speech;
-  bool _isListening = false;
-  String _voiceInput = '';
 
   final Set<Marker> _markers = {};
 
   @override
   void initState() {
     super.initState();
-    _initializeSpeech();
+    _initializeCurrentLocation(); // 앱 실행 시 사용자 위치 받아오기
   }
 
-  // SpeechToText 초기화
-  Future<void> _initializeSpeech() async {
-    _speech = stt.SpeechToText();
-    bool available = await _speech!.initialize();
-    if (!available) {
-      print("음성인식 초기화 실패");
+  // 사용자의 현재 위치를 받아와서 지도 중심을 설정하는 함수
+  Future<void> _initializeCurrentLocation() async {
+    try {
+      loc.LocationData currentLocation = await _location.getLocation();
+
+      setState(() {
+        // 사용자의 현재 위치로 중심 좌표 설정
+        _center = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+      });
+
+      // 카메라를 현재 위치로 이동
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: _center,
+          zoom: 17.0,
+        ),
+      ));
+    } catch (e) {
+      print('현재 위치를 가져오는 데 실패했습니다: $e');
     }
   }
 
@@ -81,50 +92,6 @@ class _MapPageState extends State<MapPage> {
         zoom: 17.0,
       ),
     ));
-  }
-
-  // 음성 인식 기능을 처리하는 함수
-  void _onVoiceSearch() async {
-    if (_speech == null) {
-      print("Speech recognition not initialized");
-      return;
-    }
-
-    if (!_isListening) {
-      bool available = await _speech!.initialize(
-        onStatus: (status) => print('onStatus: $status'),
-        onError: (error) => print('onError: $error'),
-      );
-
-      if (available) {
-        setState(() => _isListening = true);
-        SpeechSearchDialog.show(context, _voiceInput, 'assets/images/mic.png');
-
-        // 타임아웃 설정 (5초 후 강제로 종료)
-        Future.delayed(const Duration(seconds: 5), () {
-          if (_isListening) {
-            _speech!.stop();
-            setState(() => _isListening = false);
-            SpeechSearchDialog.hide(context);
-            print('타임아웃으로 음성 인식 종료');
-          }
-        });
-
-        _speech!.listen(
-          onResult: (val) => setState(() {
-            _voiceInput = val.recognizedWords;
-            print('음성 인식 결과: $_voiceInput');
-            SpeechSearchDialog.hide(context); // 음성 인식 완료 시 다이얼로그 닫기
-          }),
-        );
-      } else {
-        setState(() => _isListening = false);
-      }
-    } else {
-      setState(() => _isListening = false);
-      _speech!.stop();
-      SpeechSearchDialog.hide(context); // 음성 검색 중 UI 닫기
-    }
   }
 
   // 새로운 장소로 이동하고 마커 추가하는 함수
@@ -216,29 +183,23 @@ class _MapPageState extends State<MapPage> {
             left: screenWidth * 0.05,
             right: screenWidth * 0.05,
             child: MapSearchBar(
-              onSearchSubmitted: (query) {
-                // 검색창에서 검색 버튼 클릭 시에도 검색 페이지로 이동
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MapSearchPage(
-                      onPlaceSelected: _goToPlace, // 장소 선택 시 함수 전달
-                    ),
-                  ),
-                );
-              },
-              onVoiceSearch: _onVoiceSearch, // 음성 검색 기능은 유지
+              onSearchSubmitted: (query) {},
               onSearchChanged: (query) {}, // 검색창에서 입력 변화는 무시
-              onTap: () {
+              onTap: () async {
                 // 검색창을 클릭하면 검색 페이지로 이동
-                Navigator.push(
+                final result = await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => MapSearchPage(
-                      onPlaceSelected: _goToPlace, // 장소 선택 시 함수 전달
+                      onPlaceSelected: _goToPlace,
                     ),
                   ),
                 );
+
+                // 검색 결과를 받아서 마커 표시
+                if (result != null) {
+                  _goToPlace(result['lat'], result['lng'], result['name']);
+                }
               },
             ),
           ),
