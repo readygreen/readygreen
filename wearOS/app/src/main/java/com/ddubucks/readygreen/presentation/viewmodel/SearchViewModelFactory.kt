@@ -2,7 +2,7 @@ package com.ddubucks.readygreen.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.ddubucks.readygreen.core.network.LocationService
+import com.ddubucks.readygreen.core.service.LocationService
 
 class SearchViewModelFactory(private val locationService: LocationService) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

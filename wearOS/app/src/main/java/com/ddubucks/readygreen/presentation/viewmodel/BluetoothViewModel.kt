@@ -1,26 +1,41 @@
 package com.ddubucks.readygreen.presentation.viewmodel
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ddubucks.readygreen.core.service.BluetoothService
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
+class BluetoothViewModel(private val bluetoothService: BluetoothService) : ViewModel() {
 
-class BluetoothViewModel : ViewModel() {
+    private val _connected = MutableStateFlow(false)
+    val connected: StateFlow<Boolean> get() = _connected
 
-    // 상태를 mutableStateOf로 초기화
-    var connected: MutableState<Boolean> = mutableStateOf(false)
-    var message: MutableState<String> = mutableStateOf("")
+    private val _message = MutableStateFlow("")
+    val message: StateFlow<String> get() = _message
 
-    fun connectToBluetooth(connectToBluetoothDevice: () -> Unit, receivedMessage: () -> String) {
-        try {
-            // 블루투스 연결 시도
-            connectToBluetoothDevice()
-            connected.value = true // MutableState에서 .value로 상태 설정
-            message.value = receivedMessage() // MutableState에서 .value로 메시지 설정
-        } catch (e: Exception) {
-            connected.value = false
-            println("Connection failed: ${e.message}")
+    // 블루투스 연결 시도
+    fun connectToDevice() {
+        viewModelScope.launch {
+            val result = bluetoothService.connectToDevice()
+            _connected.value = result
         }
     }
-}
 
+    // 블루투스 메시지 수신
+    fun receiveMessage() {
+        viewModelScope.launch {
+            val receivedMessage = bluetoothService.receiveMessage()
+            receivedMessage?.let {
+                _message.value = it
+            }
+        }
+    }
+
+    // 블루투스 연결 해제
+    fun closeConnection() {
+        bluetoothService.closeConnection()
+        _connected.value = false
+    }
+}

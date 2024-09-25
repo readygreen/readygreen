@@ -5,24 +5,21 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.ddubucks.readygreen.presentation.viewmodel.BluetoothViewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import com.ddubucks.readygreen.presentation.viewmodel.BluetoothViewModel
 
 @Composable
 fun BluetoothConnectionScreen(
-    viewModel: BluetoothViewModel = viewModel(),
-    connectToBluetoothDevice: () -> Unit,
-    receivedMessage: () -> String
+    bluetoothViewModel: BluetoothViewModel
 ) {
-    val connected by viewModel.connected
-    val message by viewModel.message
+    val connected by bluetoothViewModel.connected.collectAsState()
+    val message by bluetoothViewModel.message.collectAsState()
 
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
@@ -33,42 +30,32 @@ fun BluetoothConnectionScreen(
         onResult = { isGranted ->
             if (isGranted) {
                 isLoading = true
-                viewModel.connectToBluetooth(
-                    connectToBluetoothDevice = {
-                        connectToBluetoothDevice()
-                        isLoading = false
-                    },
-                    receivedMessage = {
-                        isLoading = false
-                        receivedMessage()
-                    }
-                )
+                bluetoothViewModel.connectToDevice()
+                isLoading = false
             } else {
-                errorMessage = "Permission denied"
+                errorMessage = "Bluetooth 권한이 필요합니다."
             }
         }
     )
 
-    // UI 구성
+    // TODO 자동화로 변경
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isLoading) {
             CircularProgressIndicator()
         } else if (connected) {
-            Text(text = "Connected to Mobile Device")
+            Text("Connected to Bluetooth")
             Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Received Message: $message")
+            Text("Received Message: $message")
         } else {
             Button(onClick = {
                 errorMessage = ""
                 permissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
             }) {
-                Text("Connect to Mobile")
+                Text("Connect to Bluetooth")
             }
         }
 
