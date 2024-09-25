@@ -15,6 +15,19 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M"/>
         <meta-data android:name="flutterEmbedding" android:value="2" />
+        <activity 
+            android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
+            android:exported="true">
+            <intent-filter android:label="flutter_web_auth">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- "kakao${YOUR_NATIVE_APP_KEY}://oauth" 형식의 앱 실행 스킴 설정 -->
+                <!-- 카카오 로그인 Redirect URI -->
+                <data android:scheme="kakaocf5488929a2ad2db61f895c42f6926cc" android:host="oauth"/>
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"
