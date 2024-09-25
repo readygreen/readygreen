@@ -7,8 +7,15 @@ import 'package:readygreen/screens/point/point.dart';
 import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/screens/place/place.dart';
 import 'package:readygreen/screens/mypage/mypage.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+    // runApp() 호출 전 Flutter SDK 초기화
+    KakaoSdk.init(
+        nativeAppKey: 'cf5488929a2ad2db61f895c42f6926cc',
+        javaScriptAppKey: 'dc542207fe96b123abf798c0113bd537',
+    );
   runApp(const App());
 }
 
