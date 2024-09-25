@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.service;
 
+import com.ddubucks.readygreen.dto.BlinkerDTO;
 import com.ddubucks.readygreen.dto.MapResponseDTO;
 import com.ddubucks.readygreen.dto.RouteDTO;
 import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
@@ -21,6 +22,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +32,7 @@ import java.util.List;
 public class MapService {
 
     private final static String TYPE = "Point";
+    private final static int RADIUS = 10;
 
     private final BlinkerRepository blinkerRepository;
 
@@ -42,11 +46,79 @@ public class MapService {
 
         List<Point> coordinates = getBlinkerCoordinate(routeDto);
 
-        List<Blinker> blinkers = blinkerRepository.findAllByCoordinatesWithinRadius(coordinates, 5);
+        List<Blinker> blinkers = blinkerRepository.findAllByCoordinatesWithinRadius(coordinates, RADIUS);
+
+        List<BlinkerDTO> blinkerDTOs = new ArrayList<>();
+
+        LocalTime nowTime = LocalTime.now();
+
+        for (Blinker blinker : blinkers) {
+            blinkerDTOs.add(
+                    BlinkerDTO.builder()
+                            .id(blinker.getId())
+                            .lastAccessTime(nowTime)
+                            .greenDuration(blinker.getGreenDuration())
+                            .redDuration(blinker.getRedDuration())
+                            .currentState(
+                                    getBlinkerState(
+                                            blinker.getStartTime(),
+                                            nowTime,
+                                            blinker.getGreenDuration(),
+                                            blinker.getRedDuration()
+                                    )
+                            )
+                            .remainingTime(
+                                    getBlinkerTime(
+                                            blinker.getStartTime(),
+                                            nowTime,
+                                            blinker.getGreenDuration(),
+                                            blinker.getRedDuration()
+                                    )
+                            )
+                            .latitude(blinker.getCoordinate().getY())
+                            .longitude(blinker.getCoordinate().getX())
+                            .build()
+            );
+        }
 
         return MapResponseDTO.builder()
                 .routeDTO(route(routeRequestDTO))
+                .blinkerDTOs(blinkerDTOs)
                 .build();
+    }
+
+    private int getBlinkerTime(LocalTime startTime, LocalTime nowTime, int greenDuration, int redDuration) {
+
+        // 시작 시간으로부터 현재까지 경과한 시간 (초 단위)
+        long elapsedSeconds = Duration.between(startTime, nowTime).getSeconds();
+
+        int totalCycle = greenDuration + redDuration;
+
+        // 현재 주기 내에서 경과한 시간 계산
+        int currentCycleElapsedTime = (int) (elapsedSeconds % totalCycle);
+
+        // 현재 신호 상태와 남은 시간 확인
+        if (currentCycleElapsedTime < greenDuration) {
+            return greenDuration - currentCycleElapsedTime; // 초록불에서 빨간불로 바뀌기까지 남은 시간
+        }
+        return totalCycle - currentCycleElapsedTime; // 빨간불에서 초록불로 바뀌기까지 남은 시간
+    }
+
+    private String getBlinkerState(LocalTime startTime, LocalTime nowTime, int greenDuration, int redDuration) {
+
+        // 시작 시간으로부터 현재까지 경과한 시간 (초 단위)
+        long elapsedSeconds = Duration.between(startTime, nowTime).getSeconds();
+
+        int totalCycle = greenDuration + redDuration;
+
+        // 현재 주기 내에서 경과한 시간 계산
+        int currentCycleElapsedTime = (int) (elapsedSeconds % totalCycle);
+
+        // 현재 신호 상태 확인
+        if (currentCycleElapsedTime < greenDuration) {
+            return "GREEN";
+        }
+        return "RED";
     }
 
     private List<Point> getBlinkerCoordinate(RouteDTO routeDTO) {
