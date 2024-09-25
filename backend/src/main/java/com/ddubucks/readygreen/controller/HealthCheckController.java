@@ -22,7 +22,7 @@ public class HealthCheckController {
         this.env = env;
     }
 
-    @GetMapping("/")
+    @GetMapping
     @Operation(summary = "Health Check", description = "헬스 체크")
     public ResponseEntity<String> healthCheck() {
         // 예시로 DB_USERNAME 환경 변수를 가져와서 출력

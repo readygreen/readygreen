@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import com.ddubucks.readygreen.model.member.Member;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,5 +28,12 @@ public class MemberController {
     public ResponseEntity<?> delete(@AuthenticationPrincipal UserDetails userDetails) {
         memberService.delete(userDetails.getUsername());
         return ResponseEntity.ok("탈퇴 성공");
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println(userDetails.getUsername());
+        Member member = memberService.getMemberInfo(userDetails.getUsername());
+        return ResponseEntity.ok(member);
     }
 }
