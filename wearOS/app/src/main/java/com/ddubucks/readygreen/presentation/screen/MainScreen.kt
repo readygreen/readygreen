@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.Text
@@ -26,7 +25,8 @@ fun MainScreen(navController: NavHostController) {
         ButtonIconModel(R.drawable.voice_search_icon, "음성검색"),
         ButtonIconModel(R.drawable.map_icon, "주변 신호등 보기"),
         // TODO 길안내 시작 코드와 연결
-        ButtonIconModel(R.drawable.arrow_straight, "길안내")
+        ButtonIconModel(R.drawable.arrow_straight, "길안내"),
+        ButtonIconModel(R.drawable.arrow_straight, "블루투스")
     )
 
     Column(
@@ -57,10 +57,13 @@ fun MainScreen(navController: NavHostController) {
                         "주변 신호등 보기" -> {
                             navController.navigate("mapScreen")
                         }
-                        // TODO 길안내 시작 코드와 연결
                         "길안내" -> {
                             navController.navigate("navigationScreen")
                         }
+                        "블루투스" -> {
+                            navController.navigate("bluetoothScreen") // Bluetooth 연결 화면으로 이동
+                        }
+
                     }
                 })
             }
