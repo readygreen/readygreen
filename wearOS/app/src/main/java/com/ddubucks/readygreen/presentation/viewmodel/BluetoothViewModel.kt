@@ -9,17 +9,19 @@ import kotlinx.coroutines.launch
 
 class BluetoothViewModel(private val bluetoothService: BluetoothService) : ViewModel() {
 
-    private val _connected = MutableStateFlow(false)
-    val connected: StateFlow<Boolean> get() = _connected
-
-    private val _message = MutableStateFlow("")
-    val message: StateFlow<String> get() = _message
+    private val _bluetoothState = MutableStateFlow<BluetoothState>(BluetoothState.Disconnected)
+    val bluetoothState: StateFlow<BluetoothState> get() = _bluetoothState
 
     // 블루투스 연결 시도
     fun connectToDevice() {
         viewModelScope.launch {
+            _bluetoothState.value = BluetoothState.Connecting // 상태를 "연결 중"으로 업데이트
             val result = bluetoothService.connectToDevice()
-            _connected.value = result
+            _bluetoothState.value = if (result) {
+                BluetoothState.Connected  // 연결 성공 시 상태 변경
+            } else {
+                BluetoothState.Error("Bluetooth 연결에 실패했습니다.") // 연결 실패 시 상태 변경
+            }
         }
     }
 
@@ -28,7 +30,9 @@ class BluetoothViewModel(private val bluetoothService: BluetoothService) : ViewM
         viewModelScope.launch {
             val receivedMessage = bluetoothService.receiveMessage()
             receivedMessage?.let {
-                _message.value = it
+                // 메시지가 정상적으로 수신된 경우 처리
+            } ?: run {
+                _bluetoothState.value = BluetoothState.Error("메시지 수신 중 오류 발생")
             }
         }
     }
@@ -36,6 +40,6 @@ class BluetoothViewModel(private val bluetoothService: BluetoothService) : ViewM
     // 블루투스 연결 해제
     fun closeConnection() {
         bluetoothService.closeConnection()
-        _connected.value = false
+        _bluetoothState.value = BluetoothState.Disconnected // 연결 해제 시 상태 변경
     }
 }

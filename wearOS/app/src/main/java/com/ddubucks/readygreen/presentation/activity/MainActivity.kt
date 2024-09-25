@@ -3,6 +3,7 @@ package com.ddubucks.readygreen.presentation.activity
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -16,6 +17,7 @@ import com.ddubucks.readygreen.core.service.BluetoothService
 import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.screen.*
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
+import com.ddubucks.readygreen.presentation.viewmodel.BluetoothState
 import com.ddubucks.readygreen.presentation.viewmodel.BluetoothViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.BluetoothViewModelFactory
 import com.ddubucks.readygreen.presentation.viewmodel.LocationViewModel
@@ -49,8 +51,6 @@ class MainActivity : ComponentActivity() {
 
 
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -67,21 +67,26 @@ class MainActivity : ComponentActivity() {
             locationViewModel.startLocationUpdates()
         }
 
-        // Bluetooth 연결 상태 구독
         lifecycleScope.launch {
-            bluetoothViewModel.connected.collect { isConnected ->
-                if (isConnected) {
-                    // 연결이 성공적으로 되면 메시지 수신 대기
-                    bluetoothViewModel.receiveMessage()
+            bluetoothViewModel.bluetoothState.collect { state ->
+                when (state) {
+                    is BluetoothState.Connecting -> {
+                        // Bluetooth 연결 중
+                        Toast.makeText(this@MainActivity, "Bluetooth 연결 중...", Toast.LENGTH_SHORT).show()
+                    }
+                    is BluetoothState.Connected -> {
+                        // Bluetooth 연결 성공
+                        Toast.makeText(this@MainActivity, "Bluetooth 연결 성공", Toast.LENGTH_SHORT).show()
+                    }
+                    is BluetoothState.Disconnected -> {
+                        // Bluetooth 연결 해제
+                        Toast.makeText(this@MainActivity, "Bluetooth 연결 해제됨", Toast.LENGTH_SHORT).show()
+                    }
+                    is BluetoothState.Error -> {
+                        // Bluetooth 연결 실패
+                        Toast.makeText(this@MainActivity, state.message, Toast.LENGTH_SHORT).show()
+                    }
                 }
-            }
-        }
-
-        // Bluetooth 메시지 구독
-        lifecycleScope.launch {
-            bluetoothViewModel.message.collect { message ->
-                // 받은 메시지 처리
-                println("Received Bluetooth message: $message")
             }
         }
 

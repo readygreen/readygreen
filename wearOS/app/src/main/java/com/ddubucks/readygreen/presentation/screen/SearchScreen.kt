@@ -36,7 +36,6 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
 
     // 음성 인식 결과 리스트
     var voiceResults by remember { mutableStateOf(emptyList<String>()) }
-
     val searchResults by viewModel.searchResults.collectAsState() // ViewModel에서 검색 결과 가져오기
 
     // 음성 인식 결과 처리
@@ -66,12 +65,10 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            startSpeechRecognition() // 권한이 승인되면 음성 인식 시작
+            startSpeechRecognition()
         } else {
-            // 권한이 거부되었을 때 처리
             Toast.makeText(context, "음성 인식 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
 
-            // 앱 설정으로 이동하여 사용자가 수동으로 권한을 설정할 수 있도록 안내
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.fromParts("package", context.packageName, null)
             }
@@ -83,17 +80,15 @@ fun SearchScreen(navController: NavHostController, viewModel: SearchViewModel) {
     LaunchedEffect(Unit) {
         when {
             ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED -> {
-                // 권한이 있으면 음성 인식 시작
                 startSpeechRecognition()
             }
             else -> {
-                // 권한이 없으면 권한 요청
                 requestAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
             }
         }
     }
 
-    // 검색 결과가 업데이트되면 결과 화면으로 이동
+    // 결과 화면으로 이동
     LaunchedEffect(searchResults) {
         if (searchResults.isNotEmpty()) {
             val resultList = searchResults.joinToString(",")
