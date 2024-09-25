@@ -22,7 +22,7 @@ public class Feedback {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;  // 작성자 ID
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 150)
     private String title;  // 제목
 
     @Column(nullable = false, length = 225)
