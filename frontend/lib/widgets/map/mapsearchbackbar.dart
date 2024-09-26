@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
-class MapSearchBar extends StatelessWidget {
+class MapSearchBackBar extends StatelessWidget {
+  final String placeName;
   final Function(String) onSearchSubmitted;
-  // final Function() onVoiceSearch;
+  final Function() onVoiceSearch;
   final Function(String) onSearchChanged;
   final Function()? onTap;
 
-  const MapSearchBar({
+  const MapSearchBackBar({
     super.key,
+    required this.placeName,
     required this.onSearchSubmitted,
-    // required this.onVoiceSearch,
+    required this.onVoiceSearch,
     required this.onSearchChanged,
     this.onTap,
   });
@@ -31,12 +33,10 @@ class MapSearchBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Colors.black54),
-          const SizedBox(width: 10),
           Expanded(
             child: TextField(
+              controller: TextEditingController(text: placeName),
               decoration: const InputDecoration(
-                hintText: '검색어를 입력하세요.',
                 border: InputBorder.none,
               ),
               onTap: onTap,
@@ -49,7 +49,14 @@ class MapSearchBar extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.mic_none_rounded, color: Colors.black54),
             onPressed: () {
-              // onVoiceSearch();
+              onVoiceSearch();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, color: Colors.black54),
+            onPressed: () {
+              // X 버튼을 누르면 지도 화면으로 돌아가기
+              Navigator.popUntil(context, (route) => route.isFirst);
             },
           ),
         ],
