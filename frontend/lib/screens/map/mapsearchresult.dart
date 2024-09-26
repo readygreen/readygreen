@@ -23,6 +23,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
   double? _lat;
   double? _lng;
   String? _placeName;
+  String? _address;
 
   // 캐싱된 장소 정보를 저장할 Map
   Map<String, Future<String>> cachedPlaceDetails = {};
@@ -62,6 +63,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
         _lat = result.geometry!.location.lat;
         _lng = result.geometry!.location.lng;
         _placeName = result.name;
+        _address = result.formattedAddress;
       });
 
       // 위도, 경도, 장소 이름 출력 (확인용)
@@ -75,6 +77,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
             lat: _lat!,
             lng: _lng!,
             placeName: _placeName!,
+            address: _address!,
             searchQuery: widget.searchQuery,
           ),
         ),
@@ -135,7 +138,6 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                       final placeName =
                           snapshot.data?.split('\n')[0] ?? '알 수 없는 장소';
                       final address = snapshot.data?.split('\n')[1] ?? '주소 없음';
-
                       return PlaceCard(
                         placeName: placeName,
                         address: address,

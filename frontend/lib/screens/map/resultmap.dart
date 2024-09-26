@@ -2,12 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:readygreen/widgets/map/mapsearchbackbar.dart';
+import 'package:readygreen/widgets/map/placecard.dart';
 import 'package:readygreen/screens/map/mapsearch.dart';
 
 class ResultMapPage extends StatefulWidget {
   final double lat;
   final double lng;
   final String placeName;
+  final String address;
   final String searchQuery;
 
   const ResultMapPage({
@@ -15,6 +17,7 @@ class ResultMapPage extends StatefulWidget {
     required this.lat,
     required this.lng,
     required this.placeName,
+    required this.address,
     required this.searchQuery,
   });
 
@@ -68,7 +71,6 @@ class _ResultMapPageState extends State<ResultMapPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Google Map
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
@@ -87,16 +89,12 @@ class _ResultMapPageState extends State<ResultMapPage> {
             left: screenWidth * 0.05,
             right: screenWidth * 0.05,
             child: MapSearchBackBar(
-              placeName: widget.searchQuery, // 검색한 장소 이름을 표시
-              onSearchSubmitted: (value) {
-                print("검색 제출됨: $value");
-              },
-              onVoiceSearch: () {
-                print("음성 검색 실행");
-              },
-              onSearchChanged: (value) {
-                print("검색어 변경됨: $value");
-              },
+              placeName: widget.searchQuery.isNotEmpty
+                  ? widget.searchQuery
+                  : widget.placeName,
+              onSearchSubmitted: (value) {},
+              onVoiceSearch: () {},
+              onSearchChanged: (value) {},
               onTap: () async {
                 // 검색 바 클릭 시 MapSearchPage로 이동
                 final result = await Navigator.push(
@@ -118,6 +116,23 @@ class _ResultMapPageState extends State<ResultMapPage> {
                   _addMarker(result['lat'], result['lng'], result['name']);
                 }
               },
+            ),
+          ),
+          // 하단에 PlaceCard 추가
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.white,
+              child: PlaceCard(
+                placeName: widget.placeName,
+                address: widget.address,
+                onTap: () {
+                  // PlaceCard 클릭 시 처리
+                  print('PlaceCard clicked: ${widget.placeName}');
+                },
+              ),
             ),
           ),
         ],

@@ -170,6 +170,7 @@ class _MapPageState extends State<MapPage> {
             myLocationButtonEnabled: false,
             compassEnabled: true,
             zoomControlsEnabled: false,
+            mapToolbarEnabled: false,
             markers: _markers,
 
             // 지도 클릭 시 마커 추가 및 주소 표시

@@ -6,6 +6,8 @@ import 'package:readygreen/main.dart';
 import 'package:readygreen/api/user_api.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -46,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
         // 로그인 성공 시 메인 페이지로 이동
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainPage()),
+          MaterialPageRoute(builder: (context) => const MainPage()),
         );
       } else {
         // 로그인 실패 시 회원가입 시도
@@ -64,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
           // 회원가입 성공 시 메인 페이지로 이동
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => MainPage()),
+            MaterialPageRoute(builder: (context) => const MainPage()),
           );
         } else {
           // 회원가입 실패 시 에러 처리
@@ -119,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login'),
+        title: const Text('Login'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -128,18 +130,18 @@ class _LoginPageState extends State<LoginPage> {
           children: <Widget>[
             TextFormField(
               controller: emailController,
-              decoration: InputDecoration(labelText: '이메일'),
+              decoration: const InputDecoration(labelText: '이메일'),
             ),
             TextFormField(
               controller: passwordController,
-              decoration: InputDecoration(labelText: '비밀번호'),
+              decoration: const InputDecoration(labelText: '비밀번호'),
               obscureText: true,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             const SizedBox(height: 20),
             getKakaoLoginButton(),
             const SizedBox(height: 20),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             // TextButton(
             //   onPressed: _navigateToSignUp, // 회원가입 페이지로 이동
             //   child: Text('회원가입'),
