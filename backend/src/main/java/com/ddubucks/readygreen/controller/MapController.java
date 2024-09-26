@@ -39,4 +39,10 @@ public class MapController {
         BookmarkResponseDTO bookmarkResponseDTO = mapService.getBookmark(userDetails.getUsername());
         return ResponseEntity.ok(bookmarkResponseDTO);
     }
+
+    @PostMapping("bookmark")
+    public ResponseEntity<?> saveBookmark(@Valid @RequestBody BookmarkRequestDTO bookmarkRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
+        mapService.saveBookmark(bookmarkRequestDTO, userDetails.getUsername());
+        return ResponseEntity.ok().build();
+    }
 }

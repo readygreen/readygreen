@@ -240,4 +240,22 @@ public class MapService {
                 .bookmarks(bookmarks)
                 .build();
     }
+
+    public void saveBookmark(BookmarkRequestDTO bookmarkRequestDTO, String email) {
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        bookmarkRepository.save(
+                Bookmark.builder()
+                        .name(bookmarkRequestDTO.getName())
+                        .destinationName(bookmarkRequestDTO.getDestinationName())
+                        .destinationCoordinate(
+                                getPoint(bookmarkRequestDTO.getLongitude(), bookmarkRequestDTO.getLatitude())
+                        )
+                        .member(member)
+                        .build()
+        );
+    }
+
+
 }
