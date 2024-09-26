@@ -7,8 +7,10 @@ import 'package:readygreen/screens/map/mapsearchresult.dart';
 
 class MapSearchPage extends StatefulWidget {
   final Function(double, double, String) onPlaceSelected;
+  final String? initialSearchQuery;
 
-  const MapSearchPage({super.key, required this.onPlaceSelected});
+  const MapSearchPage(
+      {super.key, required this.onPlaceSelected, this.initialSearchQuery});
 
   @override
   _MapSearchPageState createState() => _MapSearchPageState();
@@ -17,7 +19,14 @@ class MapSearchPage extends StatefulWidget {
 class _MapSearchPageState extends State<MapSearchPage> {
   final places =
       GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
-  String _searchQuery = ''; // 검색어를 담는 변수 추가
+
+  late String _searchQuery = ''; // 검색어를 담는 변수 추가
+  @override
+  void initState() {
+    super.initState();
+    // 초기 검색어를 설정, 없으면 빈 문자열
+    _searchQuery = widget.initialSearchQuery ?? '';
+  }
 
   // 장소가 선택되었을 때 지도에 마커를 표시하는 함수
   Future<void> _selectPlace(String placeId) async {
@@ -97,6 +106,7 @@ class _MapSearchPageState extends State<MapSearchPage> {
             left: MediaQuery.of(context).size.width * 0.05,
             right: MediaQuery.of(context).size.width * 0.05,
             child: MapSearchBar(
+              initialValue: _searchQuery,
               onSearchSubmitted: _onSearchSubmitted, // 텍스트로 검색 시 결과 페이지로 이동
               onSearchChanged: (value) {}, // 자동완성 기능 제거
               onTap: () {}, // 검색창 클릭 시 추가 동작 없음

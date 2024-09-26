@@ -111,6 +111,10 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
               onSearchChanged: (value) {
                 print("검색어 변경됨: $value");
               },
+              onTap: () {
+                // 이전 페이지로 돌아가면서 검색어를 전달
+                Navigator.pop(context, widget.searchQuery);
+              },
             ),
           ),
 

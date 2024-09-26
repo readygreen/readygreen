@@ -101,6 +101,7 @@ class _ResultMapPageState extends State<ResultMapPage> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => MapSearchPage(
+                      initialSearchQuery: widget.searchQuery,
                       onPlaceSelected: (lat, lng, placeName) {
                         // 장소가 선택되면 해당 장소로 이동하고 마커 표시
                         _goToPlace(lat, lng);
