@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:readygreen/widgets/map/mapsearchbackbar.dart';
 import 'package:readygreen/widgets/map/placecard.dart';
+import 'package:readygreen/screens/map/resultmap.dart';
 
 class MapSearchResultPage extends StatefulWidget {
   final List<Prediction> autoCompleteResults;
@@ -66,8 +67,18 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
       // 위도, 경도, 장소 이름 출력 (확인용)
       print('위도: $_lat, 경도: $_lng, 장소 이름: $_placeName');
 
-      // 장소 선택 시 위도, 경도, 이름을 지도 페이지로 전달하고 돌아감
-      Navigator.pop(context, {'lat': _lat, 'lng': _lng, 'name': _placeName});
+      // 장소 선택 시 resultmap 페이지로 이동하며 위도, 경도, 이름 전달
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultMapPage(
+            lat: _lat!,
+            lng: _lng!,
+            placeName: _placeName!,
+            searchQuery: widget.searchQuery,
+          ),
+        ),
+      );
     } else {
       print('장소 선택 실패: ${response.errorMessage}');
     }
