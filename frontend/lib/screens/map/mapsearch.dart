@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:readygreen/widgets/map/mapsearchbar.dart';
 import 'package:location/location.dart' as loc;
 import 'package:google_maps_webservice/places.dart';
-import 'package:readygreen/widgets/map/map_autocomplete.dart';
+import 'package:readygreen/screens/map/resultmap.dart';
 import 'package:readygreen/screens/map/mapsearchresult.dart';
 
 class MapSearchPage extends StatefulWidget {
   final Function(double, double, String) onPlaceSelected;
+  final String? initialSearchQuery;
 
-  const MapSearchPage({super.key, required this.onPlaceSelected});
+  const MapSearchPage(
+      {super.key, required this.onPlaceSelected, this.initialSearchQuery});
 
   @override
   _MapSearchPageState createState() => _MapSearchPageState();
@@ -17,38 +19,13 @@ class MapSearchPage extends StatefulWidget {
 class _MapSearchPageState extends State<MapSearchPage> {
   final places =
       GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
-  List<Prediction> _autoCompleteResults = [];
 
-  String _searchQuery = ''; // 검색어를 담는 변수 추가
-
-  // 자동완성 결과를 가져오는 함수
-  Future<void> _getAutoCompleteResults(String query) async {
-    if (query.isEmpty) {
-      setState(() {
-        _autoCompleteResults.clear(); // 목록 비우기
-      });
-      return;
-    }
-
-    loc.LocationData currentLocation = await loc.Location().getLocation();
-
-    final response = await places.autocomplete(
-      query,
-      location: Location(
-        lat: currentLocation.latitude!,
-        lng: currentLocation.longitude!,
-      ),
-      radius: 7000,
-      language: 'ko',
-    );
-
-    if (response.isOkay) {
-      setState(() {
-        _autoCompleteResults = response.predictions;
-      });
-    } else {
-      print('자동완성 실패: ${response.errorMessage}');
-    }
+  late String _searchQuery = ''; // 검색어를 담는 변수 추가
+  @override
+  void initState() {
+    super.initState();
+    // 초기 검색어를 설정, 없으면 빈 문자열
+    _searchQuery = widget.initialSearchQuery ?? '';
   }
 
   // 장소가 선택되었을 때 지도에 마커를 표시하는 함수
@@ -58,16 +35,22 @@ class _MapSearchPageState extends State<MapSearchPage> {
       final result = response.result;
       final lat = result.geometry!.location.lat;
       final lng = result.geometry!.location.lng;
+      final placeName = result.name;
+      final address = result.formattedAddress ?? '';
 
-      // 구체적인 지점명이 포함된 장소 이름을 사용
-      String placeName = result.name;
-      if (result.formattedAddress != null) {
-        placeName = result.name;
-      }
-
-      // 장소 선택 시 지도에 마커를 표시
-      widget.onPlaceSelected(lat, lng, placeName);
-      Navigator.pop(context); // 선택 후 지도 페이지로 돌아가기
+      // 장소 선택 시 ResultMapPage로 정보 전달
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultMapPage(
+            lat: lat,
+            lng: lng,
+            placeName: placeName,
+            address: address,
+            searchQuery: _searchQuery,
+          ),
+        ),
+      );
     } else {
       print('장소 선택 실패: ${response.errorMessage}');
     }
@@ -123,22 +106,12 @@ class _MapSearchPageState extends State<MapSearchPage> {
             left: MediaQuery.of(context).size.width * 0.05,
             right: MediaQuery.of(context).size.width * 0.05,
             child: MapSearchBar(
+              initialValue: _searchQuery,
               onSearchSubmitted: _onSearchSubmitted, // 텍스트로 검색 시 결과 페이지로 이동
-              onSearchChanged: _getAutoCompleteResults, // 자동완성 결과 갱신
-              onTap: () {},
+              onSearchChanged: (value) {}, // 자동완성 기능 제거
+              onTap: () {}, // 검색창 클릭 시 추가 동작 없음
             ),
           ),
-          // 자동완성 결과가 있을 때만 표시
-          if (_autoCompleteResults.isNotEmpty)
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.1,
-              left: MediaQuery.of(context).size.width * 0.05,
-              right: MediaQuery.of(context).size.width * 0.05,
-              child: AutoCompleteList(
-                autoCompleteResults: _autoCompleteResults,
-                onPlaceSelected: _selectPlace, // 장소 선택 시 지도에 표시
-              ),
-            ),
         ],
       ),
     );
