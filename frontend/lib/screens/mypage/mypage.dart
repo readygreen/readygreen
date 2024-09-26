@@ -14,7 +14,7 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  final UserApi userApiService = UserApi();
+  final NewUserApi userApiService = NewUserApi();
   final storage = const FlutterSecureStorage(); // FlutterSecureStorage 인스턴스 생성
   Map<String, dynamic>? profileData;
   bool isLoading = true;
@@ -62,17 +62,34 @@ class _MyPageState extends State<MyPage> {
                       height: 160,
                       backgroundColor: Colors.white,
                       textColor: Colors.black,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Row(
                         children: [
+                          // 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시
+                          CircleAvatar(
+                            radius: 40,
+                            backgroundImage: profileData?['profileImageUrl'] !=
+                                    null
+                                ? NetworkImage(profileData!['profileImageUrl'])
+                                : AssetImage('assets/images/badge.png')
+                                    as ImageProvider,
+                          ),
                           const SizedBox(width: 16),
-                          Text('이름: ${profileData?['nickname'] ?? 'Unknown'}',
-                              style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text('이메일: ${profileData?['email'] ?? 'Unknown'}',
-                              style: const TextStyle(fontSize: 16)),
-                          Text('생년월일: ${profileData?['birth'] ?? 'Unknown'}',
-                              style: const TextStyle(fontSize: 16)),
+                          // 프로필 텍스트 정보
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  '이름: ${profileData?['nickname'] ?? 'Unknown'}',
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              Text('이메일: ${profileData?['email'] ?? 'Unknown'}',
+                                  style: const TextStyle(fontSize: 13)),
+                              Text(
+                                  '생년월일: ${profileData?['birth'] ?? 'Unknown'}',
+                                  style: const TextStyle(fontSize: 16)),
+                            ],
+                          ),
                         ],
                       ),
                     ),

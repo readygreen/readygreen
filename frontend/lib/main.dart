@@ -16,6 +16,7 @@ void main() {
     nativeAppKey: 'cf5488929a2ad2db61f895c42f6926cc',
     javaScriptAppKey: 'dc542207fe96b123abf798c0113bd537',
   );
+
   runApp(const App());
 }
 

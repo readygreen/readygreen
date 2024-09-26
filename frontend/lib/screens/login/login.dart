@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:readygreen/main.dart';
-import 'package:readygreen/screens/login/signup.dart';
-// import 'package:readygreen/api/user_api.dart';
+// import 'package:readygreen/screens/login/signup.dart';
+import 'package:readygreen/api/user_api.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,76 +13,69 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  // final UserApi loginService = UserApi(); // LoginService 객체 생성
+  final NewUserApi loginService = NewUserApi(); // LoginService 객체 생성
   Future<void> signInWithKakao() async {
-  try {
-    if (await isKakaoTalkInstalled()) {
-      try {
-        await UserApi.instance.loginWithKakaoTalk();
-        print('카카오톡으로 로그인 성공');
-      } catch (error) {
-        print('카카오톡으로 로그인 실패 $error');
+    try {
+      print('카카오 로그인 KakaoSdk.origin');
+      print(await KakaoSdk.origin);
 
-        if (error is PlatformException && error.code == 'CANCELED') {
-          return;
-        }
-
-        try {
-          await UserApi.instance.loginWithKakaoAccount();
-          print('카카오계정으로 로그인 성공');
-        } catch (error) {
-          print('카카오계정으로 로그인 실패 $error');
-        }
-      }
-    } else {
       try {
         await UserApi.instance.loginWithKakaoAccount();
         print('카카오계정으로 로그인 성공');
       } catch (error) {
         print('카카오계정으로 로그인 실패 $error');
       }
+
+      // 사용자 정보 요청 및 콘솔 출력
+      User user = await UserApi.instance.me();
+      print('User ID: ${user.id}');
+      print('Nickname: ${user.kakaoAccount?.profile?.nickname}');
+      print('Email: ${user.kakaoAccount?.email}');
+      print('Profile Image: ${user.kakaoAccount?.profile?.profileImageUrl}');
+
+      // 로그인 시도
+      String? accessToken = await loginService.login(
+        email: user.kakaoAccount?.email ?? '',
+        password: user.id.toString(), // 카카오 고유 ID를 비밀번호로 사용
+        nickname: user.kakaoAccount?.profile?.nickname ?? '',
+        socialType: 'KAKAO',
+        profileImg: user.kakaoAccount?.profile?.profileImageUrl ?? '',
+      );
+
+      if (accessToken != null) {
+        // 로그인 성공 시 메인 페이지로 이동
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainPage()),
+        );
+      } else {
+        // 로그인 실패 시 회원가입 시도
+        print('로그인 실패, 회원가입 시도 중...');
+
+        bool signUpSuccess = await loginService.signUp(
+          email: user.kakaoAccount?.email ?? '',
+          nickname: user.kakaoAccount?.profile?.nickname ?? '',
+          password: user.id.toString(),
+          socialType: 'KAKAO',
+          profileImg: user.kakaoAccount?.profile?.profileImageUrl ?? '',
+        );
+
+        if (signUpSuccess) {
+          // 회원가입 성공 시 메인 페이지로 이동
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MainPage()),
+          );
+        } else {
+          // 회원가입 실패 시 에러 처리
+          print('회원가입 실패');
+        }
+      }
+    } catch (error) {
+      print('로그인 도중 에러 발생: $error');
     }
-
-    // 사용자 정보 요청 및 콘솔 출력
-    User user = await UserApi.instance.me();
-    print('User ID: ${user.id}');
-    print('Nickname: ${user.kakaoAccount?.profile?.nickname}');
-    print('Email: ${user.kakaoAccount?.email}');
-
-  } catch (error) {
-    print('로그인 도중 에러 발생: $error');
   }
-}
-  // Future<void> _login() async {
-  //   String email = emailController.text;
-  //   String password = passwordController.text;
 
-  //   if (email.isNotEmpty && password.isNotEmpty) {
-  //     try {
-  //       // LoginService를 통해 로그인 시도
-  //       String? accessToken = await loginService.login(email, password);
-
-  //       if (accessToken != null) {
-  //         print('로그인 성공, Access Token: $accessToken');
-  //         // 로그인 성공 시 MainPage로 이동
-  //         Navigator.pushReplacement(
-  //           context,
-  //           MaterialPageRoute(builder: (context) => MainPage()),
-  //         );
-  //       }
-  //     } catch (e) {
-  //       // 오류 발생 시 메시지 출력
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('로그인에 실패했습니다. 다시 시도해주세요.')),
-  //       );
-  //       print('로그인 실패: $e');
-  //     }
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('모든 필드를 입력해주세요.')),
-  //     );
-  //   }
-  // }
   Widget getKakaoLoginButton() {
     return InkWell(
       onTap: () {
@@ -101,10 +94,11 @@ class _LoginPageState extends State<LoginPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('images/facebook.png', height: 30), // Kakao 이미지로 변경 필요
+              Image.asset('assets/images/badge.png',
+                  height: 30), // Kakao 이미지로 변경 필요
               const SizedBox(width: 10),
               const Text(
-                "Sign In With Kakao",
+                "카카오로 실행하기",
                 style: TextStyle(color: Colors.white, fontSize: 17),
               ),
             ],
@@ -113,12 +107,13 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-  void _navigateToSignUp() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => SignUpPage()),
-    );
-  }
+
+  // void _navigateToSignUp() {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => SignUpPage()),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -141,19 +136,14 @@ class _LoginPageState extends State<LoginPage> {
               obscureText: true,
             ),
             SizedBox(height: 20),
-            // ElevatedButton(
-            //   // onPressed: _login, // 로그인 버튼 클릭 시 API 호출
-            //   onPressed: ,
-            //   child: Text('Login'),
-            // ),
             const SizedBox(height: 20),
             getKakaoLoginButton(),
             const SizedBox(height: 20),
             SizedBox(height: 10),
-            TextButton(
-              onPressed: _navigateToSignUp, // 회원가입 페이지로 이동
-              child: Text('회원가입'),
-            ),
+            // TextButton(
+            //   onPressed: _navigateToSignUp, // 회원가입 페이지로 이동
+            //   child: Text('회원가입'),
+            // ),
           ],
         ),
       ),
