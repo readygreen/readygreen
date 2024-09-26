@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.dto;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class BlinkerRequestDTO {
+
+    @NotNull(message = "blinkerIDs cannot null")
     List<Integer> blinkerIDs;
 }
