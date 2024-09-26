@@ -3,37 +3,24 @@ package com.ddubucks.readygreen.presentation.activity
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.ddubucks.readygreen.core.service.BluetoothService
 import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.screen.*
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
-import com.ddubucks.readygreen.presentation.viewmodel.BluetoothState
-import com.ddubucks.readygreen.presentation.viewmodel.BluetoothViewModel
-import com.ddubucks.readygreen.presentation.viewmodel.BluetoothViewModelFactory
 import com.ddubucks.readygreen.presentation.viewmodel.LocationViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModelFactory
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    // Bluetooth 관련 변수
-    private val bluetoothService by lazy { BluetoothService(this) }
-    private val bluetoothViewModel: BluetoothViewModel by viewModels {
-        BluetoothViewModelFactory(bluetoothService)
-    }
-
-    // 위치 서비스 관련 변수
+    // 위치 서비스
     private val locationService: LocationService by lazy { LocationService(this) }
     private val searchViewModel: SearchViewModel by viewModels { SearchViewModelFactory(locationService) }
     private val locationViewModel: LocationViewModel by viewModels()
@@ -43,13 +30,11 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
-            locationService.requestLocationUpdates() // 권한이 승인되면 위치 업데이트 요청
+            locationService.requestLocationUpdates()
         } else {
             // 권한이 거부되었을 때 처리
         }
     }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,30 +51,6 @@ class MainActivity : ComponentActivity() {
             // 권한이 있으면 위치 업데이트 시작
             locationViewModel.startLocationUpdates()
         }
-
-        lifecycleScope.launch {
-            bluetoothViewModel.bluetoothState.collect { state ->
-                when (state) {
-                    is BluetoothState.Connecting -> {
-                        // Bluetooth 연결 중
-                        Toast.makeText(this@MainActivity, "Bluetooth 연결 중...", Toast.LENGTH_SHORT).show()
-                    }
-                    is BluetoothState.Connected -> {
-                        // Bluetooth 연결 성공
-                        Toast.makeText(this@MainActivity, "Bluetooth 연결 성공", Toast.LENGTH_SHORT).show()
-                    }
-                    is BluetoothState.Disconnected -> {
-                        // Bluetooth 연결 해제
-                        Toast.makeText(this@MainActivity, "Bluetooth 연결 해제됨", Toast.LENGTH_SHORT).show()
-                    }
-                    is BluetoothState.Error -> {
-                        // Bluetooth 연결 실패
-                        Toast.makeText(this@MainActivity, state.message, Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-
 
         setContent {
             ReadyGreenTheme {
@@ -111,22 +72,8 @@ class MainActivity : ComponentActivity() {
                         MapScreen(locationViewModel = locationViewModel)
                     }
                     composable("navigationScreen") { NavigationScreen() }
-                    composable("bluetoothScreen") {
-                        val bluetoothViewModel: BluetoothViewModel by viewModels {
-                            BluetoothViewModelFactory(bluetoothService)
-                        }
-                        BluetoothConnectionScreen(bluetoothViewModel = bluetoothViewModel)
-                    }
-
-
                 }
             }
         }
-    }
-
-    // 액티비티가 종료될 때 Bluetooth 연결 해제
-    override fun onDestroy() {
-        super.onDestroy()
-        bluetoothViewModel.closeConnection()
     }
 }

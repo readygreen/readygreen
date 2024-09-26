@@ -8,6 +8,7 @@ import com.ddubucks.readygreen.data.repository.BookmarkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.log
 
 class BookmarkViewModel : ViewModel() {
 
@@ -25,6 +26,7 @@ class BookmarkViewModel : ViewModel() {
             try {
                 val locations = repository.getBookmark()
                 _bookMark.value = locations
+                Log.d("BookmarkViewModel", "Fetched bookmarks: $locations")
             } catch (e: Exception) {
                 Log.e("BookmarkViewModel", "Failed to fetch bookmarks", e)
             }

@@ -38,27 +38,27 @@ fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.c
             modifier = Modifier.padding(bottom = 10.dp, top = 30.dp)
         )
 
-//        ScalingLazyColumn {
-//            items(bookmarks) { bookmark ->
-//                Text(text = bookmark.name)
-//            }
-//        }
-
-        // TODO 더미데이터 삭제
-        val buttonList = listOf(
-            ButtonIconModel(R.drawable.bookmark_home, "집"),
-            ButtonIconModel(R.drawable.bookmark_office, "회사"),
-            ButtonIconModel(R.drawable.bookmark_default, "나만의 맛집"),
-            ButtonIconModel(R.drawable.bookmark_default, "또다른 맛집")
-        )
-
         ScalingLazyColumn {
-            items(buttonList) { item ->
-                ButtonIconItem(item = item, onClick = {
-                    Log.d("BookmarkScreen", "버튼 클릭: ${item.label}")
-                })
+            items(bookmarks) { bookmark ->
+                Text(text = bookmark.name)
             }
         }
+
+        // TODO 더미데이터 삭제
+//        val buttonList = listOf(
+//            ButtonIconModel(R.drawable.bookmark_home, "집"),
+//            ButtonIconModel(R.drawable.bookmark_office, "회사"),
+//            ButtonIconModel(R.drawable.bookmark_default, "나만의 맛집"),
+//            ButtonIconModel(R.drawable.bookmark_default, "또다른 맛집")
+//        )
+//
+//        ScalingLazyColumn {
+//            items(buttonList) { item ->
+//                ButtonIconItem(item = item, onClick = {
+//                    Log.d("BookmarkScreen", "버튼 클릭: ${item.label}")
+//                })
+//            }
+//        }
         }
     }
 

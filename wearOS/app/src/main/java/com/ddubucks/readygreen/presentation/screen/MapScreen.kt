@@ -47,7 +47,7 @@ fun MapScreen(locationViewModel: LocationViewModel) {
             .fillMaxSize()
             .background(Black),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top // 수직 정렬을 상단으로 설정
+        verticalArrangement = Arrangement.Top
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
