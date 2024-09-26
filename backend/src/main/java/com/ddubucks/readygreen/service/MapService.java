@@ -6,13 +6,18 @@ import com.ddubucks.readygreen.dto.RouteDTO;
 import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
 import com.ddubucks.readygreen.dto.RouteRequestDTO;
 import com.ddubucks.readygreen.model.Blinker;
+import com.ddubucks.readygreen.model.RouteRecord;
+import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.repository.BlinkerRepository;
+import com.ddubucks.readygreen.repository.MemberRepository;
+import com.ddubucks.readygreen.repository.RouteRecordRepository;
 import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -33,25 +38,31 @@ public class MapService {
 
     private final static String TYPE = "Point";
     private final static int RADIUS = 10;
+    private static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     private final BlinkerRepository blinkerRepository;
+    private final RouteRecordRepository routeRecordRepository;
+    private final MemberRepository memberRepository;
 
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
 
-    public MapResponseDTO destinationGuide(RouteRequestDTO routeRequestDTO) {
+    public MapResponseDTO destinationGuide(RouteRequestDTO routeRequestDTO, String email) {
 
         // 경로 요청
         RouteDTO routeDto = route(routeRequestDTO);
 
+        // 경로 내 신호등 위치
         List<Point> coordinates = getBlinkerCoordinate(routeDto);
 
+        // 해당 좌표의 신호등 정보
         List<Blinker> blinkers = blinkerRepository.findAllByCoordinatesWithinRadius(coordinates, RADIUS);
 
         List<BlinkerDTO> blinkerDTOs = new ArrayList<>();
 
         LocalTime nowTime = LocalTime.now();
 
+        // 경로 내 신호등 데이터
         for (Blinker blinker : blinkers) {
             blinkerDTOs.add(
                     BlinkerDTO.builder()
@@ -80,6 +91,20 @@ public class MapService {
                             .build()
             );
         }
+
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 경로 저장하기
+        routeRecordRepository.save(
+                RouteRecord.builder()
+                        .startName(routeRequestDTO.getStartName())
+                        .startCoordinate(getPoint(routeRequestDTO.getStartX(), routeRequestDTO.getStartY()))
+                        .endName(routeRequestDTO.getEndName())
+                        .endCoordinate(getPoint(routeRequestDTO.getEndX(), routeRequestDTO.getEndY()))
+                        .member(member)
+                        .build()
+        );
 
         return MapResponseDTO.builder()
                 .routeDTO(route(routeRequestDTO))
@@ -124,17 +149,20 @@ public class MapService {
     private List<Point> getBlinkerCoordinate(RouteDTO routeDTO) {
 
         List<Point> coordinates = new ArrayList<>();
-        GeometryFactory geometryFactory = new GeometryFactory();
 
         for (FeatureDTO featureDTO : routeDTO.getFeatures()) {
             if (TYPE.equals(featureDTO.getGeometry().getType()) && isValidTurnType(featureDTO.getProperties().getTurnType())) {
                 List<Double> c = (List<Double>) featureDTO.getGeometry().getCoordinates();
 
-                Point point = geometryFactory.createPoint(new Coordinate(c.get(0), c.get(1)));
+                Point point = getPoint(c.get(0), c.get(1));
                 coordinates.add(point);
             }
         }
         return coordinates;
+    }
+
+    private static Point getPoint(double longitude, double latitude) {
+        return geometryFactory.createPoint(new Coordinate(longitude, latitude));
     }
 
     private static boolean isValidTurnType(int turnType) {
