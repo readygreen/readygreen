@@ -102,6 +102,11 @@ flutter:
     - assets/images/mic.png
     - assets/images/badge.png
     - assets/images/place.png
+    - assets/images/user.png
+    - assets/images/w-sun.png
+    - assets/images/w-rain.png
+    - assets/images/w-cloudy.png
+    - assets/images/w-snow.png
 
   fonts:
     - family: CustomFont

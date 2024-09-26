@@ -58,7 +58,7 @@ class _MyPageState extends State<MyPage> {
                     const SizedBox(height: 50),
                     // 프로필 정보 섹션
                     CardBox(
-                      title: '프로필 정보',
+                      title: '내 정보',
                       height: 160,
                       backgroundColor: Colors.white,
                       textColor: Colors.black,
@@ -70,7 +70,7 @@ class _MyPageState extends State<MyPage> {
                             backgroundImage: profileData?['profileImageUrl'] !=
                                     null
                                 ? NetworkImage(profileData!['profileImageUrl'])
-                                : AssetImage('assets/images/badge.png')
+                                : AssetImage('assets/images/user.png')
                                     as ImageProvider,
                           ),
                           const SizedBox(width: 16),
@@ -81,13 +81,13 @@ class _MyPageState extends State<MyPage> {
                               Text(
                                   '이름: ${profileData?['nickname'] ?? 'Unknown'}',
                                   style: const TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold)),
                               Text('이메일: ${profileData?['email'] ?? 'Unknown'}',
-                                  style: const TextStyle(fontSize: 13)),
+                                  style: const TextStyle(fontSize: 14)),
                               Text(
-                                  '생년월일: ${profileData?['birth'] ?? 'Unknown'}',
-                                  style: const TextStyle(fontSize: 16)),
+                                  '생년월일: ${profileData?['birth'] ?? '생일을 등록해주세요'}',
+                                  style: const TextStyle(fontSize: 14)),
                             ],
                           ),
                         ],
@@ -101,9 +101,8 @@ class _MyPageState extends State<MyPage> {
                         Expanded(
                           child: SquareCardBox(
                             title: '내 배지',
-                            backgroundColor: Colors.white,
-                            textColor: Colors.black,
                             imageUrl: 'assets/images/badge.png',
+                            subtitle: '설정하기',
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -113,6 +112,7 @@ class _MyPageState extends State<MyPage> {
                             backgroundColor: Colors.white,
                             textColor: Colors.black,
                             imageUrl: 'assets/images/place.png',
+                            subtitle: '상세보기',
                           ),
                         ),
                       ],
