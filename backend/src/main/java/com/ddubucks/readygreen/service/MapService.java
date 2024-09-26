@@ -46,7 +46,7 @@ public class MapService {
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
 
-    public MapResponseDTO destinationGuide(RouteRequestDTO routeRequestDTO, String email) {
+    public MapResponseDTO getDestinationGuide(RouteRequestDTO routeRequestDTO, String email) {
 
         // 경로 요청
         RouteDTO routeDto = route(routeRequestDTO);
@@ -214,7 +214,7 @@ public class MapService {
         return gson.fromJson(response, RouteDTO.class);
     }
 
-    public BlinkerResponseDTO nearbyBlinker(LocationRequestDTO locationRequestDTO) {
+    public BlinkerResponseDTO getNearbyBlinker(LocationRequestDTO locationRequestDTO) {
         List<Blinker> blinkers = blinkerJDBCRepository
                 .findAllByCoordinatesWithinRadius(
                         getPoint(locationRequestDTO.getLongitude(), locationRequestDTO.getLatitude()),
@@ -226,7 +226,7 @@ public class MapService {
                 .build();
     }
 
-    public BlinkerResponseDTO blinker(BlinkerRequestDTO blinkerRequestDTO) {
+    public BlinkerResponseDTO getBlinker(BlinkerRequestDTO blinkerRequestDTO) {
         List<Blinker> blinkers = blinkerRepository.findAllById(blinkerRequestDTO.getBlinkerIDs());
 
         return BlinkerResponseDTO.builder()

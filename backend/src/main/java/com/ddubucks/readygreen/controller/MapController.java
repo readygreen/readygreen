@@ -17,20 +17,20 @@ public class MapController {
     private final MapService mapService;
 
     @PostMapping("start")
-    public ResponseEntity<?> destinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
-        MapResponseDTO mapResponseDTO = mapService.destinationGuide(routeRequestDTO, userDetails.getUsername());
+    public ResponseEntity<?> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
+        MapResponseDTO mapResponseDTO = mapService.getDestinationGuide(routeRequestDTO, userDetails.getUsername());
         return ResponseEntity.ok(mapResponseDTO);
     }
 
     @GetMapping
-    public ResponseEntity<?> nearbyBlinker(@Valid @RequestBody LocationRequestDTO locationRequestDTO) {
-        BlinkerResponseDTO blinkerResponseDTO = mapService.nearbyBlinker(locationRequestDTO);
+    public ResponseEntity<?> getNearbyBlinker(@Valid @RequestBody LocationRequestDTO locationRequestDTO) {
+        BlinkerResponseDTO blinkerResponseDTO = mapService.getNearbyBlinker(locationRequestDTO);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
 
     @GetMapping("blinker")
-    public ResponseEntity<?> blinker(@Valid @RequestBody BlinkerRequestDTO blinkerRequestDTO) {
-        BlinkerResponseDTO blinkerResponseDTO = mapService.blinker(blinkerRequestDTO);
+    public ResponseEntity<?> getBlinker(@Valid @RequestBody BlinkerRequestDTO blinkerRequestDTO) {
+        BlinkerResponseDTO blinkerResponseDTO = mapService.getBlinker(blinkerRequestDTO);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
 }
