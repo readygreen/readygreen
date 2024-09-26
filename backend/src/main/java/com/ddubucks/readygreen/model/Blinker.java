@@ -32,6 +32,6 @@ public class Blinker extends BaseEntity {
     @Column(nullable = false)
     private int redDuration;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "POINT SRID 4326")
     private Point coordinate;
 }

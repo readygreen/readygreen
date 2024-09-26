@@ -33,6 +33,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.12.5'
     implementation 'org.locationtech.jts:jts-core:1.19.0'
     implementation 'io.github.flashvayne:chatgpt-spring-boot-starter:1.0.4'
+    implementation 'org.hibernate:hibernate-spatial:6.5.2.Final'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
