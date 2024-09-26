@@ -2,32 +2,32 @@ package com.ddubucks.readygreen.model;
 
 import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
 @Entity
-@Table(name = "route_record")
+@Table(name = "destination_bookmark")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RouteRecord extends BaseEntity {
+public class Bookmark extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
-    private String startName;
-
-    @Column(nullable = false, columnDefinition = "POINT SRID 4326")
-    private Point startCoordinate;
+    private String name;
 
     @Column(nullable = false)
-    private String endName;
+    private String destinationName;
 
     @Column(nullable = false, columnDefinition = "POINT SRID 4326")
-    private Point endCoordinate;
+    private Point destinationCoordinate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
