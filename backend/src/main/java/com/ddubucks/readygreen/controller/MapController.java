@@ -33,4 +33,10 @@ public class MapController {
         BlinkerResponseDTO blinkerResponseDTO = mapService.getBlinker(blinkerRequestDTO);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
+
+    @GetMapping("bookmark")
+    public ResponseEntity<?> getBookmark(@AuthenticationPrincipal UserDetails userDetails) {
+        BookmarkResponseDTO bookmarkResponseDTO = mapService.getBookmark(userDetails.getUsername());
+        return ResponseEntity.ok(bookmarkResponseDTO);
+    }
 }

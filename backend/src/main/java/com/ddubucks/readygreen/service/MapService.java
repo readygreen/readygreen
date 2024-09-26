@@ -3,12 +3,10 @@ package com.ddubucks.readygreen.service;
 import com.ddubucks.readygreen.dto.*;
 import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
 import com.ddubucks.readygreen.model.Blinker;
+import com.ddubucks.readygreen.model.Bookmark;
 import com.ddubucks.readygreen.model.RouteRecord;
 import com.ddubucks.readygreen.model.member.Member;
-import com.ddubucks.readygreen.repository.BlinkerJDBCRepository;
-import com.ddubucks.readygreen.repository.BlinkerRepository;
-import com.ddubucks.readygreen.repository.MemberRepository;
-import com.ddubucks.readygreen.repository.RouteRecordRepository;
+import com.ddubucks.readygreen.repository.*;
 import com.nimbusds.jose.shaded.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -42,6 +40,7 @@ public class MapService {
     private final BlinkerRepository blinkerRepository;
     private final RouteRecordRepository routeRecordRepository;
     private final MemberRepository memberRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
@@ -231,6 +230,14 @@ public class MapService {
 
         return BlinkerResponseDTO.builder()
                 .blinkerDTOs(toBlinkerDTOs(blinkers))
+                .build();
+    }
+
+    public BookmarkResponseDTO getBookmark(String email) {
+        List<Bookmark> bookmarks = bookmarkRepository.findAllByEmail(email);
+
+        return BookmarkResponseDTO.builder()
+                .bookmarks(bookmarks)
                 .build();
     }
 }
