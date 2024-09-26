@@ -1,8 +1,7 @@
 package com.ddubucks.readygreen.controller;
 
-import com.ddubucks.readygreen.dto.FeedbackResponseDTO;
-import com.ddubucks.readygreen.dto.FeedbackReplyDTO;
-import com.ddubucks.readygreen.model.feedback.FeedbackType;
+import com.ddubucks.readygreen.dto.FeedbackDTO;
+import com.ddubucks.readygreen.model.feedback.FeedbackStatus;
 import com.ddubucks.readygreen.service.FeedbackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,29 +18,22 @@ public class AdminFeedbackController {
 
     // 모든 건의사항 조회 (관리자만 가능)
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/all")
-    public List<FeedbackResponseDTO> getAllFeedbacks() {
+    @GetMapping
+    public List<FeedbackDTO> getAllFeedbacks() {
         return feedbackService.getAllFeedbacks();
     }
 
-    // 특정 타입의 건의사항 조회 (관리자만 가능)
+    // 특정 건의사항 승인 (관리자만 가능)
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/type/{type}")
-    public List<FeedbackResponseDTO> getFeedbacksByType(@PathVariable String type) {
-        return feedbackService.getFeedbacksByType(FeedbackType.valueOf(type.toUpperCase()));
+    @PutMapping("/{feedbackId}/approve")
+    public FeedbackDTO approveFeedback(@PathVariable Long feedbackId) {
+        return feedbackService.approveFeedback(feedbackId);
     }
 
-    // report 승인/반려 처리 (관리자만 가능)
+    // 관리자가 처리 상태에 따라 건의사항 조회
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/approve")
-    public FeedbackResponseDTO approveFeedback(@PathVariable int id, @RequestParam boolean isApproved) {
-        return feedbackService.approveFeedback(id, isApproved);
-    }
-
-    // 관리자 답장 기능 (관리자만 가능)
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/reply")
-    public FeedbackResponseDTO replyToFeedback(@PathVariable int id, @RequestBody FeedbackReplyDTO replyDTO) {
-        return feedbackService.replyToFeedback(id, replyDTO);
+    @GetMapping("/status")
+    public List<FeedbackDTO> getFeedbacksByStatus(@RequestParam FeedbackStatus status) {
+        return feedbackService.getFeedbacksByStatus(status);
     }
 }

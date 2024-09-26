@@ -1,19 +1,18 @@
-package com.ddubucks.readygreen.model.feedback;
+package com.ddubucks.readygreen.model;
 
 import com.ddubucks.readygreen.model.BaseEntity;
-import com.ddubucks.readygreen.model.Blinker;
 import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "feedback")
+@Table(name = "question")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Feedback extends BaseEntity {
+public class Question extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,15 +22,14 @@ public class Feedback extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blinker_id", nullable = false)
-    private Blinker blinker;
-
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FeedbackType feedbackType;
+    private String title;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FeedbackStatus status = FeedbackStatus.PENDING;
+    private String content;
+
+    private String reply;
+
+    private boolean answered = false;
 }
+

@@ -1,4 +1,4 @@
-package com.ddubucks.readygreen.model.feedback;
+package com.ddubucks.readygreen.model.report;
 
 import com.ddubucks.readygreen.model.BaseEntity;
 import com.ddubucks.readygreen.model.Blinker;
@@ -6,14 +6,16 @@ import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalTime;
+
 @Entity
-@Table(name = "feedback")
+@Table(name = "report")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Feedback extends BaseEntity {
+public class Report extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,11 +29,16 @@ public class Feedback extends BaseEntity {
     @JoinColumn(name = "blinker_id", nullable = false)
     private Blinker blinker;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FeedbackType feedbackType;
+    private LocalTime greenStartTime;
+
+    @Column(nullable = false)
+    private LocalTime redStartTime;
+
+    @Column(nullable = false)
+    private LocalTime nextGreenStartTime;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FeedbackStatus status = FeedbackStatus.PENDING;
+    private ReportStatus status = ReportStatus.PENDING;
 }
