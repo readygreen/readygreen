@@ -1,9 +1,6 @@
 package com.ddubucks.readygreen.controller;
 
-import com.ddubucks.readygreen.dto.BlinkerResponseDTO;
-import com.ddubucks.readygreen.dto.LocationRequestDTO;
-import com.ddubucks.readygreen.dto.MapResponseDTO;
-import com.ddubucks.readygreen.dto.RouteRequestDTO;
+import com.ddubucks.readygreen.dto.*;
 import com.ddubucks.readygreen.service.MapService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +25,12 @@ public class MapController {
     @GetMapping
     public ResponseEntity<?> nearbyBlinker(@Valid @RequestBody LocationRequestDTO locationRequestDTO) {
         BlinkerResponseDTO blinkerResponseDTO = mapService.nearbyBlinker(locationRequestDTO);
+        return ResponseEntity.ok(blinkerResponseDTO);
+    }
+
+    @GetMapping("blinker")
+    public ResponseEntity<?> blinker(@Valid @RequestBody BlinkerRequestDTO blinkerRequestDTO) {
+        BlinkerResponseDTO blinkerResponseDTO = mapService.blinker(blinkerRequestDTO);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
 }

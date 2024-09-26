@@ -6,6 +6,7 @@ import com.ddubucks.readygreen.model.Blinker;
 import com.ddubucks.readygreen.model.RouteRecord;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.repository.BlinkerJDBCRepository;
+import com.ddubucks.readygreen.repository.BlinkerRepository;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import com.ddubucks.readygreen.repository.RouteRecordRepository;
 import com.nimbusds.jose.shaded.gson.Gson;
@@ -38,6 +39,7 @@ public class MapService {
     private static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
     private final BlinkerJDBCRepository blinkerJDBCRepository;
+    private final BlinkerRepository blinkerRepository;
     private final RouteRecordRepository routeRecordRepository;
     private final MemberRepository memberRepository;
 
@@ -218,6 +220,14 @@ public class MapService {
                         getPoint(locationRequestDTO.getLongitude(), locationRequestDTO.getLatitude()),
                         locationRequestDTO.getRadius()
                 );
+
+        return BlinkerResponseDTO.builder()
+                .blinkerDTOs(toBlinkerDTOs(blinkers))
+                .build();
+    }
+
+    public BlinkerResponseDTO blinker(BlinkerRequestDTO blinkerRequestDTO) {
+        List<Blinker> blinkers = blinkerRepository.findAllById(blinkerRequestDTO.getBlinkerIDs());
 
         return BlinkerResponseDTO.builder()
                 .blinkerDTOs(toBlinkerDTOs(blinkers))
