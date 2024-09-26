@@ -1,5 +1,7 @@
 package com.ddubucks.readygreen.controller;
 
+import com.ddubucks.readygreen.dto.BlinkerResponseDTO;
+import com.ddubucks.readygreen.dto.LocationRequestDTO;
 import com.ddubucks.readygreen.dto.MapResponseDTO;
 import com.ddubucks.readygreen.dto.RouteRequestDTO;
 import com.ddubucks.readygreen.service.MapService;
@@ -8,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,5 +23,11 @@ public class MapController {
     public ResponseEntity<?> destinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
         MapResponseDTO mapResponseDTO = mapService.destinationGuide(routeRequestDTO, userDetails.getUsername());
         return ResponseEntity.ok(mapResponseDTO);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> nearbyBlinker(@Valid @RequestBody LocationRequestDTO locationRequestDTO) {
+        BlinkerResponseDTO blinkerResponseDTO = mapService.nearbyBlinker(locationRequestDTO);
+        return ResponseEntity.ok(blinkerResponseDTO);
     }
 }

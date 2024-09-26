@@ -10,14 +10,15 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
-public class BlinkerRepository {
+public class BlinkerJDBCRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public BlinkerRepository(DataSource dataSource) {
+    public BlinkerJDBCRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
@@ -61,6 +62,10 @@ public class BlinkerRepository {
         };
 
         return jdbcTemplate.query(sql.toString(), params, rowMapper);
+    }
+
+    public List<Blinker> findAllByCoordinatesWithinRadius(Point coordinate, int radius) {
+        return findAllByCoordinatesWithinRadius(Collections.singletonList(coordinate), radius);
     }
 
     @SneakyThrows

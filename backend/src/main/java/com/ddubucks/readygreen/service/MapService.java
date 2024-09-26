@@ -1,14 +1,11 @@
 package com.ddubucks.readygreen.service;
 
-import com.ddubucks.readygreen.dto.BlinkerDTO;
-import com.ddubucks.readygreen.dto.MapResponseDTO;
-import com.ddubucks.readygreen.dto.RouteDTO;
+import com.ddubucks.readygreen.dto.*;
 import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
-import com.ddubucks.readygreen.dto.RouteRequestDTO;
 import com.ddubucks.readygreen.model.Blinker;
 import com.ddubucks.readygreen.model.RouteRecord;
 import com.ddubucks.readygreen.model.member.Member;
-import com.ddubucks.readygreen.repository.BlinkerRepository;
+import com.ddubucks.readygreen.repository.BlinkerJDBCRepository;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import com.ddubucks.readygreen.repository.RouteRecordRepository;
 import com.nimbusds.jose.shaded.gson.Gson;
@@ -40,7 +37,7 @@ public class MapService {
     private final static int RADIUS = 10;
     private static GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-    private final BlinkerRepository blinkerRepository;
+    private final BlinkerJDBCRepository blinkerJDBCRepository;
     private final RouteRecordRepository routeRecordRepository;
     private final MemberRepository memberRepository;
 
@@ -56,10 +53,33 @@ public class MapService {
         List<Point> coordinates = getBlinkerCoordinate(routeDto);
 
         // 해당 좌표의 신호등 정보
-        List<Blinker> blinkers = blinkerRepository.findAllByCoordinatesWithinRadius(coordinates, RADIUS);
+        List<Blinker> blinkers = blinkerJDBCRepository.findAllByCoordinatesWithinRadius(coordinates, RADIUS);
 
+        // 신호등의 상태 정보
+        List<BlinkerDTO> blinkerDTOs = toBlinkerDTOs(blinkers);
+
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 경로 저장하기
+        routeRecordRepository.save(
+                RouteRecord.builder()
+                        .startName(routeRequestDTO.getStartName())
+                        .startCoordinate(getPoint(routeRequestDTO.getStartX(), routeRequestDTO.getStartY()))
+                        .endName(routeRequestDTO.getEndName())
+                        .endCoordinate(getPoint(routeRequestDTO.getEndX(), routeRequestDTO.getEndY()))
+                        .member(member)
+                        .build()
+        );
+
+        return MapResponseDTO.builder()
+                .routeDTO(routeDto)
+                .blinkerDTOs(blinkerDTOs)
+                .build();
+    }
+
+    private List<BlinkerDTO> toBlinkerDTOs(List<Blinker> blinkers) {
         List<BlinkerDTO> blinkerDTOs = new ArrayList<>();
-
         LocalTime nowTime = LocalTime.now();
 
         // 경로 내 신호등 데이터
@@ -91,25 +111,7 @@ public class MapService {
                             .build()
             );
         }
-
-        Member member = memberRepository.findMemberByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // 경로 저장하기
-        routeRecordRepository.save(
-                RouteRecord.builder()
-                        .startName(routeRequestDTO.getStartName())
-                        .startCoordinate(getPoint(routeRequestDTO.getStartX(), routeRequestDTO.getStartY()))
-                        .endName(routeRequestDTO.getEndName())
-                        .endCoordinate(getPoint(routeRequestDTO.getEndX(), routeRequestDTO.getEndY()))
-                        .member(member)
-                        .build()
-        );
-
-        return MapResponseDTO.builder()
-                .routeDTO(route(routeRequestDTO))
-                .blinkerDTOs(blinkerDTOs)
-                .build();
+        return blinkerDTOs;
     }
 
     private int getBlinkerTime(LocalTime startTime, LocalTime nowTime, int greenDuration, int redDuration) {
@@ -208,5 +210,17 @@ public class MapService {
         Gson gson = new Gson();
 
         return gson.fromJson(response, RouteDTO.class);
+    }
+
+    public BlinkerResponseDTO nearbyBlinker(LocationRequestDTO locationRequestDTO) {
+        List<Blinker> blinkers = blinkerJDBCRepository
+                .findAllByCoordinatesWithinRadius(
+                        getPoint(locationRequestDTO.getLongitude(), locationRequestDTO.getLatitude()),
+                        locationRequestDTO.getRadius()
+                );
+
+        return BlinkerResponseDTO.builder()
+                .blinkerDTOs(toBlinkerDTOs(blinkers))
+                .build();
     }
 }
