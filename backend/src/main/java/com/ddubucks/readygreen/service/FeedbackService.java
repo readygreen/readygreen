@@ -1,14 +1,17 @@
 package com.ddubucks.readygreen.service;
 
-import com.ddubucks.readygreen.dto.*;
-import com.ddubucks.readygreen.model.feedback.*;
+import com.ddubucks.readygreen.dto.FeedbackDTO;
+import com.ddubucks.readygreen.model.Blinker;
 import com.ddubucks.readygreen.model.member.Member;
+import com.ddubucks.readygreen.model.feedback.Feedback;
+import com.ddubucks.readygreen.model.feedback.FeedbackStatus;
+import com.ddubucks.readygreen.model.feedback.FeedbackType;
+import com.ddubucks.readygreen.repository.BlinkerRepository;
 import com.ddubucks.readygreen.repository.FeedbackRepository;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,85 +21,87 @@ public class FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
     private final MemberRepository memberRepository;
+    private final BlinkerRepository blinkerRepository;
 
-    // 건의사항 등록
-    public FeedbackResponseDTO createFeedback(FeedbackRequestDTO requestDTO, String userEmail) {
-        Member member = memberRepository.findMemberByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    // 건의사항 제출
+    public FeedbackDTO submitFeedback(Integer memberId, Integer blinkerId, String feedbackType) {
+        // memberId로 사용자(Member) 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
+        // blinkerId로 Blinker 객체 조회
+        Blinker blinker = blinkerRepository.findById(blinkerId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid blinker ID"));
+
+        // FeedbackType이 "UPDATE" 또는 "REQUEST" 중 하나인지 확인
+        FeedbackType type = FeedbackType.valueOf(feedbackType.toUpperCase());
+
+        // Feedback 객체 생성
         Feedback feedback = Feedback.builder()
-                .title(requestDTO.getTitle())
-                .content(requestDTO.getContent())
-                .type(requestDTO.getType())
-                .status(FeedbackStatus.NEW)
                 .member(member)
+                .blinker(blinker)
+                .feedbackType(type)
+                .status(FeedbackStatus.PENDING) // 기본 상태는 PENDING
                 .build();
 
         feedbackRepository.save(feedback);
-        return mapToResponseDTO(feedback);
+        return mapToFeedbackDTO(feedback);
     }
 
-    // 사용자가 자신의 건의사항들 조회
-    public List<FeedbackResponseDTO> getUserFeedbacks(String userEmail) {
-        Member member = memberRepository.findMemberByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    // 모든 건의사항 조회 (관리자)
+    public List<FeedbackDTO> getAllFeedbacks() {
+        return feedbackRepository.findAll().stream()
+                .map(this::mapToFeedbackDTO)
+                .collect(Collectors.toList());
+    }
+
+    // 특정 사용자의 건의사항 조회
+    public List<FeedbackDTO> getFeedbacksByMember(Integer memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         return feedbackRepository.findByMember(member).stream()
-                .map(this::mapToResponseDTO)
+                .map(this::mapToFeedbackDTO)
                 .collect(Collectors.toList());
     }
 
-    // 관리자가 모든 건의사항 조회
-    public List<FeedbackResponseDTO> getAllFeedbacks() {
-        return feedbackRepository.findAll().stream()
-                .map(this::mapToResponseDTO)
+
+    // 사용자가 제출한 건의사항 조회 (처리 상태별 조회 추가)
+    public List<FeedbackDTO> getFeedbacksByMemberAndStatus(Integer memberId, FeedbackStatus status) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+
+        return feedbackRepository.findByMemberAndStatus(member, status).stream()
+                .map(this::mapToFeedbackDTO)
                 .collect(Collectors.toList());
     }
 
-    // 관리자가 특정 타입의 건의사항만 조회
-    public List<FeedbackResponseDTO> getFeedbacksByType(FeedbackType type) {
-        return feedbackRepository.findByType(type).stream()
-                .map(this::mapToResponseDTO)
+    // 관리자가 상태에 따라 건의사항 조회
+    public List<FeedbackDTO> getFeedbacksByStatus(FeedbackStatus status) {
+        return feedbackRepository.findByStatus(status).stream()
+                .map(this::mapToFeedbackDTO)
                 .collect(Collectors.toList());
     }
 
-    // 관리자: report 승인/반려 처리
-    public FeedbackResponseDTO approveFeedback(int feedbackId, boolean isApproved) {
+    // 특정 건의사항 승인 (관리자)
+    public FeedbackDTO approveFeedback(Long feedbackId) {
         Feedback feedback = feedbackRepository.findById(feedbackId)
-                .orElseThrow(() -> new RuntimeException("Feedback not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid feedback ID"));
 
-        if (!feedback.requiresApproval()) {
-            throw new RuntimeException("Only reports require approval");
-        }
-
-        feedback.setStatus(isApproved ? FeedbackStatus.APPROVED : FeedbackStatus.REJECTED);
+        feedback.setStatus(FeedbackStatus.APPROVED);  // 상태를 APPROVED로 변경
         feedbackRepository.save(feedback);
-        return mapToResponseDTO(feedback);
+
+        return mapToFeedbackDTO(feedback);
     }
 
-    // 관리자: 건의사항에 답장
-    public FeedbackResponseDTO replyToFeedback(int feedbackId, FeedbackReplyDTO replyDTO) {
-        Feedback feedback = feedbackRepository.findById(feedbackId)
-                .orElseThrow(() -> new RuntimeException("Feedback not found"));
-
-        if (!feedback.canReply()) {
-            throw new RuntimeException("Cannot reply to this feedback");
-        }
-
-        feedback.setReply(replyDTO.getReply());
-        feedbackRepository.save(feedback);
-        return mapToResponseDTO(feedback);
-    }
-
-    private FeedbackResponseDTO mapToResponseDTO(Feedback feedback) {
-        FeedbackResponseDTO responseDTO = new FeedbackResponseDTO();
-        responseDTO.setId(feedback.getId());
-        responseDTO.setTitle(feedback.getTitle());
-        responseDTO.setContent(feedback.getContent());
-        responseDTO.setType(feedback.getType());
-        responseDTO.setStatus(feedback.getStatus());
-        responseDTO.setCreateDate(feedback.getCreateDate());
-        responseDTO.setReply(feedback.getReply());
-        return responseDTO;
+    // Helper method to convert Feedback entity to DTO
+    private FeedbackDTO mapToFeedbackDTO(Feedback feedback) {
+        FeedbackDTO feedbackDTO = new FeedbackDTO();
+        feedbackDTO.setId(feedback.getId());
+        feedbackDTO.setBlinkerId(feedback.getBlinker().getId());
+        feedbackDTO.setFeedbackType(feedback.getFeedbackType().name());
+        feedbackDTO.setStatus(feedback.getStatus().name());
+        feedbackDTO.setCreatedAt(feedback.getCreateDate());
+        return feedbackDTO;
     }
 }
