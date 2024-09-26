@@ -29,7 +29,7 @@ public class RouteRecord extends BaseEntity {
     @Column(nullable = false, columnDefinition = "POINT SRID 4326")
     private Point endCoordinate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 }
