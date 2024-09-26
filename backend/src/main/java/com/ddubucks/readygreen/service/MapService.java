@@ -2,12 +2,15 @@ package com.ddubucks.readygreen.service;
 
 import com.ddubucks.readygreen.dto.*;
 import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
+import com.ddubucks.readygreen.exception.UnauthorizedAccessException;
 import com.ddubucks.readygreen.model.Blinker;
 import com.ddubucks.readygreen.model.Bookmark;
 import com.ddubucks.readygreen.model.RouteRecord;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.repository.*;
 import com.nimbusds.jose.shaded.gson.Gson;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.locationtech.jts.geom.Coordinate;
@@ -60,7 +63,7 @@ public class MapService {
         List<BlinkerDTO> blinkerDTOs = toBlinkerDTOs(blinkers);
 
         Member member = memberRepository.findMemberByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         // 경로 저장하기
         routeRecordRepository.save(
@@ -213,20 +216,17 @@ public class MapService {
         return gson.fromJson(response, RouteDTO.class);
     }
 
-    public BlinkerResponseDTO getNearbyBlinker(LocationRequestDTO locationRequestDTO) {
+    public BlinkerResponseDTO getNearbyBlinker(double latitude, double longitude, int radius) {
         List<Blinker> blinkers = blinkerJDBCRepository
-                .findAllByCoordinatesWithinRadius(
-                        getPoint(locationRequestDTO.getLongitude(), locationRequestDTO.getLatitude()),
-                        locationRequestDTO.getRadius()
-                );
+                .findAllByCoordinatesWithinRadius(getPoint(longitude, latitude), radius);
 
         return BlinkerResponseDTO.builder()
                 .blinkerDTOs(toBlinkerDTOs(blinkers))
                 .build();
     }
 
-    public BlinkerResponseDTO getBlinker(BlinkerRequestDTO blinkerRequestDTO) {
-        List<Blinker> blinkers = blinkerRepository.findAllById(blinkerRequestDTO.getBlinkerIDs());
+    public BlinkerResponseDTO getBlinker(List<Integer> blinkerIDs) {
+        List<Blinker> blinkers = blinkerRepository.findAllById(blinkerIDs);
 
         return BlinkerResponseDTO.builder()
                 .blinkerDTOs(toBlinkerDTOs(blinkers))
@@ -243,7 +243,7 @@ public class MapService {
 
     public void saveBookmark(BookmarkRequestDTO bookmarkRequestDTO, String email) {
         Member member = memberRepository.findMemberByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         bookmarkRepository.save(
                 Bookmark.builder()
@@ -258,4 +258,13 @@ public class MapService {
     }
 
 
+    @SneakyThrows
+    @Transactional
+    public void deleteBookmark(List<Integer> bookmarkIDs, String email) {
+        int count = bookmarkRepository.countByIdIn(bookmarkIDs, email);
+        if (count != bookmarkIDs.size()) {
+            throw new UnauthorizedAccessException("Unauthorized Access");
+        }
+        bookmarkRepository.deleteAllById(bookmarkIDs);
+    }
 }

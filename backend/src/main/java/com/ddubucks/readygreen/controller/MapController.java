@@ -9,6 +9,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/map")
@@ -23,14 +25,16 @@ public class MapController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getNearbyBlinker(@Valid @RequestBody LocationRequestDTO locationRequestDTO) {
-        BlinkerResponseDTO blinkerResponseDTO = mapService.getNearbyBlinker(locationRequestDTO);
+    public ResponseEntity<?> getNearbyBlinker(@RequestParam(required = false) double latitude,
+                                              @RequestParam(required = false) double longitude,
+                                              @RequestParam(required = false) int radius) {
+        BlinkerResponseDTO blinkerResponseDTO = mapService.getNearbyBlinker(latitude, longitude, radius);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
 
     @GetMapping("blinker")
-    public ResponseEntity<?> getBlinker(@Valid @RequestBody BlinkerRequestDTO blinkerRequestDTO) {
-        BlinkerResponseDTO blinkerResponseDTO = mapService.getBlinker(blinkerRequestDTO);
+    public ResponseEntity<?> getBlinker(@RequestParam(required = false) List<Integer> blinkerIDs) {
+        BlinkerResponseDTO blinkerResponseDTO = mapService.getBlinker(blinkerIDs);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
 
@@ -44,5 +48,11 @@ public class MapController {
     public ResponseEntity<?> saveBookmark(@Valid @RequestBody BookmarkRequestDTO bookmarkRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
         mapService.saveBookmark(bookmarkRequestDTO, userDetails.getUsername());
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("bookmark")
+    public ResponseEntity<?> deleteBookmark(@RequestParam(required = false) List<Integer> bookmarkIDs, @AuthenticationPrincipal UserDetails userDetails) {
+        mapService.deleteBookmark(bookmarkIDs, userDetails.getUsername());
+        return ResponseEntity.noContent().build();
     }
 }
