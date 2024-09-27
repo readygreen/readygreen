@@ -42,4 +42,8 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private int point;
+
+    private String smartphone;
+
+    private String watch;
 }
