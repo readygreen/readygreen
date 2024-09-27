@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:readygreen/widgets/map/mapsearchbackbar.dart';
 import 'package:readygreen/widgets/map/placecard.dart';
+import 'package:readygreen/screens/map/resultmap.dart';
 
 class MapSearchResultPage extends StatefulWidget {
   final List<Prediction> autoCompleteResults;
@@ -22,6 +23,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
   double? _lat;
   double? _lng;
   String? _placeName;
+  String? _address;
 
   // 캐싱된 장소 정보를 저장할 Map
   Map<String, Future<String>> cachedPlaceDetails = {};
@@ -61,13 +63,25 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
         _lat = result.geometry!.location.lat;
         _lng = result.geometry!.location.lng;
         _placeName = result.name;
+        _address = result.formattedAddress;
       });
 
       // 위도, 경도, 장소 이름 출력 (확인용)
       print('위도: $_lat, 경도: $_lng, 장소 이름: $_placeName');
 
-      // 장소 선택 시 위도, 경도, 이름을 지도 페이지로 전달하고 돌아감
-      Navigator.pop(context, {'lat': _lat, 'lng': _lng, 'name': _placeName});
+      // 장소 선택 시 resultmap 페이지로 이동하며 위도, 경도, 이름 전달
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultMapPage(
+            lat: _lat!,
+            lng: _lng!,
+            placeName: _placeName!,
+            address: _address!,
+            searchQuery: widget.searchQuery,
+          ),
+        ),
+      );
     } else {
       print('장소 선택 실패: ${response.errorMessage}');
     }
@@ -97,6 +111,10 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
               onSearchChanged: (value) {
                 print("검색어 변경됨: $value");
               },
+              onTap: () {
+                // 이전 페이지로 돌아가면서 검색어를 전달
+                Navigator.pop(context, widget.searchQuery);
+              },
             ),
           ),
 
@@ -124,7 +142,6 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                       final placeName =
                           snapshot.data?.split('\n')[0] ?? '알 수 없는 장소';
                       final address = snapshot.data?.split('\n')[1] ?? '주소 없음';
-
                       return PlaceCard(
                         placeName: placeName,
                         address: address,

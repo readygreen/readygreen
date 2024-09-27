@@ -64,9 +64,9 @@ class App extends StatelessWidget {
         fontFamily: 'CustomFont',
         primarySwatch: Colors.green,
       ),
-      initialRoute: '/main',
+      initialRoute: '/',
       routes: {
-        // '/': (context) => const StartLoadingPage(),
+        '/': (context) => const StartLoadingPage(),
         '/main': (context) => const MainPage(),
         '/login': (context) => LoginPage(),
         // '/home': (context) => const HomePage(), // MainScreen으로 변경

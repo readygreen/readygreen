@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:readygreen/api/main_api.dart';
 import 'package:readygreen/widgets/common/textbutton.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
-import 'package:readygreen/widgets/common/bgcontainer.dart'; // BackgroundContainer import
+import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/widgets/modals/weather_modal.dart';
+import 'package:readygreen/widgets/modals/luck_modal.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,19 +20,40 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // 기존 배경색 제거
-      body: const MainScreenContent(), // 그냥 MainScreenContent만 출력
+      body: const HomeScreenContent(),
     );
   }
 }
 
-class MainScreenContent extends StatelessWidget {
-  const MainScreenContent({super.key});
+class HomeScreenContent extends StatefulWidget {
+  const HomeScreenContent({Key? key}) : super(key: key);
+
+  @override
+  _HomeScreenContentState createState() => _HomeScreenContentState();
+}
+
+class _HomeScreenContentState extends State<HomeScreenContent> {
+  final NewMainApi api = NewMainApi();
+  final FlutterSecureStorage storage = FlutterSecureStorage();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAndStoreFortune(); // 페이지가 로드될 때 운세 데이터 로드 및 저장
+  }
+
+  // 운세 데이터를 API로부터 가져와서 로컬 스토리지에 저장
+  Future<void> _loadAndStoreFortune() async {
+    final fortune = await api.getFortune(); // API 요청
+    if (fortune != null) {
+      await storage.write(key: 'fortune', value: fortune); // 로컬 스토리지에 저장
+      // print('운세 저장 완료: $fortune');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return BackgroundContainer(
-      // 배경 설정을 위한 BackgroundContainer 추가
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,20 +83,47 @@ class MainScreenContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: SquareCardBox(
-                    title: '날씨',
-                    backgroundColor: AppColors.white,
-                    textColor: Colors.black,
-                    imageUrl: 'assets/images/badge.png', // 이미지 경로 수정
+                  child: GestureDetector(
+                    onTap: () {
+                      // 날씨 카드 클릭 시 WeatherModal 모달 띄우기
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const WeatherModal(); // 분리한 WeatherModal 사용
+                        },
+                      );
+                    },
+                    child: SquareCardBox(
+                      title: '날씨',
+                      textColor: Colors.black,
+                      imageUrl: 'assets/images/w-sun.png',
+                      backgroundGradient: LinearGradient(
+                        colors: [AppColors.weaherblue, AppColors.white],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      subtitle: '맑음',
+                      subtitleColor: AppColors.blue,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: SquareCardBox(
-                    title: '오늘의운세',
-                    backgroundColor: AppColors.darkblue,
-                    textColor: AppColors.white,
-                    imageUrl: 'assets/images/luck.png', // 이미지 경로 수정
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return const FortuneModal();
+                        },
+                      );
+                    },
+                    child: SquareCardBox(
+                      title: '오늘의운세',
+                      backgroundColor: AppColors.darkblue,
+                      textColor: AppColors.white,
+                      imageUrl: 'assets/images/luck.png',
+                    ),
                   ),
                 ),
               ],

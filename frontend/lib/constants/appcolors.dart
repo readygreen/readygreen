@@ -9,4 +9,5 @@ class AppColors {
   static const Color red = Color(0xFFE85554); // 취소, 삭제
   static const Color blue = Color(0xFF428EFF); // 날씨
   static const Color darkblue = Color(0xFF2D3765); // 운세
+  static const Color weaherblue = Color(0xFFC3E0FF); // 운세
 }
