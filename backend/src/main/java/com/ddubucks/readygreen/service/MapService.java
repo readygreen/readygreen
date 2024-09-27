@@ -236,8 +236,22 @@ public class MapService {
     public BookmarkResponseDTO getBookmark(String email) {
         List<Bookmark> bookmarks = bookmarkRepository.findAllByEmail(email);
 
+        List<BookmarkDTO> bookmarkDTOs = new ArrayList<>();
+        for (Bookmark bookmark : bookmarks) {
+            bookmarkDTOs.add(
+                    BookmarkDTO
+                            .builder()
+                            .id(bookmark.getId())
+                            .name(bookmark.getName())
+                            .destinationName(bookmark.getDestinationName())
+                            .latitude(bookmark.getDestinationCoordinate().getY())
+                            .longitude(bookmark.getDestinationCoordinate().getX())
+                            .alertTime(bookmark.getAlertTime())
+                            .build()
+            );
+        }
         return BookmarkResponseDTO.builder()
-                .bookmarks(bookmarks)
+                .bookmarkDTOs(bookmarkDTOs)
                 .build();
     }
 
@@ -252,6 +266,7 @@ public class MapService {
                         .destinationCoordinate(
                                 getPoint(bookmarkRequestDTO.getLongitude(), bookmarkRequestDTO.getLatitude())
                         )
+                        .alertTime(bookmarkRequestDTO.getAlertTime())
                         .member(member)
                         .build()
         );
@@ -266,5 +281,28 @@ public class MapService {
             throw new UnauthorizedAccessException("Unauthorized Access");
         }
         bookmarkRepository.deleteAllById(bookmarkIDs);
+    }
+
+    public RouteRecordResponseDTO getRouteRecord(String email) {
+        List<RouteRecord> routeRecords = routeRecordRepository.findAllByEmail(email);
+
+        List<RouteRecordDTO> routeRecordDTOs = new ArrayList<>();
+        for (RouteRecord routeRecord : routeRecords) {
+            routeRecordDTOs.add(
+                    RouteRecordDTO
+                            .builder()
+                            .id(routeRecord.getId())
+                            .startName(routeRecord.getStartName())
+                            .startLatitude(routeRecord.getStartCoordinate().getY())
+                            .startLongitude(routeRecord.getStartCoordinate().getX())
+                            .endName(routeRecord.getEndName())
+                            .endLatitude(routeRecord.getEndCoordinate().getY())
+                            .endLongitude(routeRecord.getEndCoordinate().getX())
+                            .build()
+            );
+        }
+        return RouteRecordResponseDTO.builder()
+                .routeRecordDTOs(routeRecordDTOs)
+                .build();
     }
 }

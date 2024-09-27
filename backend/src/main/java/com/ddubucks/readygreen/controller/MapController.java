@@ -38,6 +38,12 @@ public class MapController {
         return ResponseEntity.ok(blinkerResponseDTO);
     }
 
+    @GetMapping("route")
+    public ResponseEntity<?> getRouteRecord(@AuthenticationPrincipal UserDetails userDetails) {
+        RouteRecordResponseDTO routeRecordResponseDTO = mapService.getRouteRecord(userDetails.getUsername());
+        return ResponseEntity.ok(routeRecordResponseDTO);
+    }
+
     @GetMapping("bookmark")
     public ResponseEntity<?> getBookmark(@AuthenticationPrincipal UserDetails userDetails) {
         BookmarkResponseDTO bookmarkResponseDTO = mapService.getBookmark(userDetails.getUsername());

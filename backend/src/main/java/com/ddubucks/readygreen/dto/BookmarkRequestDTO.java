@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,4 +25,7 @@ public class BookmarkRequestDTO {
 
     @NotNull(message = "longitude cannot null")
     private double longitude;
+
+    @DateTimeFormat(pattern = "HH:mm:ss")
+    private LocalTime alertTime;
 }

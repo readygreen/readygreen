@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "destination_bookmark")
 @Getter
@@ -28,6 +30,8 @@ public class Bookmark extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "POINT SRID 4326")
     private Point destinationCoordinate;
+
+    private LocalTime alertTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
