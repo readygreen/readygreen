@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.dto;
 
+import com.ddubucks.readygreen.model.RouteRecord;
 import lombok.*;
 
 import java.util.List;
@@ -9,6 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-public class BookmarkResponseDTO {
-    List<BookmarkDTO> bookmarkDTOs;
+public class RouteRecordResponseDTO {
+    List<RouteRecordDTO> routeRecordDTOs;
 }
