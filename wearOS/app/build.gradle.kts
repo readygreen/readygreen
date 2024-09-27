@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.horologist.tiles)
     implementation(libs.watchface.complications.data.source.ktx)
     implementation(libs.navigation.compose)
-    implementation(libs.appcompat)
+    implementation(libs.material3.android)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)

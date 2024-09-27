@@ -14,6 +14,7 @@ horologistTiles = "0.4.8"
 watchfaceComplicationsDataSourceKtx = "1.1.1"
 navigationCompose = "2.8.0"
 appcompat = "1.7.0"
+material3Android = "1.3.0"
 
 [libraries]
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
@@ -34,6 +35,7 @@ horologist-tiles = { group = "com.google.android.horologist", name = "horologist
 watchface-complications-data-source-ktx = { group = "androidx.wear.watchface", name = "watchface-complications-data-source-ktx", version.ref = "watchfaceComplicationsDataSourceKtx" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

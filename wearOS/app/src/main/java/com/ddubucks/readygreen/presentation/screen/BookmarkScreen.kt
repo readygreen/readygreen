@@ -31,19 +31,22 @@ fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.c
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "자주가는 목적지",
-            style = h3Style,
-            color = Yellow,
-            modifier = Modifier.padding(bottom = 10.dp, top = 30.dp)
-        )
-
         ScalingLazyColumn {
+            item {
+                Text(
+                    text = "자주가는 목적지",
+                    style = h3Style,
+                    color = Yellow,
+                    modifier = Modifier.padding(bottom = 10.dp, top = 30.dp)
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
             items(bookmarks) { bookmark ->
                 Text(text = bookmark.name)
             }
         }
-
         // TODO 더미데이터 삭제
 //        val buttonList = listOf(
 //            ButtonIconModel(R.drawable.bookmark_home, "집"),

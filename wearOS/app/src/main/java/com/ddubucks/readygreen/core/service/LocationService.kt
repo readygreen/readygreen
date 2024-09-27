@@ -1,35 +1,23 @@
 package com.ddubucks.readygreen.core.service
 
-import android.os.Bundle
-import android.annotation.SuppressLint
-import android.content.Context
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.google.android.gms.location.FusedLocationProviderClient
 
-class LocationService(private val context: Context) {
+class LocationService {
 
-    private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-    private val _locationFlow = MutableStateFlow<Location?>(null)
-    val locationFlow: StateFlow<Location?> = _locationFlow
-
-    // 위치 업데이트 요청
-    @SuppressLint("MissingPermission")
-    fun requestLocationUpdates() {
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            1000L,
-            10f,
-            object : LocationListener {
-                override fun onLocationChanged(location: Location) {
-                    _locationFlow.value = location // 새로운 위치를 Flow에 업데이트
+    fun getLastLocation(
+        fusedLocationClient: FusedLocationProviderClient,
+        onLocationReceived: (Double, Double) -> Unit
+    ) {
+        try {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location: Location? ->
+                    location?.let {
+                        onLocationReceived(it.latitude, it.longitude)
+                    }
                 }
-                override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-                override fun onProviderEnabled(provider: String) {}
-                override fun onProviderDisabled(provider: String) {}
-            }
-        )
+        } catch (e: SecurityException) {
+            // 권한 예외 처리
+        }
     }
 }

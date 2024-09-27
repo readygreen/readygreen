@@ -1,6 +1,6 @@
 package com.ddubucks.readygreen.core.network
 
-import com.ddubucks.readygreen.data.api.ApiService
+import com.ddubucks.readygreen.data.api.BookmarkApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -10,7 +10,7 @@ object RetrofitClient {
 
     private const val BASE_URL = "http://j11b108.p.ssafy.io/api/v1/"
 
-    val apiService: ApiService by lazy {
+    val apiService: BookmarkApi by lazy {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
@@ -24,6 +24,6 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
-            .create(ApiService::class.java)
+            .create(BookmarkApi::class.java)
     }
 }
