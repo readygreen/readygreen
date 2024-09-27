@@ -15,7 +15,7 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   final NewUserApi userApiService = NewUserApi();
-  final storage = const FlutterSecureStorage(); // FlutterSecureStorage 인스턴스 생성
+  final storage = const FlutterSecureStorage();
   Map<String, dynamic>? profileData;
   bool isLoading = true;
 
@@ -56,7 +56,7 @@ class _MyPageState extends State<MyPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 50),
-                    // 프로필 정보 섹션
+                    // 프로필 정보
                     CardBox(
                       title: '내 정보',
                       height: 160,
@@ -64,7 +64,7 @@ class _MyPageState extends State<MyPage> {
                       textColor: Colors.black,
                       child: Row(
                         children: [
-                          // 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시
+                          // 프로필 이미지
                           CircleAvatar(
                             radius: 40,
                             backgroundImage: profileData?['profileImageUrl'] !=
@@ -73,7 +73,7 @@ class _MyPageState extends State<MyPage> {
                                 : AssetImage('assets/images/user.png')
                                     as ImageProvider,
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: 13),
                           // 프로필 텍스트 정보
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +94,7 @@ class _MyPageState extends State<MyPage> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // 내 배지 및 내 장소 섹션
+                    // 내 배지 및 내 장소
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
