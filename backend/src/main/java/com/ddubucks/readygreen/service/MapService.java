@@ -236,8 +236,21 @@ public class MapService {
     public BookmarkResponseDTO getBookmark(String email) {
         List<Bookmark> bookmarks = bookmarkRepository.findAllByEmail(email);
 
+        List<BookmarkDTO> bookmarkDTOs = new ArrayList<>();
+        for (Bookmark bookmark : bookmarks) {
+            bookmarkDTOs.add(
+                    BookmarkDTO
+                            .builder()
+                            .id(bookmark.getId())
+                            .name(bookmark.getName())
+                            .destinationName(bookmark.getDestinationName())
+                            .latitude(bookmark.getDestinationCoordinate().getY())
+                            .longitude(bookmark.getDestinationCoordinate().getX())
+                            .build()
+            );
+        }
         return BookmarkResponseDTO.builder()
-                .bookmarks(bookmarks)
+                .bookmarkDTOs(bookmarkDTOs)
                 .build();
     }
 
