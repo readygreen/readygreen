@@ -246,6 +246,7 @@ public class MapService {
                             .destinationName(bookmark.getDestinationName())
                             .latitude(bookmark.getDestinationCoordinate().getY())
                             .longitude(bookmark.getDestinationCoordinate().getX())
+                            .alertTime(bookmark.getAlertTime())
                             .build()
             );
         }
@@ -265,6 +266,7 @@ public class MapService {
                         .destinationCoordinate(
                                 getPoint(bookmarkRequestDTO.getLongitude(), bookmarkRequestDTO.getLatitude())
                         )
+                        .alertTime(bookmarkRequestDTO.getAlertTime())
                         .member(member)
                         .build()
         );

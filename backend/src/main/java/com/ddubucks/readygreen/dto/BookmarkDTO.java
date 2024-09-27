@@ -2,6 +2,8 @@ package com.ddubucks.readygreen.dto;
 
 import lombok.*;
 
+import java.time.LocalTime;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -13,4 +15,5 @@ public class BookmarkDTO {
     private String destinationName;
     private double latitude;
     private double longitude;
+    private LocalTime alertTime;
 }
