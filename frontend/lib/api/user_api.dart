@@ -1,8 +1,7 @@
-// lib/api_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:readygreen/constants/baseurl.dart'; // baseUrl 임포트
+import 'package:readygreen/constants/baseurl.dart';
 
 class NewUserApi {
   final storage = const FlutterSecureStorage();
@@ -44,7 +43,7 @@ class NewUserApi {
           print('로그인 토큰 저장 accessToken');
           print(accessToken);
 
-          return accessToken; // 로그인 성공 시 accessToken 반환
+          return accessToken;
         } else {
           print('Access Token을 찾을 수 없습니다.');
           return null;
@@ -52,6 +51,7 @@ class NewUserApi {
       } else if (response.statusCode == 401) {
         // 401 에러 발생 시 회원가입 요청
         print('로그인 실패: 401 Unauthorized, 회원가입 시도 중...');
+
         bool signUpSuccess = await signUp(
           email: email,
           nickname: nickname,
@@ -89,8 +89,11 @@ class NewUserApi {
     required String password,
     required String socialType,
     required String profileImg,
+    String? smartphone,
   }) async {
     final String apiUrl = "$baseUrl/auth";
+
+    String? deviceToken = await storage.read(key: 'deviceToken');
 
     Map<String, String> requestBody = {
       'email': email,
@@ -98,6 +101,7 @@ class NewUserApi {
       'socialId': password,
       'socialType': socialType.toUpperCase(), // 대문자로 변환
       'profileImg': profileImg,
+      'smartphone': deviceToken ?? ''
     };
 
     print('회원가입 요청 데이터: $requestBody');
@@ -125,7 +129,7 @@ class NewUserApi {
     }
   }
 
-  // 프로필 불러오기 함수 (이전 코드 유지)
+  // 프로필 불러오기 함수
   Future<Map<String, dynamic>?> fetchProfileData() async {
     String? accessToken = await storage.read(key: 'accessToken');
     print('프로필 accessToken');

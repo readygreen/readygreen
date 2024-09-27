@@ -4,6 +4,7 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:readygreen/main.dart';
 // import 'package:readygreen/screens/login/signup.dart';
 import 'package:readygreen/api/user_api.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +17,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final NewUserApi loginService = NewUserApi(); // LoginService 객체 생성
+  final storage = const FlutterSecureStorage();
   Future<void> signInWithKakao() async {
     try {
       print('카카오 로그인 KakaoSdk.origin');

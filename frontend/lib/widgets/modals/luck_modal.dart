@@ -15,11 +15,11 @@ class _FortuneModalState extends State<FortuneModal> {
   @override
   void initState() {
     super.initState();
-    _loadStoredFortune();
+    _loadStoreFortune();
   }
 
 // 로컬 스토리지에서 운세 데이터를 불러오는 함수
-  Future<void> _loadStoredFortune() async {
+  Future<void> _loadStoreFortune() async {
     final storedFortune = await storage.read(key: 'fortune'); // 저장된 운세 불러오기
     setState(() {
       fortune = storedFortune ?? '운세 정보를 불러올 수 없습니다.';
