@@ -8,10 +8,43 @@ import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/screens/place/place.dart';
 import 'package:readygreen/screens/mypage/mypage.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import '../../firebase_options.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Secure Storage
 
-void main() {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+print("백그라운드 메시지 처리.. ${message.notification!.body!}");
+}
+
+void initializeNotification() async {
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(const AndroidNotificationChannel(
+          'high_importance_channel', 'high_importance_notification',
+          importance: Importance.max));
+  await flutterLocalNotificationsPlugin.initialize(const InitializationSettings(
+    android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+  ));
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+}
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // runApp() 호출 전 Flutter SDK 초기화
+  await Firebase.initializeApp();
+  initializeNotification();
   KakaoSdk.init(
     nativeAppKey: 'cf5488929a2ad2db61f895c42f6926cc',
     javaScriptAppKey: 'dc542207fe96b123abf798c0113bd537',
@@ -34,7 +67,8 @@ class App extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const StartLoadingPage(),
-        '/login': (context) => const LoginPage(),
+        '/main': (context) => const MainPage(),
+        '/login': (context) => LoginPage(),
         // '/home': (context) => const HomePage(), // MainScreen으로 변경
         '/map': (context) => const MapPage(),
       },
@@ -49,9 +83,12 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
+
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
-
+  var messageString = "";
+ // Secure Storage 객체 생성
+  
   static final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),
     PointPage(),
@@ -59,6 +96,35 @@ class _MainPageState extends State<MainPage> {
     const PlacePage(),
     const MyPage(),
   ];
+  // 저장된 accessToken 확인하여 자동 로그인 처리
+
+@override 
+void initState() {
+  print("init하는중");
+  super.initState();
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    if(!mounted) return;
+    RemoteNotification? notification = message.notification;
+    if (notification != null) {
+      FlutterLocalNotificationsPlugin().show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'high_importance_channel',
+            'high_importance_notification',
+            importance: Importance.max,
+          ),
+        ),
+      );
+      setState(() {
+        messageString = message.notification!.body!;
+        print("Foreground 메시지 수신: $messageString");
+      });
+    }
+  });
+}
 
   void _onItemTapped(int index) {
     setState(() {

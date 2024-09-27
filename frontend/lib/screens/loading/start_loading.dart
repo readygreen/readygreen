@@ -3,6 +3,11 @@ import 'dart:async'; // for Timer
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Secure Storage
 import 'package:readygreen/screens/login/login.dart'; // 로그인 페이지
 import 'package:readygreen/main.dart'; // 메인 페이지
+import 'package:firebase_messaging/firebase_messaging.dart';
+import '../../firebase_options.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Secure Storage
+
 
 class StartLoadingPage extends StatefulWidget {
   const StartLoadingPage({super.key});
@@ -18,7 +23,12 @@ class _StartLoadingPageState extends State<StartLoadingPage> {
   @override
   void initState() {
     super.initState();
+    getMyDeviceToken();
     _checkLoginStatus(); // 앱 시작 시 로그인 상태 확인
+  }
+  void getMyDeviceToken() async {
+    final token = await FirebaseMessaging.instance.getToken();
+    print("내 디바이스 토큰: $token");
   }
 
   // 저장된 accessToken 확인하여 자동 로그인 처리
