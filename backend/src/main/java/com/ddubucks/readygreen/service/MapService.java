@@ -280,4 +280,27 @@ public class MapService {
         }
         bookmarkRepository.deleteAllById(bookmarkIDs);
     }
+
+    public RouteRecordResponseDTO getRouteRecord(String email) {
+        List<RouteRecord> routeRecords = routeRecordRepository.findAllByEmail(email);
+
+        List<RouteRecordDTO> routeRecordDTOs = new ArrayList<>();
+        for (RouteRecord routeRecord : routeRecords) {
+            routeRecordDTOs.add(
+                    RouteRecordDTO
+                            .builder()
+                            .id(routeRecord.getId())
+                            .startName(routeRecord.getStartName())
+                            .startLatitude(routeRecord.getStartCoordinate().getY())
+                            .startLongitude(routeRecord.getStartCoordinate().getX())
+                            .endName(routeRecord.getEndName())
+                            .endLatitude(routeRecord.getEndCoordinate().getY())
+                            .endLongitude(routeRecord.getEndCoordinate().getX())
+                            .build()
+            );
+        }
+        return RouteRecordResponseDTO.builder()
+                .routeRecordDTOs(routeRecordDTOs)
+                .build();
+    }
 }
