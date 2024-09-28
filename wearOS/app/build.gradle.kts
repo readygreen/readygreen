@@ -27,8 +27,6 @@ android {
 
     }
 
-    println("MAPS_API_KEY: ${properties.getProperty("MAPS_API_KEY")}")
-
 
     buildTypes {
         release {
@@ -96,8 +94,8 @@ dependencies {
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")  // JSON 파싱을 위한 GSON
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")  // 로그 인터셉터 (디버깅용)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
     // Lottie
     implementation("com.airbnb.android:lottie-compose:6.0.0")

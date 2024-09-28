@@ -1,6 +1,6 @@
-package com.ddubucks.readygreen.data.model
+package com.ddubucks.readygreen.presentation.retrofit.bookmark
 
-data class BookmarkModel(
+data class BookmarkResponse(
     // TODO response body 보고 수정
     val coordinate: Double,
     val name: String,

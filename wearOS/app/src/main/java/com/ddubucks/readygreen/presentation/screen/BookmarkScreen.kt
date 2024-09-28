@@ -24,44 +24,29 @@ import h3Style
 fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val bookmarks by viewModel.bookmark.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        ScalingLazyColumn {
-            item {
-                Text(
-                    text = "자주가는 목적지",
-                    style = h3Style,
-                    color = Yellow,
-                    modifier = Modifier.padding(bottom = 10.dp, top = 30.dp)
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-            items(bookmarks) { bookmark ->
-                Text(text = bookmark.name)
-            }
+    val buttonList = listOf(
+        ButtonIconModel(R.drawable.bookmark_home, "집"),
+        ButtonIconModel(R.drawable.bookmark_office, "회사"),
+        ButtonIconModel(R.drawable.bookmark_default, "나만의 맛집"),
+        ButtonIconModel(R.drawable.bookmark_default, "또다른 맛집")
+    )
+
+    ScalingLazyColumn {
+        item {
+            Text(
+                text = "자주가는 목적지",
+                style = h3Style,
+                color = Yellow,
+                modifier = Modifier.padding(bottom = 10.dp, top = 30.dp)
+            )
         }
-        // TODO 더미데이터 삭제
-//        val buttonList = listOf(
-//            ButtonIconModel(R.drawable.bookmark_home, "집"),
-//            ButtonIconModel(R.drawable.bookmark_office, "회사"),
-//            ButtonIconModel(R.drawable.bookmark_default, "나만의 맛집"),
-//            ButtonIconModel(R.drawable.bookmark_default, "또다른 맛집")
-//        )
-//
-//        ScalingLazyColumn {
-//            items(buttonList) { item ->
-//                ButtonIconItem(item = item, onClick = {
-//                    Log.d("BookmarkScreen", "버튼 클릭: ${item.label}")
-//                })
-//            }
-//        }
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+        items(buttonList) { item ->
+                ButtonIconItem(item = item, onClick = {
+                    Log.d("BookmarkScreen", "버튼 클릭: ${item.label}")
+                })
+            }
         }
     }
-

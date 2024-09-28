@@ -3,22 +3,21 @@ package com.ddubucks.readygreen.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ddubucks.readygreen.data.model.BookmarkModel
+import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkResponse
 import com.ddubucks.readygreen.data.repository.BookmarkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 class BookmarkViewModel : ViewModel() {
 
     private val repository = BookmarkRepository()
 
-    private val _bookMark = MutableStateFlow<List<BookmarkModel>>(emptyList())
-    val bookmark: StateFlow<List<BookmarkModel>> get() = _bookMark
+    private val _bookMark = MutableStateFlow<List<BookmarkResponse>>(emptyList())
+    val bookmark: StateFlow<List<BookmarkResponse>> get() = _bookMark
 
     init {
-        fetchBookmark()  // ViewModel 초기화 시점에 데이터 로드
+        fetchBookmark()
     }
 
     private fun fetchBookmark() {

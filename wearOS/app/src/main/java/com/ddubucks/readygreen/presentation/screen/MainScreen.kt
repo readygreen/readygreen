@@ -24,11 +24,11 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.items
 import androidx.navigation.NavHostController
 import com.ddubucks.readygreen.R
+import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.data.model.ButtonIconModel
 import com.ddubucks.readygreen.presentation.components.ButtonIconItem
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Yellow
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import h1Style
 
@@ -41,6 +41,7 @@ fun MainScreen(navController: NavHostController) {
     var latitude by remember { mutableStateOf<Double?>(null) }
     var longitude by remember { mutableStateOf<Double?>(null) }
     var permissionGranted by remember { mutableStateOf(false) }
+    val locationService = remember { LocationService() }
 
     // 위치 권한 요청
     val locationPermission = rememberLauncherForActivityResult(
@@ -48,7 +49,7 @@ fun MainScreen(navController: NavHostController) {
     ) { isGranted ->
         permissionGranted = isGranted
         if (isGranted) {
-            getLastLocation(fusedLocationClient) { lat, long ->
+            locationService.getLastLocation(fusedLocationClient) { lat, long ->
                 latitude = lat
                 longitude = long
             }
@@ -64,7 +65,7 @@ fun MainScreen(navController: NavHostController) {
             locationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
             permissionGranted = true
-            getLastLocation(fusedLocationClient) { lat, long ->
+            locationService.getLastLocation(fusedLocationClient) { lat, long ->
                 latitude = lat
                 longitude = long
             }
@@ -123,18 +124,3 @@ fun MainScreen(navController: NavHostController) {
     }
 }
 
-fun getLastLocation(
-    fusedLocationClient: FusedLocationProviderClient,
-    onLocationReceived: (Double, Double) -> Unit
-) {
-    try {
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location: Location? ->
-                location?.let {
-                    onLocationReceived(it.latitude, it.longitude)
-                }
-            }
-    } catch (e: SecurityException) {
-        // 권한 예외 처리
-    }
-}
