@@ -42,6 +42,10 @@ public class RouteRequestDTO {
         - 10: 최단
         - 30: 최단거리+계단제외
     */
+
     @JsonIgnore
     private Integer searchOption = 0;
+
+    @NotNull
+    private boolean isWatch;
 }

@@ -1,7 +1,12 @@
 package com.ddubucks.readygreen.controller;
 
 import com.ddubucks.readygreen.dto.*;
+import com.ddubucks.readygreen.model.member.Member;
+import com.ddubucks.readygreen.service.FcmService;
 import com.ddubucks.readygreen.service.MapService;
+import com.ddubucks.readygreen.service.MemberService;
+import com.ddubucks.readygreen.service.RedisService;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,15 +22,35 @@ import java.util.List;
 public class MapController {
 
     private final MapService mapService;
+    private final RedisService redisService;
+    private final FcmService fcmService;
+    private final MemberService memberService;
 
     @PostMapping("start")
-    public ResponseEntity<?> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<MapResponseDTO> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         MapResponseDTO mapResponseDTO = mapService.getDestinationGuide(routeRequestDTO, userDetails.getUsername());
+        redisService.save(userDetails.getUsername(),mapResponseDTO);
+        Member member = memberService.getMemberInfo(userDetails.getUsername());
+        fcmService.sendMessageToOtherDevice(member,routeRequestDTO.isWatch());
         return ResponseEntity.ok(mapResponseDTO);
     }
 
+    @GetMapping("check")
+    public ResponseEntity<MapResponseDTO> getCheckAlreadyGuide(@AuthenticationPrincipal UserDetails userDetails){
+        System.out.println(userDetails.getUsername());
+        MapResponseDTO result = (MapResponseDTO)redisService.find(userDetails.getUsername());
+        System.out.println(result);
+        if(result==null){
+            return ResponseEntity.noContent().build();
+        }else{
+
+            return ResponseEntity.ok().body(result);
+        }
+    }
+//    @GetMapping("")
+
     @GetMapping
-    public ResponseEntity<?> getNearbyBlinker(@RequestParam(required = false) double latitude,
+    public ResponseEntity<BlinkerResponseDTO> getNearbyBlinker(@RequestParam(required = false) double latitude,
                                               @RequestParam(required = false) double longitude,
                                               @RequestParam(required = false) int radius) {
         BlinkerResponseDTO blinkerResponseDTO = mapService.getNearbyBlinker(latitude, longitude, radius);
@@ -33,19 +58,19 @@ public class MapController {
     }
 
     @GetMapping("blinker")
-    public ResponseEntity<?> getBlinker(@RequestParam(required = false) List<Integer> blinkerIDs) {
+    public ResponseEntity<BlinkerResponseDTO> getBlinker(@RequestParam(required = false) List<Integer> blinkerIDs) {
         BlinkerResponseDTO blinkerResponseDTO = mapService.getBlinker(blinkerIDs);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
 
     @GetMapping("route")
-    public ResponseEntity<?> getRouteRecord(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<RouteRecordResponseDTO> getRouteRecord(@AuthenticationPrincipal UserDetails userDetails) {
         RouteRecordResponseDTO routeRecordResponseDTO = mapService.getRouteRecord(userDetails.getUsername());
         return ResponseEntity.ok(routeRecordResponseDTO);
     }
 
     @GetMapping("bookmark")
-    public ResponseEntity<?> getBookmark(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<BookmarkResponseDTO> getBookmark(@AuthenticationPrincipal UserDetails userDetails) {
         BookmarkResponseDTO bookmarkResponseDTO = mapService.getBookmark(userDetails.getUsername());
         return ResponseEntity.ok(bookmarkResponseDTO);
     }

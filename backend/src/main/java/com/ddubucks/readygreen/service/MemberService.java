@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -28,7 +27,6 @@ public class MemberService {
                 .role(Role.USER)
                 .build());
     }
-
     @Transactional
     public void delete(String email) {
         memberRepository.deleteMemberByEmail(email);

@@ -31,7 +31,7 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<Member> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails) {
         System.out.println(userDetails.getUsername());
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         return ResponseEntity.ok(member);
