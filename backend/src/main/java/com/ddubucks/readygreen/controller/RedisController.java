@@ -1,19 +1,17 @@
 package com.ddubucks.readygreen.controller;
 
 import com.ddubucks.readygreen.service.RedisService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/redis")
+@AllArgsConstructor
 public class RedisController {
 
     private final RedisService redisService;
 
-    @Autowired
-    public RedisController(RedisService redisService) {
-        this.redisService = redisService;
-    }
 
     @PostMapping("/save")
     public String saveToRedis(@RequestParam String key, @RequestParam String value) {

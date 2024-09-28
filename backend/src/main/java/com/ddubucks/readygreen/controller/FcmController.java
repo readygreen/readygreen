@@ -31,7 +31,7 @@ public class FcmController {
                 if(member.getSmartphone()==null || member.getWatch()==null){
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
-                fcmService.sendMessageToOtherDevice(member, fcmRequestDTO.isWatch());
+                fcmService.sendMessageToOtherDevice(member, fcmRequestDTO.isWatch(),1);
 
                 return ResponseEntity.status(HttpStatus.OK).body("전송 성공");
             }else{

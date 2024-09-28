@@ -73,6 +73,13 @@ public class SwaggerConfig {
                 .pathsToMatch("/main/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi linkApi() {
+        return GroupedOpenApi.builder()
+                .group("워치연동")
+                .pathsToMatch("/link/**")
+                .build();
+    }
 
     @Bean
     public GroupedOpenApi mapApi() {
