@@ -7,6 +7,8 @@ import 'package:readygreen/screens/point/point.dart';
 import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/screens/place/place.dart';
 import 'package:readygreen/screens/mypage/mypage.dart';
+import 'package:provider/provider.dart';
+import 'provider/current_location.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -58,20 +60,26 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Navigation Example',
-      theme: ThemeData(
-        fontFamily: 'CustomFont',
-        primarySwatch: Colors.green,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+            create: (_) =>
+                CurrentLocationProvider()), // CurrentLocationProvider 등록
+      ],
+      child: MaterialApp(
+        title: 'Flutter Navigation Example',
+        theme: ThemeData(
+          fontFamily: 'CustomFont',
+          primarySwatch: Colors.green,
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => const StartLoadingPage(),
+          '/login': (context) => const LoginPage(),
+          // '/home': (context) => const HomePage(), // MainScreen으로 변경
+          '/map': (context) => const MapPage(),
+        },
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const StartLoadingPage(),
-        '/main': (context) => const MainPage(),
-        '/login': (context) => LoginPage(),
-        // '/home': (context) => const HomePage(), // MainScreen으로 변경
-        // '/map': (context) => const MapPage(),
-      },
     );
   }
 }

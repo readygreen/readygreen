@@ -129,8 +129,8 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                   future: _getDetailedInfo(result.placeId!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const ListTile(
-                        title: Text('로딩 중...'),
+                      return const Center(
+                        child: CircularProgressIndicator(),
                       );
                     } else if (snapshot.hasError ||
                         !snapshot.hasData ||
