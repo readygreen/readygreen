@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
-class MapSearchBar extends StatelessWidget {
+class MapSearchBackBar extends StatelessWidget {
+  final String placeName;
   final Function(String) onSearchSubmitted;
-  // final Function() onVoiceSearch;
+  final Function() onVoiceSearch;
   final Function(String) onSearchChanged;
   final Function()? onTap;
-  final String? initialValue;
 
-  const MapSearchBar({
+  const MapSearchBackBar({
     super.key,
+    required this.placeName,
     required this.onSearchSubmitted,
-    // required this.onVoiceSearch,
+    required this.onVoiceSearch,
     required this.onSearchChanged,
     this.onTap,
-    this.initialValue,
   });
 
   @override
@@ -33,24 +33,30 @@ class MapSearchBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.search, color: Colors.black54),
-          const SizedBox(width: 10),
           Expanded(
-            child: TextFormField(
-              initialValue: initialValue ?? '', // 초기값이 없으면 빈칸 처리
+            child: TextField(
+              controller: TextEditingController(text: placeName),
               decoration: const InputDecoration(
-                hintText: '검색어를 입력하세요.',
                 border: InputBorder.none,
               ),
               onTap: onTap,
               onChanged: onSearchChanged,
-              onFieldSubmitted: onSearchSubmitted,
+              onSubmitted: (value) {
+                onSearchSubmitted(value);
+              },
             ),
           ),
           IconButton(
             icon: const Icon(Icons.mic_none_rounded, color: Colors.black54),
             onPressed: () {
-              // 음성 검색 기능 추가 시 여기에 추가
+              onVoiceSearch();
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, color: Colors.black54),
+            onPressed: () {
+              // X 버튼을 누르면 지도 화면으로 돌아가기
+              Navigator.popUntil(context, (route) => route.isFirst);
             },
           ),
         ],

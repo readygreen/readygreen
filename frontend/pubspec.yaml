@@ -41,9 +41,15 @@ dependencies:
   location: ^6.0.2
   geolocator: ^13.0.1
   geocoding: ^3.0.0
+  provider: ^6.1.2
   http: ^0.13.6
   speech_to_text: ^7.0.0
   flutter_secure_storage: ^9.2.2
+  kakao_flutter_sdk_user: ^1.9.6
+  intl: ^0.17.0
+  firebase_messaging: ^15.1.2
+  googleapis_auth: ^1.4.1
+  flutter_local_notifications: ^17.2.3
 
 dev_dependencies:
   flutter_test:
@@ -101,6 +107,11 @@ flutter:
     - assets/images/mic.png
     - assets/images/badge.png
     - assets/images/place.png
+    - assets/images/user.png
+    - assets/images/w-sun.png
+    - assets/images/w-rain.png
+    - assets/images/w-cloudy.png
+    - assets/images/w-snow.png
 
   fonts:
     - family: CustomFont
