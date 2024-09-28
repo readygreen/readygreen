@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/screens/map/mapdirection.dart';
 
 class ArriveButton extends StatelessWidget {
   final String text;
@@ -20,7 +21,15 @@ class ArriveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // onTap: onPressed, // 클릭 이벤트 처리
+      onTap: () {
+        print('도착지 버튼이 눌렸습니다.');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MapDirectionPage(),
+          ),
+        );
+      },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
