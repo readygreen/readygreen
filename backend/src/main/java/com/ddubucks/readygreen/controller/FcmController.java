@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import com.ddubucks.readygreen.model.member.Member;
 
 import java.util.List;
 import java.util.Map;
@@ -22,27 +23,20 @@ public class FcmController {
     private final MemberService memberService;
     private final FcmService fcmService;
 
-    @GetMapping("/message")
+    @PostMapping("/message")
     public ResponseEntity<?> sendMessage(@AuthenticationPrincipal UserDetails userDetails, @RequestBody FcmRequestDTO fcmRequestDTO){
         try {
             if(fcmRequestDTO.getMessageType()==1){
-                fcmService.sendMessageToOtherDevice(memberService.getMemberInfo(userDetails.getUsername()), fcmRequestDTO.isWatch());
+                Member member = memberService.getMemberInfo(userDetails.getUsername());
+                if(member.getSmartphone()==null || member.getWatch()==null){
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+                fcmService.sendMessageToOtherDevice(member, fcmRequestDTO.isWatch());
 
                 return ResponseEntity.status(HttpStatus.OK).body("전송 성공");
             }else{
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-
-//            if (!liveScrapUserInfo.isEmpty()) {
-//                // FCM 메시지 전송
-//                fcmService.sendMessageToMultipleTokens(liveScrapUserInfo, title, liveId);
-//
-//                // 성공적으로 전송되었을 때, 사용자 정보를 반환
-//                return ResponseEntity.status(HttpStatus.OK).body(liveScrapUserInfo);
-//            } else {
-//                // FCM 정보를 찾지 못한 경우
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-//            }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

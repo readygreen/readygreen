@@ -20,5 +20,4 @@ public class FcmRequestDTO {
     private String message;
 
     private String distEmail;
-
 }

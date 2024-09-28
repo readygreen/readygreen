@@ -30,23 +30,23 @@ public class MainController {
 
 
     @GetMapping("/weather")
-    public ResponseEntity<?> weather(@RequestParam("x")String x, @RequestParam("y") String y) throws Exception {
+    public ResponseEntity<List<WeatherResponseDTO>> weather(@RequestParam("x")String x, @RequestParam("y") String y) throws Exception {
 //        List<WeatherResponse> list = mainService.weather(x,y);
 //        if(list.isEmpty())return new ResponseEntity<>("날씨 조회 실패", HttpStatus.NOT_FOUND);
 //        return ResponseEntity.ok(list);
         List<WeatherResponseDTO> list = mainService.weathers(x,y);
-        if(list.isEmpty())return new ResponseEntity<>("날씨 조회 실패", HttpStatus.NOT_FOUND);
+        if(list.isEmpty())return ResponseEntity.noContent().build();
         return ResponseEntity.ok(list);
     }
 
     @GetMapping
-    public ResponseEntity<?> mainPage(@RequestParam("x") String x, @RequestParam("y") String y) throws Exception {
+    public ResponseEntity<WeatherResponseDTO> mainPage(@RequestParam("x") String x, @RequestParam("y") String y) throws Exception {
         WeatherResponseDTO weatherResponseDTO = mainService.weather(x, y);
         return ResponseEntity.ok(weatherResponseDTO);
     }
 
     @GetMapping("/fortune")
-    public ResponseEntity<?> chat(@AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<String> chat(@AuthenticationPrincipal UserDetails userDetails){
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         if (member.getBirth() == null) {
             return ResponseEntity.badRequest().body("생일 정보가 없습니다.");
