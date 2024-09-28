@@ -9,6 +9,7 @@ import com.ddubucks.readygreen.service.RedisService;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,16 +30,16 @@ public class MapController {
     @PostMapping("start")
     public ResponseEntity<MapResponseDTO> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         MapResponseDTO mapResponseDTO = mapService.getDestinationGuide(routeRequestDTO, userDetails.getUsername());
-        redisService.save(userDetails.getUsername(),mapResponseDTO);
+        redisService.save("dir|"+userDetails.getUsername(),mapResponseDTO);
         Member member = memberService.getMemberInfo(userDetails.getUsername());
-        fcmService.sendMessageToOtherDevice(member,routeRequestDTO.isWatch());
+        fcmService.sendMessageToOtherDevice(member,routeRequestDTO.isWatch(),1);
         return ResponseEntity.ok(mapResponseDTO);
     }
 
-    @GetMapping("check")
+    @GetMapping("guide")
     public ResponseEntity<MapResponseDTO> getCheckAlreadyGuide(@AuthenticationPrincipal UserDetails userDetails){
         System.out.println(userDetails.getUsername());
-        MapResponseDTO result = (MapResponseDTO)redisService.find(userDetails.getUsername());
+        MapResponseDTO result = (MapResponseDTO)redisService.find("dir|"+userDetails.getUsername());
         System.out.println(result);
         if(result==null){
             return ResponseEntity.noContent().build();
@@ -47,7 +48,22 @@ public class MapController {
             return ResponseEntity.ok().body(result);
         }
     }
-//    @GetMapping("")
+
+    @DeleteMapping("guide")
+    public ResponseEntity<String> deleteGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean isWatch) throws FirebaseMessagingException {
+        redisService.delete("dir|"+userDetails.getUsername());
+        Member member = memberService.getMemberInfo(userDetails.getUsername());
+        fcmService.sendMessageToOtherDevice(member,isWatch,2);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("guide")
+    public ResponseEntity<String> doneGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean isWatch) throws FirebaseMessagingException {
+        redisService.delete("dir|"+userDetails.getUsername());
+        Member member = memberService.getMemberInfo(userDetails.getUsername());
+        fcmService.sendMessageToOtherDevice(member,isWatch,2);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping
     public ResponseEntity<BlinkerResponseDTO> getNearbyBlinker(@RequestParam(required = false) double latitude,

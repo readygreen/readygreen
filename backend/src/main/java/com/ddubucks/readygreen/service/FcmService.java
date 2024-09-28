@@ -18,11 +18,13 @@ import java.util.stream.Collectors;
 public class FcmService {
     private final MemberService memberService;
 
-    public void sendMessageToOtherDevice(Member member, boolean isWatch) throws FirebaseMessagingException {
+    public void sendMessageToOtherDevice(Member member, boolean isWatch,int type) throws FirebaseMessagingException {
+        //type 1 : 안내 시작
+        //type 2 : 안내 끝
         System.out.println(member.getNickname()+" ");
         Message message = Message.builder()
                 .setToken(isWatch?member.getSmartphone():member.getWatch())
-                .putData("type","1")
+                .putData("type", String.valueOf(type))
                 .build();
         String response = FirebaseMessaging.getInstance().send(message);
         System.out.println("Successfully sent message: " + response);
