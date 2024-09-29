@@ -114,9 +114,6 @@ fun MainScreen(navController: NavHostController) {
                         "길안내" -> {
                             navController.navigate("navigationScreen")
                         }
-                        "시작하기" -> {
-                            navController.navigate("initialEmailScreen")
-                        }
                     }
                 })
             }

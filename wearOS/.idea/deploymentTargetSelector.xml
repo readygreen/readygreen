@@ -7,10 +7,10 @@
       </SelectionState>
       <SelectionState runConfigName="readygreen">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-09-28T07:56:49.964158900Z">
+        <DropdownSelection timestamp="2024-09-29T08:37:24.395041900Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\SSAFY\.android\avd\Wear_OS_Large_Round_API_34_1.avd" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.137.174:38061;connection=730c9d14" />
             </handle>
           </Target>
         </DropdownSelection>

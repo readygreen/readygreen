@@ -2,7 +2,6 @@ package com.ddubucks.readygreen.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
@@ -11,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +53,6 @@ fun LinkScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-
         TextField(
             value = authNumber,
             onValueChange = { newText ->
@@ -63,15 +60,12 @@ fun LinkScreen(
                     authNumber = newText
                 }
             },
-            modifier = Modifier
-                .fillMaxWidth(0.75f)
-                .height(40.dp),
+            modifier = Modifier.fillMaxWidth(0.75f),
             keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             placeholder = { Text(text = "인증번호 입력", color = Gray) }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
-
 
         TextButton(
             onClick = {
@@ -85,23 +79,14 @@ fun LinkScreen(
                     }
                 }
             },
-            modifier = Modifier
-                .height(40.dp)
-                .fillMaxWidth(0.4f),
-            shape = RoundedCornerShape(40.dp),
             colors = ButtonDefaults.textButtonColors(containerColor = DarkGray)
         ) {
-            Text(
-                text = "시작하기",
-                color = White,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Text(text = "시작하기", color = White, fontSize = 12.sp)
         }
 
         if (errorMessage.isNotEmpty()) {
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = errorMessage, color = Red, style = pStyle)
+            Text(text = errorMessage, color = Red)
         }
     }
 }

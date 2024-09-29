@@ -4,9 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 
 object TokenManager {
-    private const val PREFS_NAME = "token_prefs"
-    private const val TOKEN_KEY = "auth_token"
-
+    private const val PREFS_NAME = "app_prefs"
+    private const val TOKEN_KEY = "access_token"
 
     // 토큰 저장
     fun saveToken(context: Context, token: String) {
@@ -14,12 +13,11 @@ object TokenManager {
         sharedPreferences.edit().putString(TOKEN_KEY, token).apply()
     }
 
-    // 토큰 인터셉터
+    // 저장된 토큰 가져오기
     fun getToken(context: Context): String? {
         val sharedPreferences: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return sharedPreferences.getString(TOKEN_KEY, null)
     }
-
 
     // 토큰 삭제
     fun clearToken(context: Context) {
