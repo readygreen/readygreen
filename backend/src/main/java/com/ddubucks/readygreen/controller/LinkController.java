@@ -31,6 +31,7 @@ public class LinkController {
     @GetMapping("check")
     @Operation(summary = "check auth", description = "워치에서 인증번호 일치하는지 확인")
     public ResponseEntity<Object> checkAuth(@RequestParam String email, @RequestParam String authNumber) {
+
         Object token = redisService.find(email+authNumber);
         if (token!=null) {
             return ResponseEntity.ok(token);
