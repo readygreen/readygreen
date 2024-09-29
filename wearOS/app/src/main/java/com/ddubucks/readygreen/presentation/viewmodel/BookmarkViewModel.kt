@@ -1,33 +1,51 @@
 package com.ddubucks.readygreen.presentation.viewmodel
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ddubucks.readygreen.presentation.retrofit.RestClient
+import com.ddubucks.readygreen.presentation.retrofit.TokenManager
+import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkApi
 import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkResponse
-import com.ddubucks.readygreen.data.repository.BookmarkRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import retrofit2.awaitResponse
 
 class BookmarkViewModel : ViewModel() {
 
-    private val repository = BookmarkRepository()
+    private val _bookmark = MutableStateFlow<List<BookmarkResponse>?>(null)
+    val bookmark: StateFlow<List<BookmarkResponse>?> = _bookmark
 
-    private val _bookMark = MutableStateFlow<List<BookmarkResponse>>(emptyList())
-    val bookmark: StateFlow<List<BookmarkResponse>> get() = _bookMark
+    fun getBookmarks(context: Context) {
+        val accessToken = TokenManager.getToken(context)
 
-    init {
-        fetchBookmark()
-    }
+        if (accessToken.isNullOrEmpty()) {
+            Log.e("BookmarkViewModel", "Access Token이 없습니다.")
+            _bookmark.value = emptyList()
+            return
+        }
 
-    private fun fetchBookmark() {
+        val bookmarkApi = RestClient.createService(BookmarkApi::class.java, accessToken)
+
         viewModelScope.launch {
             try {
-                val locations = repository.getBookmark()
-                _bookMark.value = locations
-                Log.d("BookmarkViewModel", "Fetched bookmarks: $locations")
+                val response = withContext(Dispatchers.IO) {
+                    bookmarkApi.getBookmarks().awaitResponse()
+                }
+
+                if (response.isSuccessful) {
+                    _bookmark.value = response.body()?.bookmarkDTOs
+                } else {
+                    Log.e("BookmarkViewModel", "북마크 요청 실패: ${response.code()}")
+                    _bookmark.value = emptyList()
+                }
             } catch (e: Exception) {
-                Log.e("BookmarkViewModel", "Failed to fetch bookmarks", e)
+                Log.e("BookmarkViewModel", "북마크 요청 중 오류 발생", e)
+                _bookmark.value = emptyList()
             }
         }
     }

@@ -1,8 +1,18 @@
 package com.ddubucks.readygreen.presentation.retrofit.bookmark
 
 data class BookmarkResponse(
-    // TODO response body 보고 수정
-    val coordinate: Double,
+    val id: Int,
     val name: String,
-    val type: String
+    val destinationName: String,
+    val latitude: Double,
+    val longitude: Double,
+    val alertTime: AlertTime
+)
+
+// 알림시간
+data class AlertTime(
+    val hour: Int,
+    val minute: Int,
+    val second: Int,
+    val nano: Int
 )

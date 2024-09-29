@@ -10,10 +10,9 @@ import com.ddubucks.readygreen.presentation.retrofit.link.LinkApi
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
-class LinkViewModel : ViewModel() {
+class LinkViewModel(private val fcmViewModel: FcmViewModel) : ViewModel() {
 
-    private val linkApi = RestClient.create(LinkApi::class.java)
-
+    // 인증번호 확인 로직
     fun checkAuth(
         context: Context,
         email: String,
@@ -22,22 +21,31 @@ class LinkViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val responseBody: ResponseBody = linkApi.checkAuth(email, authNumber)
-                val responseString = responseBody.string()
-                val token = responseString
+                // Retrofit을 이용한 API 요청
+                val linkApi = RestClient.createService(LinkApi::class.java, "")
+                val response = linkApi.checkAuth(email, authNumber)
+                val token = response.string()
 
                 if (token.isNotEmpty()) {
                     Log.d("LinkViewModel", "받은 토큰: $token")
-                    TokenManager.saveToken(context, token)
-                } else {
-                    Log.e("LinkViewModel", "토큰이 없습니다.")
-                }
+                    TokenManager.saveToken(context, token)  // 토큰 저장
 
-                onResult(true, "인증 성공")
+                    // 로그인 성공 후 FCM 토큰 전송
+                    onLoginSuccess(context, token)
+
+                    onResult(true, "인증 성공")
+                } else {
+                    onResult(false, "토큰이 없습니다.")
+                }
             } catch (e: Exception) {
                 Log.e("LinkViewModel", "오류 발생", e)
-                onResult(false, "오류가 발생했습니다: ${e.message}")
+                onResult(false, "오류 발생: ${e.message}")
             }
         }
+    }
+
+    // 로그인 성공 시 처리 로직
+    private fun onLoginSuccess(context: Context, accessToken: String) {
+        fcmViewModel.registerFcm(context)  // FCM 토큰 등록
     }
 }

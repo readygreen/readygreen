@@ -6,6 +6,7 @@ properties.load(project.rootProject.file("local.properties").inputStream())
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -75,6 +76,7 @@ dependencies {
     implementation(libs.watchface.complications.data.source.ktx)
     implementation(libs.navigation.compose)
     implementation(libs.material3.android)
+    implementation(libs.firebase.messaging.ktx)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
@@ -91,6 +93,13 @@ dependencies {
     implementation("androidx.wear.compose:compose-material:1.1.0")
     implementation("androidx.wear.compose:compose-foundation:1.1.0")
     implementation("androidx.wear.compose:compose-navigation:1.1.0")
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-messaging-ktx")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

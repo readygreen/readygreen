@@ -29,7 +29,6 @@ fun NavigationScreen(
     lng: Float?
 ) {
 
-
     Column(
         modifier = Modifier
             .fillMaxSize()

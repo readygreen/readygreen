@@ -57,6 +57,14 @@
             <!-- Any inner elements would go here. -->
         </service>
 
+        <service
+            android:name=".core.service.FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- Google Wear 라이브러리 사용 -->
         <uses-library
             android:name="com.google.android.wearable"
