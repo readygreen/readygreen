@@ -7,7 +7,9 @@ class ArriveButton extends StatelessWidget {
   final Color borderColor; // 테두리 색상
   final Color textColor; // 텍스트 색상
   final IconData iconData; // 이모티콘 (아이콘)
-  // final VoidCallback onPressed; // 버튼 클릭 이벤트 처리
+  final double lat; // 전달할 위도
+  final double lng; // 전달할 경도
+  final String placeName; // 전달할 장소 이름
 
   const ArriveButton({
     super.key,
@@ -15,18 +17,26 @@ class ArriveButton extends StatelessWidget {
     this.borderColor = AppColors.green, // 테두리 기본 색상 (초록색)
     this.textColor = AppColors.green, // 텍스트 기본 색상 (초록색)
     this.iconData = Icons.navigation, // 기본 이모티콘 (도착지 아이콘)
-    // required this.onPressed, // 클릭 이벤트를 외부에서 전달받음
+    required this.lat, // 위도를 외부에서 전달받음
+    required this.lng, // 경도를 외부에서 전달받음
+    required this.placeName, // 장소 이름을 외부에서 전달받음
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print('도착지 버튼이 눌렸습니다.');
+        print('도착지 버튼이 눌렸습니다: $placeName (위도: $lat, 경도: $lng)');
+
+        // 위도, 경도, 장소 이름을 MapDirectionPage로 전달
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const MapDirectionPage(),
+            builder: (context) => MapDirectionPage(
+              endLat: lat,
+              endLng: lng,
+              endPlaceName: placeName,
+            ),
           ),
         );
       },

@@ -9,7 +9,16 @@ import 'package:provider/provider.dart';
 import 'package:readygreen/provider/current_location.dart';
 
 class MapDirectionPage extends StatefulWidget {
-  const MapDirectionPage({super.key});
+  final double endLat; // 도착지 위도
+  final double endLng; // 도착지 경도
+  final String endPlaceName; // 도착지 이름
+
+  const MapDirectionPage({
+    super.key,
+    required this.endLat,
+    required this.endLng,
+    required this.endPlaceName,
+  });
 
   @override
   _MapDirectionPageState createState() => _MapDirectionPageState();
@@ -17,8 +26,6 @@ class MapDirectionPage extends StatefulWidget {
 
 class _MapDirectionPageState extends State<MapDirectionPage> {
   late GoogleMapController mapController;
-  final LatLng _center =
-      const LatLng(36.354946759143, 127.29980994578); // 임시 좌표
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   final loc.Location _location = loc.Location();
@@ -28,6 +35,10 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   @override
   void initState() {
     super.initState();
+    // 도착지 정보가 제대로 넘어왔는지 확인하기 위해 출력
+    print(
+        "도착지 위도: ${widget.endLat}, 경도: ${widget.endLng}, 이름: ${widget.endPlaceName}");
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CurrentLocationProvider>(context, listen: false)
           .updateLocation();
@@ -47,14 +58,14 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       String startName =
           locationProvider.currentPlaceName ?? 'Unknown Start Location';
 
-      // 도착지 정보 (임의의 값)
-      double endX = 127.298412;
-      double endY = 36.355443;
-      String endName = "삼성화재 유성캠퍼스";
+      // 도착지 정보는 ArriveButton에서 전달받은 값 사용
+      double endX = widget.endLng;
+      double endY = widget.endLat;
+      String endName = widget.endPlaceName;
 
       // API 호출
-      MapAPI mapAPI = MapAPI();
-      var routeData = await mapAPI.fetchRoute(
+      MapStartAPI mapStartAPI = MapStartAPI();
+      var routeData = await mapStartAPI.fetchRoute(
         startX: startX,
         startY: startY,
         endX: endX,
@@ -78,6 +89,14 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
         setState(() {
           _routeCoordinates.addAll(coordinates);
+          // 도착지에 마커 추가
+          _markers.add(
+            Marker(
+              markerId: const MarkerId('destination'),
+              position: LatLng(widget.endLat, widget.endLng),
+              infoWindow: InfoWindow(title: widget.endPlaceName),
+            ),
+          );
         });
       }
     }
@@ -86,6 +105,27 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   // 지도 생성 함수
   void _onMapCreated(GoogleMapController controller) {
     _controller.complete(controller);
+    // 사용자의 현재 위치로 카메라 이동
+    _moveToCurrentLocation();
+  }
+
+  // 사용자의 현재 위치로 카메라를 이동시키는 함수
+  Future<void> _moveToCurrentLocation() async {
+    final locationProvider =
+        Provider.of<CurrentLocationProvider>(context, listen: false);
+
+    if (locationProvider.currentPosition != null) {
+      final GoogleMapController controller = await _controller.future;
+      controller.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(
+            locationProvider.currentPosition!.latitude,
+            locationProvider.currentPosition!.longitude,
+          ),
+          zoom: 17.0, // 적절한 줌 레벨 설정
+        ),
+      ));
+    }
   }
 
   // 위치 정보를 받아오는 함수
@@ -113,7 +153,11 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
-              target: _center,
+              target: LatLng(
+                // 초기 카메라 위치를 사용자 현재 위치로 설정
+                locationProvider.currentPosition?.latitude ?? 0.0,
+                locationProvider.currentPosition?.longitude ?? 0.0,
+              ),
               zoom: 17.0,
             ),
             myLocationEnabled: true,
@@ -145,7 +189,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             child: DestinationBar(
               currentLocation:
                   locationProvider.currentPlaceName ?? 'Loading...',
-              destination: '삼성화재 유성캠퍼스',
+              destination: widget.endPlaceName, // 전달받은 도착지 이름
             ),
           ),
         ],

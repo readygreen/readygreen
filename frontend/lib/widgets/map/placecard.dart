@@ -5,12 +5,16 @@ import 'package:readygreen/widgets/map/bookmarkbutton.dart';
 class PlaceCard extends StatelessWidget {
   final String placeName;
   final String address;
+  final double lat; // 위도
+  final double lng; // 경도
   final VoidCallback onTap;
 
   const PlaceCard({
     super.key,
     required this.placeName,
     required this.address,
+    required this.lat, // 위도 받기
+    required this.lng, // 경도 받기
     required this.onTap,
   });
 
@@ -31,13 +35,18 @@ class PlaceCard extends StatelessWidget {
           ),
         ],
       ),
-      subtitle: const Padding(
-        padding: EdgeInsets.only(top: 5),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 5),
         child: Row(
           children: [
-            ArriveButton(),
-            SizedBox(width: 8),
-            BookmarkButton(),
+            // 위도, 경도, 장소 이름을 ArriveButton에 넘겨줌
+            ArriveButton(
+              lat: lat,
+              lng: lng,
+              placeName: placeName,
+            ),
+            const SizedBox(width: 8),
+            const BookmarkButton(),
           ],
         ),
       ),

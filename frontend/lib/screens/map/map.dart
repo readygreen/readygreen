@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:google_maps_webservice/places.dart' as places;
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:geocoding/geocoding.dart';
 import 'package:readygreen/widgets/map/mapsearchbar.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/draggable_favorites.dart';
-import 'package:readygreen/widgets/map/speechsearch.dart';
 import 'package:readygreen/widgets/map/placecard.dart';
 import 'package:readygreen/screens/map/mapsearch.dart';
 import 'package:readygreen/provider/current_location.dart';
@@ -29,6 +27,8 @@ class _MapPageState extends State<MapPage> {
 
   String _selectedPlaceName = ''; // 선택된 장소 이름
   String _selectedAddress = ''; // 선택된 주소
+  double _selectedLat = 0.0; // 선택된 위도
+  double _selectedLng = 0.0; // 선택된 경도
 
   @override
   void initState() {
@@ -64,6 +64,8 @@ class _MapPageState extends State<MapPage> {
       );
       _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
       _selectedAddress = address; // 선택된 주소 업데이트
+      _selectedLat = lat; // 선택된 위도 업데이트
+      _selectedLng = lng; // 선택된 경도 업데이트
     });
   }
 
@@ -135,7 +137,7 @@ class _MapPageState extends State<MapPage> {
               },
             ),
           ),
-          // 즐겨찾기 드래그 가능한 영역
+          // 즐겨찾기 드래그 가능한 영역 추가
           DraggableFavorites(
             scrollController: ScrollController(),
           ),
@@ -163,8 +165,11 @@ class _MapPageState extends State<MapPage> {
                 child: PlaceCard(
                   placeName: _selectedPlaceName,
                   address: _selectedAddress,
+                  lat: _selectedLat, // 선택된 위도 전달
+                  lng: _selectedLng, // 선택된 경도 전달
                   onTap: () {
                     print('PlaceCard clicked: $_selectedPlaceName');
+                    print('위도: $_selectedLat, 경도: $_selectedLng');
                   },
                 ),
               ),
@@ -188,6 +193,10 @@ class _MapPageState extends State<MapPage> {
       final address =
           response.results.first.formattedAddress ?? '주소 정보 없음'; // 주소 가져오기
 
+      print('선택된 장소 이름: $placeName');
+      print('선택된 주소: $address');
+      print('위도: ${tappedLocation.latitude}, 경도: ${tappedLocation.longitude}');
+
       setState(() {
         _markers.clear(); // 기존 마커 제거
         _markers.add(
@@ -201,6 +210,8 @@ class _MapPageState extends State<MapPage> {
         );
         _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
         _selectedAddress = address; // 선택된 주소 업데이트
+        _selectedLat = tappedLocation.latitude; // 선택된 위도 업데이트
+        _selectedLng = tappedLocation.longitude; // 선택된 경도 업데이트
       });
     } else {
       print('장소 이름을 가져오지 못했습니다.');

@@ -127,6 +127,8 @@ class _ResultMapPageState extends State<ResultMapPage> {
             child: Container(
               color: Colors.white,
               child: PlaceCard(
+                lat: widget.lat,
+                lng: widget.lng,
                 placeName: widget.placeName,
                 address: widget.address,
                 onTap: () {

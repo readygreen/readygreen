@@ -60,8 +60,8 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
     if (response.isOkay) {
       final result = response.result;
       setState(() {
-        _lat = result.geometry!.location.lat;
-        _lng = result.geometry!.location.lng;
+        _lat = result.geometry?.location.lat; // null check 추가
+        _lng = result.geometry?.location.lng; // null check 추가
         _placeName = result.name;
         _address = result.formattedAddress;
       });
@@ -70,18 +70,22 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
       print('위도: $_lat, 경도: $_lng, 장소 이름: $_placeName');
 
       // 장소 선택 시 resultmap 페이지로 이동하며 위도, 경도, 이름 전달
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultMapPage(
-            lat: _lat!,
-            lng: _lng!,
-            placeName: _placeName!,
-            address: _address!,
-            searchQuery: widget.searchQuery,
+      if (_lat != null && _lng != null && _placeName != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ResultMapPage(
+              lat: _lat!,
+              lng: _lng!,
+              placeName: _placeName!,
+              address: _address!,
+              searchQuery: widget.searchQuery,
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        print('위치 정보가 없습니다.');
+      }
     } else {
       print('장소 선택 실패: ${response.errorMessage}');
     }
@@ -132,9 +136,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
-                    } else if (snapshot.hasError ||
-                        !snapshot.hasData ||
-                        snapshot.data == null) {
+                    } else if (snapshot.hasError || !snapshot.hasData) {
                       return const ListTile(
                         title: Text('정보를 가져오지 못했습니다.'),
                       );
@@ -142,7 +144,10 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                       final placeName =
                           snapshot.data?.split('\n')[0] ?? '알 수 없는 장소';
                       final address = snapshot.data?.split('\n')[1] ?? '주소 없음';
+
                       return PlaceCard(
+                        lat: _lat ?? 0.0, // Null 값을 0.0으로 대체
+                        lng: _lng ?? 0.0, // Null 값을 0.0으로 대체
                         placeName: placeName,
                         address: address,
                         onTap: () {
