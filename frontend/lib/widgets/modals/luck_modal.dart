@@ -28,18 +28,36 @@ class _FortuneModalState extends State<FortuneModal> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    final deviceWidth = MediaQuery.of(context).size.width;
+
+    return Dialog(
       backgroundColor: Colors.white,
-      title: const Text('오늘의 운세'),
-      content: Text(fortune),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('닫기'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+      child: Container(
+        width: deviceWidth,
+        height: 500,
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Text(
+              '오늘의 운세',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            Text(fortune),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: TextButton(
+                child: const Text('닫기'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

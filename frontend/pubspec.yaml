@@ -112,6 +112,7 @@ flutter:
     - assets/images/w-rain.png
     - assets/images/w-cloudy.png
     - assets/images/w-snow.png
+    - assets/images/w-default.png
 
   fonts:
     - family: CustomFont

@@ -63,8 +63,8 @@ class App extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) =>
-                CurrentLocationProvider()), // CurrentLocationProvider 등록
+          create: (_) => CurrentLocationProvider(),
+        ), // CurrentLocationProvider 등록
       ],
       child: MaterialApp(
         title: 'Flutter Navigation Example',

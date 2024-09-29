@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'dart:math';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/mypage/bgcontainer_mypage.dart';
@@ -13,11 +14,42 @@ class WatchPage extends StatefulWidget {
 class _WatchPageState extends State<WatchPage> {
   List<int> randomNumbers = [];
   final WatchApi watchApi = WatchApi();
+  Timer? _timer;
+  Duration _remainingTime = Duration(minutes: 5);
 
   @override
   void initState() {
     super.initState();
     _makeWatchNum();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel(); // 기존 타이머가 있으면 취소
+    _remainingTime = Duration(minutes: 5); // 시간을 5분으로 초기화
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_remainingTime.inSeconds > 0) {
+          _remainingTime = _remainingTime - Duration(seconds: 1);
+        } else {
+          _timer?.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _formatDuration(Duration duration) {
+    String minutes =
+        duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    String seconds =
+        duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
   }
 
   void _makeWatchNum() {
@@ -26,6 +58,7 @@ class _WatchPageState extends State<WatchPage> {
       randomNumbers = List.generate(6, (index) => Random().nextInt(10));
     });
     _sendWatchCode();
+    _startTimer();
   }
 
   void _sendWatchCode() async {
@@ -69,7 +102,7 @@ class _WatchPageState extends State<WatchPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 100),
+                    SizedBox(height: 70),
                     Text(
                       '기기 연결을 위해',
                       style: TextStyle(fontSize: 17),
@@ -110,7 +143,7 @@ class _WatchPageState extends State<WatchPage> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 80),
+                    SizedBox(height: 70),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: randomNumbers.map((number) {
@@ -133,7 +166,22 @@ class _WatchPageState extends State<WatchPage> {
                         );
                       }).toList(),
                     ),
-                    SizedBox(height: 120),
+                    SizedBox(height: 70),
+                    Text(
+                      '인증코드 유효 시간',
+                      style: TextStyle(
+                        fontSize: 15,
+                      ),
+                    ),
+                    Text(
+                      _formatDuration(_remainingTime),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.red,
+                      ),
+                    ),
+                    SizedBox(height: 70),
                     ElevatedButton(
                       onPressed: _makeWatchNum, // 버튼 클릭 시 랜덤 숫자 새로 생성
                       child: Text('인증코드 다시 받기',
