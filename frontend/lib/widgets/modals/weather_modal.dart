@@ -53,7 +53,8 @@ class _WeatherModalState extends State<WeatherModal> {
     return AlertDialog(
       backgroundColor: AppColors.white,
       title: const Text('날씨 정보'),
-      content: const Text('현재 날씨는 맑음입니다.'),
+      // weatherInfo를 출력하는 부분으로 수정
+      content: Text(weatherInfo),
       actions: <Widget>[
         TextButton(
           child: const Text('닫기'),

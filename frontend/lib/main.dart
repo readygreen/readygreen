@@ -100,7 +100,7 @@ class _MainPageState extends State<MainPage> {
     const HomePage(),
     PointPage(),
     const MapPage(),
-    const PlacePage(),
+    PlacePage(),
     const MyPage(),
   ];
   // 저장된 accessToken 확인하여 자동 로그인 처리

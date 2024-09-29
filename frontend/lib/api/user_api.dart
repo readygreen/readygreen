@@ -13,8 +13,6 @@ class NewUserApi {
     required String socialType,
     required String profileImg,
   }) async {
-    final String apiUrl = "$baseUrl/auth/login";
-
     Map<String, String> requestBody = {
       'email': email,
       'nickname': nickname,
@@ -25,7 +23,7 @@ class NewUserApi {
 
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse('$baseUrl/auth/login'),
         headers: {
           "Content-Type": "application/json",
         },
@@ -91,8 +89,6 @@ class NewUserApi {
     required String profileImg,
     String? smartphone,
   }) async {
-    final String apiUrl = "$baseUrl/auth";
-
     String? deviceToken = await storage.read(key: 'deviceToken');
 
     Map<String, String> requestBody = {
@@ -108,7 +104,7 @@ class NewUserApi {
 
     try {
       final response = await http.post(
-        Uri.parse(apiUrl),
+        Uri.parse('$baseUrl/auth'),
         headers: {
           "Content-Type": "application/json",
         },
