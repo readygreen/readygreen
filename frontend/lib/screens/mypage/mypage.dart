@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:readygreen/screens/mypage/feedback.dart';
+import 'package:readygreen/screens/mypage/feedback_list.dart';
+import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
+import 'package:readygreen/widgets/mypage/cardbox_mypage.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/api/user_api.dart';
+import 'package:readygreen/screens/mypage/notice.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({Key? key}) : super(key: key);
@@ -14,7 +19,7 @@ class MyPage extends StatefulWidget {
 }
 
 class _MyPageState extends State<MyPage> {
-  final NewUserApi userApiService = NewUserApi();
+  final NewUserApi userApi = NewUserApi();
   final storage = const FlutterSecureStorage();
   Map<String, dynamic>? profileData;
   bool isLoading = true;
@@ -26,8 +31,7 @@ class _MyPageState extends State<MyPage> {
   }
 
   Future<void> _fetchProfileData() async {
-    final data =
-        await userApiService.fetchProfileData(); // ApiService에서 데이터 받아오기
+    final data = await userApi.fetchProfileData(); // ApiService에서 데이터 받아오기
     setState(() {
       profileData = data;
       isLoading = false; // 데이터 로딩 완료
@@ -51,7 +55,7 @@ class _MyPageState extends State<MyPage> {
       body: SingleChildScrollView(
         child: BackgroundContainer(
           child: isLoading
-              ? Center(child: CircularProgressIndicator()) // 로딩 중일 때
+              ? const Center(child: CircularProgressIndicator()) // 로딩 중일 때
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -70,7 +74,7 @@ class _MyPageState extends State<MyPage> {
                             backgroundImage: profileData?['profileImageUrl'] !=
                                     null
                                 ? NetworkImage(profileData!['profileImageUrl'])
-                                : AssetImage('assets/images/user.png')
+                                : const AssetImage('assets/images/user.png')
                                     as ImageProvider,
                           ),
                           const SizedBox(width: 13),
@@ -119,45 +123,10 @@ class _MyPageState extends State<MyPage> {
                     ),
                     const SizedBox(height: 16),
                     // 고객지원 섹션
-                    CardBox(
-                      title: '고객지원',
-                      height: 205,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 8),
-                          _buildSupportItem('공지사항'),
-                          _buildSupportItem('건의하기'),
-                          _buildSupportItem('내 건의함'),
-                        ],
-                      ),
-                    ),
+                    _buildSupportSection(),
                     const SizedBox(height: 16),
-                    // 로그아웃 및 회원탈퇴 섹션
-                    CardBox(
-                      title: '설정',
-                      height: 130,
-                      backgroundColor: Colors.white,
-                      textColor: Colors.black,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              _handleLogout(context); // 로그아웃 함수 호출
-                            },
-                            child: const Text('로그아웃',
-                                style: TextStyle(fontSize: 16)),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text('회원탈퇴',
-                              style: TextStyle(
-                                  fontSize: 16, color: AppColors.red)),
-                        ],
-                      ),
-                    ),
+                    // 계정 설정 섹션
+                    _buildSettingsSection(),
                   ],
                 ),
         ),
@@ -165,10 +134,121 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-  Widget _buildSupportItem(String title) {
+// 고객지원 섹션
+  Widget _buildSupportSection() {
+    return CardboxMypage(
+      title: Row(
+        children: [
+          Icon(Icons.feedback_rounded, size: 20, color: AppColors.red),
+          const SizedBox(width: 8),
+          const Text(
+            '고객지원',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+      height: 180,
+      backgroundColor: Colors.white,
+      textColor: Colors.black,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NoticePage()),
+              );
+            },
+            child: _buildItem('공지사항'),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FeedbackPage()),
+              );
+            },
+            child: _buildItem('건의하기'),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FeedbackListPage()),
+              );
+            },
+            child: _buildItem('내 건의함'),
+          ),
+        ],
+      ),
+    );
+  }
+
+// 계정 설정 섹션
+  Widget _buildSettingsSection() {
+    return CardboxMypage(
+      title: Row(
+        children: [
+          Icon(Icons.settings_rounded,
+              size: 20, color: AppColors.greytext), // 설정 아이콘 추가
+          const SizedBox(width: 8), // 아이콘과 텍스트 사이 간격
+          const Text(
+            '계정',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+      height: 180,
+      backgroundColor: Colors.white,
+      textColor: Colors.black,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => WatchPage()),
+              );
+            },
+            child: _buildItem('워치 연결'),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              _handleLogout(context); // 로그아웃 함수 호출
+            },
+            child: _buildItem('로그아웃'),
+          ),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {},
+            child: _buildItem('회원탈퇴'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 공통 스타일링된 지원 항목 빌더
+  Widget _buildItem(String title) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Text(title, style: const TextStyle(fontSize: 16)),
+      padding: const EdgeInsets.symmetric(vertical: 0.0),
+      child: Text(title,
+          style: const TextStyle(fontSize: 16, color: AppColors.greytext)),
     );
   }
 }
