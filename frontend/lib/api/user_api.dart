@@ -91,8 +91,6 @@ class NewUserApi {
   }) async {
     String? deviceToken = await storage.read(key: 'deviceToken');
 
-    String? deviceToken = await storage.read(key: 'deviceToken');
-
     Map<String, String> requestBody = {
       'email': email,
       'nickname': nickname,
