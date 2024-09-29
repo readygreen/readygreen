@@ -42,7 +42,7 @@ class NewMainApi {
   }
 
   // 날씨 API 요청
-  Future<Map<String, dynamic>?> getWeather(
+  Future<List<Map<String, dynamic>>?> getWeather(
       String latitude, String longitude) async {
     // 저장된 JWT accessToken 가져오기
     String? accessToken = await storage.read(key: 'accessToken');
@@ -60,8 +60,11 @@ class NewMainApi {
         );
 
         if (response.statusCode == 200) {
-          // JSON 응답을 파싱
-          return json.decode(response.body);
+          // JSON 응답을 List로 파싱
+          List<dynamic> decodedResponse = json.decode(response.body);
+
+          // 각 항목이 Map 형식인 List로 변환하여 반환
+          return decodedResponse.map((e) => e as Map<String, dynamic>).toList();
         } else {
           print('날씨 정보 로드 실패 ${response.statusCode}');
           return null;
