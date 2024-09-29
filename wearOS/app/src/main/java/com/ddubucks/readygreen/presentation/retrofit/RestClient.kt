@@ -19,6 +19,7 @@ object RestClient {
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
+//        .addInterceptor(TokenInterceptor(context))
         .build()
 
     private val retrofit = Retrofit.Builder()

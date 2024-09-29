@@ -1,37 +1,38 @@
 package com.ddubucks.readygreen.presentation.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.wear.compose.material.Text
-import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.DarkGray
-import com.ddubucks.readygreen.presentation.theme.Gray
-import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.*
+import com.ddubucks.readygreen.presentation.viewmodel.LinkViewModel
 import h1Style
 import pStyle
 
 @Composable
-fun InitialScreen() {
+fun LinkScreen(
+    navController: NavController,
+    viewModel: LinkViewModel = viewModel(),
+    email: String,
+) {
+    var authNumber by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf("") }
 
-    var text by remember { mutableStateOf("") }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -53,37 +54,54 @@ fun InitialScreen() {
             modifier = Modifier.padding(top = 10.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
+
+
         TextField(
-            value = text,
+            value = authNumber,
             onValueChange = { newText ->
                 if (newText.length <= 6 && newText.all { it.isDigit() }) {
-                    text = newText
+                    authNumber = newText
                 }
             },
             modifier = Modifier
                 .fillMaxWidth(0.75f)
                 .height(40.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Number
-            )
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            placeholder = { Text(text = "인증번호 입력", color = Gray) }
         )
+
         Spacer(modifier = Modifier.height(10.dp))
+
+
         TextButton(
-            onClick = { /*TODO*/ },
+            onClick = {
+                viewModel.checkAuth(context, email, authNumber) { success, message ->
+                    if (success) {
+                        navController.navigate("mainScreen") {
+                            popUpTo("linkEmailScreen") { inclusive = true }
+                        }
+                    } else {
+                        errorMessage = message
+                    }
+                }
+            },
             modifier = Modifier
                 .height(40.dp)
                 .fillMaxWidth(0.4f),
             shape = RoundedCornerShape(40.dp),
-            colors = ButtonDefaults.textButtonColors(
-                containerColor = DarkGray,
-            )
+            colors = ButtonDefaults.textButtonColors(containerColor = DarkGray)
         ) {
             Text(
                 text = "시작하기",
+                color = White,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = White
+                fontWeight = FontWeight.Bold
             )
+        }
+
+        if (errorMessage.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(text = errorMessage, color = Red, style = pStyle)
         }
     }
 }

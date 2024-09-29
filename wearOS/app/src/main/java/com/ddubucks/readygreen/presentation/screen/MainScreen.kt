@@ -78,7 +78,7 @@ fun MainScreen(navController: NavHostController) {
         ButtonIconModel(R.drawable.map_icon, "주변 신호등 보기"),
         // TODO 길안내 시작 코드와 연결
         ButtonIconModel(R.drawable.arrow_straight, "길안내"),
-        ButtonIconModel(R.drawable.arrow_straight, "로그인")
+        ButtonIconModel(R.drawable.arrow_straight, "시작하기")
     )
     Column(
         modifier = Modifier
@@ -114,8 +114,8 @@ fun MainScreen(navController: NavHostController) {
                         "길안내" -> {
                             navController.navigate("navigationScreen")
                         }
-                        "로그인" -> {
-                            navController.navigate("initialScreen")
+                        "시작하기" -> {
+                            navController.navigate("initialEmailScreen")
                         }
                     }
                 })

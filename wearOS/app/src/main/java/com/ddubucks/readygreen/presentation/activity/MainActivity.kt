@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.presentation.activity
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,18 +12,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ddubucks.readygreen.BuildConfig
 import com.ddubucks.readygreen.core.service.LocationService
-import com.ddubucks.readygreen.presentation.screen.BookmarkScreen
-import com.ddubucks.readygreen.presentation.screen.InitialScreen
-import com.ddubucks.readygreen.presentation.screen.MainScreen
-import com.ddubucks.readygreen.presentation.screen.MapScreen
-import com.ddubucks.readygreen.presentation.screen.NavigationScreen
-import com.ddubucks.readygreen.presentation.screen.SearchResultScreen
-import com.ddubucks.readygreen.presentation.screen.SearchScreen
+import com.ddubucks.readygreen.presentation.screen.*
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import com.google.android.gms.location.LocationServices
-
-// MainActivity.kt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,11 +27,19 @@ class MainActivity : ComponentActivity() {
                 val searchViewModel: SearchViewModel = viewModel()
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-                NavHost(navController = navController, startDestination = "mainScreen") {
-                    // MainScreen 설정
+                val sharedPreferences = getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
+                val token = sharedPreferences.getString("accessToken", null)
+
+                NavHost(
+                    navController = navController,
+                    startDestination = if (token.isNullOrEmpty()) "linkEmailScreen" else "mainScreen"
+                ) {
+                    // MainScreen
                     composable("mainScreen") { MainScreen(navController) }
+
                     // BookmarkScreen
                     composable("bookmarkScreen") { BookmarkScreen() }
+
                     // SearchScreen
                     composable("searchScreen") {
                         SearchScreen(
@@ -61,6 +62,7 @@ class MainActivity : ComponentActivity() {
                             fusedLocationClient = fusedLocationClient
                         )
                     }
+
                     // NavigationScreen
                     composable(
                         "navigationScreen/{name}/{lat}/{lng}",
@@ -75,8 +77,16 @@ class MainActivity : ComponentActivity() {
                         val lng = backStackEntry.arguments?.getFloat("lng")
                         NavigationScreen(name = name, lat = lat, lng = lng)
                     }
+
                     // Authentication
-                    composable("initialScreen") { InitialScreen() }
+                    composable("linkEmailScreen") { LinkEmailScreen(navController) }
+                    composable(
+                        "linkScreen/{email}",
+                        arguments = listOf(navArgument("email") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val email = backStackEntry.arguments?.getString("email")
+                        LinkScreen(navController = navController, email = email ?: "")
+                    }
                 }
             }
         }
