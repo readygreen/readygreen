@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:readygreen/constants/baseurl.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class MapStartAPI {
-  // 경로 요청을 위한 POST 함수
+  final storage = const FlutterSecureStorage();
+
+  // 경로 요청 (POST)
   Future<Map<String, dynamic>?> fetchRoute({
     required double startX,
     required double startY,
@@ -13,45 +16,58 @@ class MapStartAPI {
     required String endName,
     required bool watch,
   }) async {
-    final url = Uri.parse('$baseUrl/map/start');
+    String? accessToken = await storage.read(key: 'accessToken');
+
+    Map<String, dynamic> requestBody = {
+      'startX': startX,
+      'startY': startY,
+      'endX': endX,
+      'endY': endY,
+      'startName': startName,
+      'endName': endName,
+      'watch': watch,
+    };
+    print('길찾기 요청 데이터: $requestBody');
+    print('액세스토큰 $accessToken');
+    print('Base URL: $baseUrl');
+
     final response = await http.post(
-      url,
+      Uri.parse('$baseUrl/map/start'),
       headers: {
         'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
       },
-      body: jsonEncode({
-        'startX': startX,
-        'startY': startY,
-        'endX': endX,
-        'endY': endY,
-        'startName': startName,
-        'endName': endName,
-        'watch': watch,
-      }),
+      body: json.encode(requestBody),
     );
+
+    print('Response status code: ${response.statusCode}');
+    print('Response headers: ${response.headers}');
+    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     } else {
-      print('Failed to fetch route: ${response.statusCode}');
+      print('Error response body: ${response.body}');
+      print('실패 코드: ${response.statusCode}');
       return null;
     }
   }
 
   // 즐겨찾기 목록 조회 (GET)
   Future<List<dynamic>?> fetchBookmarks() async {
-    final url = Uri.parse('$baseUrl/map/bookmark');
     final response = await http.get(
-      url,
+      Uri.parse('$baseUrl/map/bookmark'),
       headers: {
         'Content-Type': 'application/json',
       },
     );
 
     if (response.statusCode == 200) {
+      print('즐겨찾기 목록 조회 성공');
       return jsonDecode(response.body);
     } else {
-      print('Failed to fetch bookmarks: ${response.statusCode}');
+      print('즐겨찾기 목록 조회 실패: ${response.statusCode}');
       return null;
     }
   }
@@ -67,41 +83,47 @@ class MapStartAPI {
     required int second,
     required int nano,
   }) async {
-    final url = Uri.parse('$baseUrl/map/bookmark');
+    String? accessToken = await storage.read(key: 'accessToken');
+    // 시간을 'HH:mm:ss' 형식으로 변환
+    String formattedTime = '${hour.toString().padLeft(2, '0')}:'
+        '${minute.toString().padLeft(2, '0')}:'
+        '${second.toString().padLeft(2, '0')}';
+
     final response = await http.post(
-      url,
+      Uri.parse('$baseUrl/map/bookmark'),
       headers: {
         'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({
         'name': name,
         'destinationName': destinationName,
         'latitude': latitude,
         'longitude': longitude,
-        'alertTime': {
-          'hour': hour,
-          'minute': minute,
-          'second': second,
-          'nano': nano,
-        },
+        'alertTime': formattedTime,
       }),
     );
 
     if (response.statusCode == 200) {
+      print('즐겨찾기 추가 성공: ${response.body}');
       return true;
     } else {
-      print('Failed to add bookmark: ${response.statusCode}');
+      print('즐겨찾기 추가 실패: ${response.statusCode}');
+      print('Response body: ${response.body}');
       return false;
     }
   }
 
   // 즐겨찾기 삭제 (DELETE)
   Future<bool> deleteBookmark(String name) async {
-    final url = Uri.parse('$baseUrl/map/bookmark');
+    String? accessToken = await storage.read(key: 'accessToken');
     final response = await http.delete(
-      url,
+      Uri.parse('$baseUrl/map/bookmark'),
       headers: {
         'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
       },
       body: jsonEncode({
         'name': name,
@@ -109,9 +131,11 @@ class MapStartAPI {
     );
 
     if (response.statusCode == 200) {
+      print('즐겨찾기 삭제 성공');
       return true;
     } else {
-      print('Failed to delete bookmark: ${response.statusCode}');
+      print('즐겨찾기 삭제 실패: ${response.statusCode}');
+      print('Response body: ${response.body}');
       return false;
     }
   }

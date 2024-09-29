@@ -46,7 +46,12 @@ class PlaceCard extends StatelessWidget {
               placeName: placeName,
             ),
             const SizedBox(width: 8),
-            const BookmarkButton(),
+            // BookmarkButton에 위도, 경도, 장소 이름 전달
+            BookmarkButton(
+              destinationName: placeName, // 장소 이름
+              latitude: lat, // 위도
+              longitude: lng, // 경도
+            ),
           ],
         ),
       ),
