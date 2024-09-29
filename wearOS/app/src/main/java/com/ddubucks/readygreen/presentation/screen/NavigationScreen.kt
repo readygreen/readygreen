@@ -24,6 +24,10 @@ import secStyle
 
 @Composable
 fun NavigationScreen() {
+
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()

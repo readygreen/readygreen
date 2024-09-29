@@ -1,13 +1,13 @@
 package com.ddubucks.readygreen.presentation.retrofit.search
 
 data class SearchResponse(
-    val candidates: List<SearchCandidate>?
+    val results: List<SearchCandidate>?
 )
 
 data class SearchCandidate(
-    val address: String,
     val name: String,
-    val geometry: Geometry
+    val geometry: Geometry,
+    val vicinity: String
 )
 
 data class Geometry(

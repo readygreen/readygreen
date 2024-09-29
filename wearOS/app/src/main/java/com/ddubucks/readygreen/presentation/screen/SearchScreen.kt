@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.speech.RecognizerIntent
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -39,6 +40,7 @@ fun SearchScreen(
 ) {
     val mike by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
     var voiceResults by remember { mutableStateOf(emptyList<String>()) }
+    val searchResults by viewModel.searchResults.collectAsState()
     val context = LocalContext.current
     val locationService = LocationService()
 
@@ -50,7 +52,7 @@ fun SearchScreen(
             val data = result.data
             val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             matches?.let {
-                voiceResults = voiceResults + it[0]
+                voiceResults = listOf(it[0]) // 음성인식 결과로 voiceResults를 갱신
             }
         }
     }
@@ -85,9 +87,17 @@ fun SearchScreen(
         }
     }
 
+    // voiceResults와 searchResults 초기화
+    LaunchedEffect(navController.currentBackStackEntry) {
+        voiceResults = emptyList()  // voiceResults 초기화
+        viewModel.clearSearchResults() // searchResults 초기화
+    }
+
+
     // 음성 검색 시작
     LaunchedEffect(voiceResults) {
         if (voiceResults.isNotEmpty()) {
+            Log.d("SearchScreen", "음성 인식 결과: ${voiceResults.first()}")
             val location = suspendCancellableCoroutine<Pair<Double, Double>> { continuation ->
                 locationService.getLastLocation(fusedLocationClient) { latitude, longitude ->
                     continuation.resume(Pair(latitude, longitude), null)
@@ -95,6 +105,7 @@ fun SearchScreen(
             }
 
             val (latitude, longitude) = location
+            Log.d("SearchScreen", "현재 위치: $latitude, $longitude")
 
             // 검색 수행
             viewModel.searchPlaces(
@@ -103,10 +114,14 @@ fun SearchScreen(
                 keyword = voiceResults.first(),
                 apiKey = apiKey
             )
+        }
+    }
 
-            // 검색결과 넘김
-            val searchResults = viewModel.searchResults.value.take(5)
-            navController.currentBackStackEntry?.savedStateHandle?.set("searchResults", searchResults.map { it.name })
+    // 검색 결과 변화 화면 전환
+    LaunchedEffect(searchResults) {
+        if (searchResults.isNotEmpty()) {
+            navController.currentBackStackEntry?.savedStateHandle?.set("searchResults", searchResults)
+            Log.d("SearchScreen", "검색 결과 화면으로 이동")
             navController.navigate("searchResultScreen")
         }
     }

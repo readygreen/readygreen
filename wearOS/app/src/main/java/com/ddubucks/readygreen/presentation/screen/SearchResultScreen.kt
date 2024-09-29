@@ -13,6 +13,7 @@ import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.data.model.ButtonModel
 import com.ddubucks.readygreen.presentation.components.ButtonItem
+import com.ddubucks.readygreen.presentation.retrofit.search.SearchCandidate
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Yellow
@@ -24,10 +25,10 @@ import pStyle
 fun SearchResultScreen(
     navController: NavHostController
 ) {
-
+    // SearchCandidate 리스트를 받습니다.
     val searchResults = navController.previousBackStackEntry
         ?.savedStateHandle
-        ?.get<List<String>>("searchResults") ?: emptyList()
+        ?.get<List<SearchCandidate>>("searchResults") ?: emptyList()
 
     Column(
         modifier = Modifier
@@ -69,8 +70,9 @@ fun SearchResultScreen(
             }
             item { Spacer(modifier = Modifier.height(10.dp)) }
             items(searchResults) { result ->
-                ButtonItem(item = ButtonModel(result), onClick = {
-                    Log.d("SearchResultScreen", "선택한 장소: $result")
+                ButtonItem(item = ButtonModel(result.name), onClick = {
+                    // navigation으로 넘겨서 안내 시작
+                    Log.d("SearchResultScreen", "선택한 장소: ${result.name}, 좌표: ${result.geometry.location.lat}, ${result.geometry.location.lng}")
                 })
             }
             item {
@@ -81,3 +83,4 @@ fun SearchResultScreen(
         }
     }
 }
+

@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.ddubucks.readygreen.BuildConfig
+import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.screen.BookmarkScreen
 import com.ddubucks.readygreen.presentation.screen.InitialScreen
 import com.ddubucks.readygreen.presentation.screen.MainScreen
@@ -53,7 +54,12 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // MapScreen
-                    composable("mapScreen") { MapScreen() }
+                    composable("mapScreen") {
+                        MapScreen(
+                            locationService = LocationService(),
+                            fusedLocationClient = fusedLocationClient
+                        )
+                    }
                     // NavigationScreen
                     composable("navigationScreen") { NavigationScreen() }
                     // Authentication
