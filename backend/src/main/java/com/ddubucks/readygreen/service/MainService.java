@@ -113,7 +113,7 @@ public class MainService {
                     if (fcstTime.substring(0, 2).equals(time)) {
                         weatherResponseDTO.setSky(Integer.parseInt(fcstValue));
                     }
-                } else if (category.equals("POP")) {
+                } else if (category.equals("PTY")) {
                     if (fcstTime.substring(0, 2).equals(time)) {
                         weatherResponseDTO.setRainy(Integer.parseInt(fcstValue));
                     }
@@ -217,7 +217,7 @@ public class MainService {
                         weatherResponseDTO.setSky(Integer.parseInt(fcstValue));
                         current = fcstTime.substring(0, 2);
                     }
-                } else if (category.equals("POP")) {
+                } else if (category.equals("PTY")) {
                     if (fcstTime.substring(0, 2).equals(current)) {
                         weatherResponseDTO.setRainy(Integer.parseInt(fcstValue));
                     } else {
