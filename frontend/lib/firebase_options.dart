@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '547340854789',
     projectId: 'readygreen-e9025',
     storageBucket: 'readygreen-e9025.appspot.com',
-    iosBundleId: 'com.example.readygreen',
+    iosBundleId: 'com.ddubucks.readygreen',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -74,7 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '547340854789',
     projectId: 'readygreen-e9025',
     storageBucket: 'readygreen-e9025.appspot.com',
-    iosBundleId: 'com.example.readygreen',
+    iosBundleId: 'com.ddubucks.readygreen',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

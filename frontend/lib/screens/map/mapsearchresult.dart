@@ -25,19 +25,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
   String? _placeName;
   String? _address;
 
-  // 캐싱된 장소 정보를 저장할 Map
-  Map<String, Future<String>> cachedPlaceDetails = {};
-
   // 세부 정보 가져오는 함수
-  Future<String> _getDetailedInfo(String placeId) {
-    if (!cachedPlaceDetails.containsKey(placeId)) {
-      // 해당 placeId가 아직 캐시되지 않았다면 API 호출
-      cachedPlaceDetails[placeId] = _fetchPlaceDetails(placeId);
-    }
-    return cachedPlaceDetails[placeId]!;
-  }
-
-  // 실제 Google Places API를 호출하는 함수
   Future<String> _fetchPlaceDetails(String placeId) async {
     GoogleMapsPlaces places =
         GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
@@ -130,7 +118,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                 final result = widget.autoCompleteResults[index];
 
                 return FutureBuilder<String?>(
-                  future: _getDetailedInfo(result.placeId!),
+                  future: _fetchPlaceDetails(result.placeId!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(

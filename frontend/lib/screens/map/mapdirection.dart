@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
+import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/destinationbar.dart';
 import 'package:readygreen/api/map_api.dart';
@@ -39,10 +40,11 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     print(
         "도착지 위도: ${widget.endLat}, 경도: ${widget.endLng}, 이름: ${widget.endPlaceName}");
 
+    // 페이지가 로드되면 API 호출
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CurrentLocationProvider>(context, listen: false)
           .updateLocation();
-      _fetchRouteData();
+      _fetchRouteData(); // 페이지가 로드될 때 API 호출
     });
   }
 
@@ -63,6 +65,10 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       double endY = widget.endLat;
       String endName = widget.endPlaceName;
 
+      // 요청 파라미터 출력
+      print(
+          "리퀘스트변수 - startX: $startX, startY: $startY, endX: $endX, endY: $endY, startName: $startName, endName: $endName");
+
       // API 호출
       MapStartAPI mapStartAPI = MapStartAPI();
       var routeData = await mapStartAPI.fetchRoute(
@@ -72,17 +78,31 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
         endY: endY,
         startName: startName,
         endName: endName,
-        watch: true,
+        watch: false,
       );
 
+      // 응답 데이터 출력
+      print('데이터 값~!~!~!~!~!~!~!~!~!: $routeData');
+
+      // 추후 수정 ....
       if (routeData != null) {
         // 경로 데이터를 바탕으로 coordinates 처리
         List<dynamic> features = routeData['routeDTO']['features'];
         List<LatLng> coordinates = [];
 
         for (var feature in features) {
-          List<dynamic> points = feature['geometry']['coordinates'];
-          for (var point in points) {
+          var geometry = feature['geometry'];
+
+          // LineString 처리
+          if (geometry['type'] == 'LineString') {
+            List<dynamic> points = geometry['coordinates'];
+            for (var point in points) {
+              coordinates.add(LatLng(point[1], point[0])); // 경도, 위도 순서로 추가
+            }
+          }
+          // Point 처리
+          else if (geometry['type'] == 'Point') {
+            var point = geometry['coordinates'];
             coordinates.add(LatLng(point[1], point[0])); // 경도, 위도 순서로 추가
           }
         }
@@ -98,7 +118,11 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             ),
           );
         });
+      } else {
+        print("No route data received.");
       }
+    } else {
+      print("No current location available.");
     }
   }
 
@@ -169,8 +193,10 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
               Polyline(
                 polylineId: const PolylineId('route'),
                 points: _routeCoordinates, // 경로 좌표 리스트
-                color: Colors.blue,
-                width: 5,
+                color: AppColors.blue,
+                width: 7,
+                startCap: Cap.roundCap, // 시작 지점을 둥글게
+                endCap: Cap.roundCap, // 끝 지점을 둥글게
               ),
             },
           ),
