@@ -23,9 +23,11 @@ import pStyle
 import secStyle
 
 @Composable
-fun NavigationScreen() {
-
-
+fun NavigationScreen(
+    name: String?,
+    lat: Float?,
+    lng: Float?
+) {
 
 
     Column(

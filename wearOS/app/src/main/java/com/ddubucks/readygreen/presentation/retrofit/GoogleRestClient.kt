@@ -5,13 +5,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object RestClient {
-    private const val BASE_URL = "http://j11b108.p.ssafy.io/api/v1/"
-
-//    클라이언트 생성 시 토큰 인터셉터 추가
-//    private val client = OkHttpClient.Builder()
-//        .addInterceptor(TokenInterceptor { getTokenFromStorage() })
-//        .build()
+object GoogleRestClient {
+    private const val BASE_URL = "https://maps.googleapis.com/"
 
     val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

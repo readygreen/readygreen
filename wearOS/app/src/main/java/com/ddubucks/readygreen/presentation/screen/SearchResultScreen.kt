@@ -71,8 +71,15 @@ fun SearchResultScreen(
             item { Spacer(modifier = Modifier.height(10.dp)) }
             items(searchResults) { result ->
                 ButtonItem(item = ButtonModel(result.name), onClick = {
-                    // navigation으로 넘겨서 안내 시작
-                    Log.d("SearchResultScreen", "선택한 장소: ${result.name}, 좌표: ${result.geometry.location.lat}, ${result.geometry.location.lng}")
+                    // 선택된 장소의 이름과 좌표를 navigationScreen으로 넘깁니다.
+                    val name = result.name
+                    val lat = result.geometry.location.lat
+                    val lng = result.geometry.location.lng
+
+                    // navigationScreen으로 이동하며 데이터 전달
+                    navController.navigate("navigationScreen/$name/$lat/$lng")
+
+                    Log.d("SearchResultScreen", "선택한 장소: $name, 좌표: $lat, $lng")
                 })
             }
             item {
@@ -83,4 +90,3 @@ fun SearchResultScreen(
         }
     }
 }
-

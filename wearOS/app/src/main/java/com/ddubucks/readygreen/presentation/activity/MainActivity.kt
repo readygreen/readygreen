@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -61,7 +62,19 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     // NavigationScreen
-                    composable("navigationScreen") { NavigationScreen() }
+                    composable(
+                        "navigationScreen/{name}/{lat}/{lng}",
+                        arguments = listOf(
+                            navArgument("name") { type = NavType.StringType },
+                            navArgument("lat") { type = NavType.FloatType },
+                            navArgument("lng") { type = NavType.FloatType }
+                        )
+                    ) { backStackEntry ->
+                        val name = backStackEntry.arguments?.getString("name")
+                        val lat = backStackEntry.arguments?.getFloat("lat")
+                        val lng = backStackEntry.arguments?.getFloat("lng")
+                        NavigationScreen(name = name, lat = lat, lng = lng)
+                    }
                     // Authentication
                     composable("initialScreen") { InitialScreen() }
                 }

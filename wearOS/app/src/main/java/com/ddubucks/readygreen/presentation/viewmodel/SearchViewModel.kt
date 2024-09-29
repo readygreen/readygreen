@@ -3,7 +3,7 @@ package com.ddubucks.readygreen.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ddubucks.readygreen.presentation.retrofit.RestClient
+import com.ddubucks.readygreen.presentation.retrofit.GoogleRestClient
 import com.ddubucks.readygreen.presentation.retrofit.search.SearchApi
 import com.ddubucks.readygreen.presentation.retrofit.search.SearchCandidate
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel : ViewModel() {
 
-    private val searchService: SearchApi = RestClient.create(SearchApi::class.java)
+    private val searchService: SearchApi = GoogleRestClient.create(SearchApi::class.java)
 
     private val _searchResults = MutableStateFlow<List<SearchCandidate>>(emptyList())
     val searchResults: StateFlow<List<SearchCandidate>> = _searchResults
