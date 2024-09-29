@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/widgets/common/bgcontainer.dart';
 
 class PlacePage extends StatelessWidget {
-  const PlacePage({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Place Page'),
-      ),
-      body: Center(
-        child: Text(
-          'This is the Place Page',
-          style: TextStyle(fontSize: 24),
+      body: SingleChildScrollView(
+        child: BackgroundContainer(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 50),
+              Center(
+                child: Text(
+                  'place',
+                  style: TextStyle(fontSize: 24),
+                ),
+              ),
+              // 다른 위젯 추가 가능
+            ],
+          ),
         ),
       ),
     );
