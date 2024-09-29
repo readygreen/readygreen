@@ -17,12 +17,11 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         Log.d("FCM", "From: ${remoteMessage.from}")
         remoteMessage.data.isNotEmpty().let {
             Log.d("FCM", "Message data payload: ${remoteMessage.data}")
-            val syncData = remoteMessage.data["key"] ?: "No Data"
-            showNotification(syncData)
+            val messageBody  = remoteMessage.data["key"] ?: "No Data"
+            showNotification(messageBody)
         }
     }
 
-    // 새 토큰 발급
     override fun onNewToken(token: String) {
         Log.d("FCM", "New token: $token")
     }
@@ -33,16 +32,20 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         val notificationId = 1
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "FCM Notifications", NotificationManager.IMPORTANCE_DEFAULT)
+            val channel = NotificationChannel(
+                channelId,
+                "FCM Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.map_icon)
-            .setContentTitle("FCM Sync")
-            .setContentText(messageBody)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setSmallIcon(R.drawable.map_icon)  // 알림 아이콘
+            .setContentTitle("FCM Sync")        // 알림 제목
+            .setContentText(messageBody)        // 알림 내용 (서버에서 받은 메시지)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)  // 알림 우선순위
 
         with(NotificationManagerCompat.from(this)) {
             notify(notificationId, notificationBuilder.build())

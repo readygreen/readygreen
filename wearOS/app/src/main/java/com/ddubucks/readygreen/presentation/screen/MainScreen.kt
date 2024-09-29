@@ -3,6 +3,8 @@ package com.ddubucks.readygreen.presentation.screen
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
+import android.os.Build
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -56,8 +58,21 @@ fun MainScreen(navController: NavHostController) {
         }
     }
 
-    // 위치 권한이 없을 때 요청
+
+    // 알림 권한 요청
+    val notificationPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d("MainScreen", "알림 권한이 부여되었습니다.")
+        } else {
+            Log.d("MainScreen", "알림 권한이 거부되었습니다.")
+        }
+    }
+
+    // 위치와 알림 권한을 확인 및 요청
     LaunchedEffect(key1 = Unit) {
+        // 위치 권한 확인
         if (ContextCompat.checkSelfPermission(
                 context, Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
@@ -69,6 +84,15 @@ fun MainScreen(navController: NavHostController) {
                 latitude = lat
                 longitude = long
             }
+        }
+
+        // 알림 권한 확인 및 요청
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                context, Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 
