@@ -45,7 +45,6 @@ public class MapController {
         if(result==null){
             return ResponseEntity.noContent().build();
         }else{
-
             return ResponseEntity.ok().body(result);
         }
     }

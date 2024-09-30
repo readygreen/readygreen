@@ -6,8 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -17,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 import io.github.flashvayne.chatgpt.service.ChatgptService;
-
 import java.util.HashMap;
 import java.util.Map;
 
