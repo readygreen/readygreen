@@ -3,6 +3,7 @@ import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/loading/start_loading.dart';
 import 'package:readygreen/screens/login/login.dart';
 import 'package:readygreen/screens/home/home.dart';
+import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/screens/point/point.dart';
 import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/screens/place/place.dart';
@@ -110,6 +111,31 @@ class _MainPageState extends State<MainPage> {
     print("init하는중");
     super.initState();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+      print("메시지 수신!");
+      if(message.data['type']==1){
+        if (message.data['type'] == '1') {
+        // 특정 페이지로 이동하고, 특정 함수를 실행하도록 전달
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => MapDirectionPage()),
+          );
+        }
+      }
+      // Notification 메시지 출력 (알림)
+      if (message.notification != null) {
+        print('알림 제목: ${message.notification!.title}');
+        print('알림 본문: ${message.notification!.body}');
+      }
+
+      // 데이터 메시지 출력 (데이터)
+      if (message.data.isNotEmpty) {
+        print('데이터 메시지: ${message.data}');
+        // 예: message.data['type'] 확인
+        if (message.data.containsKey('type')) {
+          String type = message.data['type'];
+          print('받은 메시지 타입: $type');
+        }
+      }
       if (!mounted) return;
       RemoteNotification? notification = message.notification;
       if (notification != null) {
@@ -127,6 +153,7 @@ class _MainPageState extends State<MainPage> {
         );
         setState(() {
           messageString = message.notification!.body!;
+          print(message.notification);
           print("Foreground 메시지 수신: $messageString");
         });
       }
