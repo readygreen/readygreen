@@ -33,15 +33,16 @@ class FcmViewModel : ViewModel() {
                 return@addOnCompleteListener
             }
 
-            // FCM 토큰을 서버로 전송
-            val requestBody = JSONObject(mapOf("fcmToken" to deviceToken)).toString()
+            val formBody = okhttp3.FormBody.Builder()
+                .add("deviceToken", deviceToken)
+                .build()
+
             val fcmApi = RestClient.createService(FcmApi::class.java, accessToken)
-            val body = RequestBody.create("application/json".toMediaTypeOrNull(), requestBody)
 
             viewModelScope.launch {
                 try {
                     val response = withContext(Dispatchers.IO) {
-                        fcmApi.registerFcmToken(body).awaitResponse()
+                        fcmApi.registerFcmToken(formBody).awaitResponse()
                     }
                     if (response.isSuccessful) {
                         Log.d("FcmViewModel", "device 토큰 전송 성공")

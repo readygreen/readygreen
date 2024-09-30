@@ -25,7 +25,10 @@ class MainActivity : ComponentActivity() {
             ReadyGreenTheme {
                 val navController = rememberNavController()
                 val searchViewModel: SearchViewModel = viewModel()
+
+                // Context를 사용해 FusedLocationProviderClient 및 LocationService 인스턴스 생성
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+                val locationService = LocationService()
 
                 val sharedPreferences = getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
                 val token = sharedPreferences.getString("accessToken", null)
@@ -58,7 +61,7 @@ class MainActivity : ComponentActivity() {
                     // MapScreen
                     composable("mapScreen") {
                         MapScreen(
-                            locationService = LocationService(),
+                            locationService = locationService,  // Context 전달된 LocationService 사용
                             fusedLocationClient = fusedLocationClient
                         )
                     }

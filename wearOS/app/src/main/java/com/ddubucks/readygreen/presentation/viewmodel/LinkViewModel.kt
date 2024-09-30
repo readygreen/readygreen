@@ -15,7 +15,9 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
-class LinkViewModel(private val fcmViewModel: FcmViewModel) : ViewModel() {
+class LinkViewModel : ViewModel() {
+
+    private val fcmViewModel = FcmViewModel()  // FcmViewModel을 직접 생성
 
     fun checkAuth(
         context: Context,
@@ -23,7 +25,6 @@ class LinkViewModel(private val fcmViewModel: FcmViewModel) : ViewModel() {
         authNumber: String,
         onResult: (Boolean, String) -> Unit
     ) {
-
         viewModelScope.launch {
             try {
                 val linkApi = RestClient.createService(LinkApi::class.java, "")
@@ -47,7 +48,6 @@ class LinkViewModel(private val fcmViewModel: FcmViewModel) : ViewModel() {
     }
 
     private fun onLoginSuccess(context: Context, accessToken: String) {
-        fcmViewModel.registerFcm(context)
+        fcmViewModel.registerFcm(context)  // 로그인 성공 시 FCM 토큰 등록
     }
 }
-
