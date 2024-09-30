@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,9 +27,8 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val searchViewModel: SearchViewModel = viewModel()
 
-                // Context를 사용해 FusedLocationProviderClient 및 LocationService 인스턴스 생성
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-                val locationService = LocationService()
+                val locationService = remember { LocationService(this) }
 
                 val sharedPreferences = getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
                 val token = sharedPreferences.getString("accessToken", null)
@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                    // 검색 결과를 넘겨주는 SearchResultScreen
+                    // SearchResultScreen
                     composable("searchResultScreen") {
                         SearchResultScreen(navController = navController)
                     }
@@ -61,8 +61,7 @@ class MainActivity : ComponentActivity() {
                     // MapScreen
                     composable("mapScreen") {
                         MapScreen(
-                            locationService = locationService,  // Context 전달된 LocationService 사용
-                            fusedLocationClient = fusedLocationClient
+                            locationService = locationService,
                         )
                     }
 

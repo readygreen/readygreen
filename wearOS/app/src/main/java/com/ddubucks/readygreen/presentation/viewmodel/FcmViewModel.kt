@@ -18,7 +18,7 @@ import retrofit2.awaitResponse
 
 class FcmViewModel : ViewModel() {
 
-    // FCM 토큰 서버로 전송
+    // device 토큰 전송
     fun registerFcm(context: Context) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
@@ -65,7 +65,6 @@ class FcmViewModel : ViewModel() {
             return
         }
 
-        // FCM 메시지 전송
         val fcmRequest = JSONObject(
             mapOf(
                 "messageType" to messageType,

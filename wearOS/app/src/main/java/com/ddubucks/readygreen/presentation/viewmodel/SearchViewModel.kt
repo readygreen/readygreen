@@ -37,11 +37,9 @@ class SearchViewModel : ViewModel() {
                     apiKey = apiKey
                 )
                 if (response.results?.isNotEmpty() == true) {
-                    // 검색 결과가 있을 경우
                     _searchResults.value = response.results.take(5)
                     Log.d("SearchViewModel", "검색 결과: ${response.results.map { it.name }}")
                 } else {
-                    // 검색 결과가 없을 경우
                     Log.d("SearchViewModel", "검색 결과 없음")
                 }
                 Log.d("SearchViewModel", "API 응답: $response")

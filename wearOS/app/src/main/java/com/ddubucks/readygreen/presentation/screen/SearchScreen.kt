@@ -27,7 +27,6 @@ import com.ddubucks.readygreen.presentation.theme.Yellow
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import h3Style
-import kotlinx.coroutines.suspendCancellableCoroutine
 import pStyle
 
 
@@ -42,7 +41,7 @@ fun SearchScreen(
     var voiceResults by remember { mutableStateOf(emptyList<String>()) }
     val searchResults by viewModel.searchResults.collectAsState()
     val context = LocalContext.current
-    val locationService = LocationService()
+    val locationService = remember { LocationService(context) }
 
     // 음성인식 결과 추가
     val speechLauncher = rememberLauncherForActivityResult(
@@ -89,30 +88,31 @@ fun SearchScreen(
 
     // voiceResults와 searchResults 초기화
     LaunchedEffect(navController.currentBackStackEntry) {
-        voiceResults = emptyList()  // voiceResults 초기화
-        viewModel.clearSearchResults() // searchResults 초기화
+        voiceResults = emptyList()
+        viewModel.clearSearchResults()
     }
 
-    // 음성 검색 시작
+    // 음성 검색과 위치 추적
     LaunchedEffect(voiceResults) {
         if (voiceResults.isNotEmpty()) {
             Log.d("SearchScreen", "음성 인식 결과: ${voiceResults.first()}")
-            val location = suspendCancellableCoroutine<Pair<Double, Double>> { continuation ->
-                locationService.getLastLocation(fusedLocationClient) { latitude, longitude ->
-                    continuation.resume(Pair(latitude, longitude), null)
+            locationService.getLastLocation { location ->
+                if (location != null) {
+                    val latitude = location.latitude
+                    val longitude = location.longitude
+                    Log.d("SearchScreen", "현재 위치: $latitude, $longitude")
+
+                    // 검색 수행
+                    viewModel.searchPlaces(
+                        latitude = latitude,
+                        longitude = longitude,
+                        keyword = voiceResults.first(),
+                        apiKey = apiKey
+                    )
+                } else {
+                    Log.e("SearchScreen", "현재 위치를 가져올 수 없습니다.")
                 }
             }
-
-            val (latitude, longitude) = location
-            Log.d("SearchScreen", "현재 위치: $latitude, $longitude")
-
-            // 검색 수행
-            viewModel.searchPlaces(
-                latitude = latitude,
-                longitude = longitude,
-                keyword = voiceResults.first(),
-                apiKey = apiKey
-            )
         }
     }
 

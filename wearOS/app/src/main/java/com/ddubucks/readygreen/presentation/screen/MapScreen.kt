@@ -23,15 +23,15 @@ import com.google.maps.android.compose.rememberCameraPositionState
 @Composable
 fun MapScreen(
     locationService: LocationService,
-    fusedLocationClient: FusedLocationProviderClient
 ) {
     var latitude by remember { mutableStateOf<Double?>(null) }
     var longitude by remember { mutableStateOf<Double?>(null) }
 
+    // 위치 정보 가져오기
     LaunchedEffect(Unit) {
-        locationService.getLastLocation(fusedLocationClient) { lat, lon ->
-            latitude = lat
-            longitude = lon
+        locationService.getLastLocation { location ->
+            latitude = location?.latitude
+            longitude = location?.longitude
         }
     }
 
@@ -66,13 +66,12 @@ fun MapScreen(
                 cameraPositionState = cameraPositionState,
                 uiSettings = MapUiSettings(myLocationButtonEnabled = true)
             ) {
-                // 신호등 정보 마커
                 trafficlightList.forEach { pin ->
                     Marker(
                         state = MarkerState(position = LatLng(pin.latitude, pin.longitude)),
                         title = pin.state,
                         snippet = "번호: ${pin.number}",
-                        icon = BitmapDescriptorFactory.fromBitmap(createTrafficlightBitmap(pin)) // 커스텀 비트맵 사용
+                        icon = BitmapDescriptorFactory.fromBitmap(createTrafficlightBitmap(pin))
                     )
                 }
             }
