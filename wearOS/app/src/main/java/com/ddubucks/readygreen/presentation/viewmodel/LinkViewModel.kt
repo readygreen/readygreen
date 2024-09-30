@@ -15,7 +15,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.launch
 import okhttp3.ResponseBody
 
-class LinkViewModel() : ViewModel() {
+class LinkViewModel(private val fcmViewModel: FcmViewModel) : ViewModel() {
 
     fun checkAuth(
         context: Context,
@@ -24,34 +24,30 @@ class LinkViewModel() : ViewModel() {
         onResult: (Boolean, String) -> Unit
     ) {
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("LinkViewModel", "Device 토큰 가져오기 실패", task.exception)
-                onResult(false, "Device 토큰 가져오기 실패")
-                return@addOnCompleteListener
-            }
-            val deviceToken = task.result
-            Log.d("LinkViewModel", "Device 토큰: $deviceToken")
+        viewModelScope.launch {
+            try {
+                val linkApi = RestClient.createService(LinkApi::class.java, "")
+                val response = linkApi.checkAuth(email, authNumber)
+                val accessToken = response.string()
 
-            viewModelScope.launch {
-                try {
-                    val linkApi = RestClient.createService(LinkApi::class.java, "")
-                    val response = linkApi.checkAuth(email, authNumber, deviceToken)
-                    val accessToken = response.string()
+                if (accessToken.isNotEmpty()) {
+                    Log.d("LinkViewModel", "access 토큰: $accessToken")
+                    TokenManager.saveToken(context, accessToken)
 
-                    if (accessToken.isNotEmpty()) {
-                        Log.d("LinkViewModel", "access 토큰: $accessToken")
-                        TokenManager.saveToken(context, accessToken)
-
-                        onResult(true, "인증 성공")
-                    } else {
-                        onResult(false, "토큰이 없습니다.")
-                    }
-                } catch (e: Exception) {
-                    Log.e("LinkViewModel", "오류 발생", e)
-                    onResult(false, "오류 발생: ${e.message}")
+                    onLoginSuccess(context, accessToken)
+                    onResult(true, "인증 성공")
+                } else {
+                    onResult(false, "토큰이 없습니다.")
                 }
+            } catch (e: Exception) {
+                Log.e("LinkViewModel", "오류 발생", e)
+                onResult(false, "오류 발생: ${e.message}")
             }
         }
     }
+
+    private fun onLoginSuccess(context: Context, accessToken: String) {
+        fcmViewModel.registerFcm(context)
+    }
 }
+
