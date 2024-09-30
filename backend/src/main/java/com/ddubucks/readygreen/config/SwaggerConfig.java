@@ -58,12 +58,26 @@ public class SwaggerConfig {
                 .pathsToMatch("/health/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi redisApi() {
+        return GroupedOpenApi.builder()
+                .group("redis")
+                .pathsToMatch("/api/redis/**")
+                .build();
+    }
 
     @Bean
     public GroupedOpenApi mainApi() {
         return GroupedOpenApi.builder()
                 .group("메인")
                 .pathsToMatch("/main/**")
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi linkApi() {
+        return GroupedOpenApi.builder()
+                .group("워치연동")
+                .pathsToMatch("/link/**")
                 .build();
     }
 
@@ -96,6 +110,13 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("포인트")
                 .pathsToMatch("/point/**")
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi FcmApi(){
+        return GroupedOpenApi.builder()
+                .group("FCM")
+                .pathsToMatch("/fcm/**")
                 .build();
     }
 }

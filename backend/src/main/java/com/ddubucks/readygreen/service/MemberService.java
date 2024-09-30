@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -24,10 +23,10 @@ public class MemberService {
                 .birth(signupRequestDTO.getBirth())
                 .socialId(passwordEncoder.encode(signupRequestDTO.getSocialId()))
                 .socialType(signupRequestDTO.getSocialType())
+                .smartphone(signupRequestDTO.getSmartphone())
                 .role(Role.USER)
                 .build());
     }
-
     @Transactional
     public void delete(String email) {
         memberRepository.deleteMemberByEmail(email);

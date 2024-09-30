@@ -36,4 +36,7 @@ public class SignupRequestDTO {
     @NotNull(message = "Social Type cannot be null")
     private SocialType socialType;
 
+    @NotNull(message = "devicesToken cannot be null")
+    private String smartphone;
+
 }

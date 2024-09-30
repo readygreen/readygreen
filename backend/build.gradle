@@ -34,6 +34,8 @@ dependencies {
     implementation 'org.locationtech.jts:jts-core:1.19.0'
     implementation 'io.github.flashvayne:chatgpt-spring-boot-starter:1.0.4'
     implementation 'org.hibernate:hibernate-spatial:6.5.2.Final'
+    implementation 'com.google.firebase:firebase-admin:9.1.1'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
