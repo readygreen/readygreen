@@ -5,6 +5,7 @@ import 'package:location/location.dart' as loc;
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/destinationbar.dart';
+import 'package:readygreen/widgets/map/draggable_route.dart';
 import 'package:readygreen/api/map_api.dart';
 import 'package:provider/provider.dart';
 import 'package:readygreen/provider/current_location.dart';
@@ -209,13 +210,34 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             ),
           ),
           Positioned(
-            top: screenHeight * 0.05,
-            left: screenWidth * 0.05,
-            right: screenWidth * 0.05,
+            top: screenHeight * 0,
+            left: screenWidth * 0,
+            right: screenWidth * 0,
             child: DestinationBar(
               currentLocation:
                   locationProvider.currentPlaceName ?? 'Loading...',
               destination: widget.endPlaceName, // 전달받은 도착지 이름
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              height: screenHeight * 0.11,
+              decoration: BoxDecoration(
+                color: AppColors.blue,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6.0,
+                    spreadRadius: 2.0,
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Text("상세 경로"),
+              ),
             ),
           ),
         ],
