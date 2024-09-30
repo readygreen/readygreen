@@ -107,9 +107,12 @@ flutter:
     - assets/images/mic.png
     - assets/images/badge.png
     - assets/images/place.png
+    - assets/images/fortune.png
     - assets/images/user.png
     - assets/images/w-sun.png
     - assets/images/w-rain.png
+    - assets/images/w-rainsnow.png
+    - assets/images/w-suncloud.png
     - assets/images/w-cloudy.png
     - assets/images/w-snow.png
     - assets/images/w-default.png
@@ -123,3 +126,6 @@ flutter:
     - family: LogoFont
       fonts:
         - asset: assets/fonts/Dunggeunmiso-B.ttf
+    - family: LogoFontReg
+      fonts:
+        - asset: assets/fonts/Dunggeunmiso-R.ttf

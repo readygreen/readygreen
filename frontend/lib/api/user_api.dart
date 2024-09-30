@@ -159,4 +159,32 @@ class NewUserApi {
       return null;
     }
   }
+
+  // 신호등 정보 요청 (GET)
+  Future<List<dynamic>?> fetchBlinkerInfo({
+    required double latitude,
+    required double longitude,
+    required int radius,
+  }) async {
+    String? accessToken = await storage.read(key: 'accessToken');
+
+    final response = await http.get(
+      Uri.parse(
+          '$baseUrl/map?latitude=$latitude&longitude=$longitude&radius=$radius'),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('신호등 정보 조회 성공');
+      return jsonDecode(response.body)['blinkerDTOs'];
+    } else {
+      print('신호등 정보 조회 실패: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      return null;
+    }
+  }
 }
