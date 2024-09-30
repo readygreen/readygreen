@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/redis")
+@RequestMapping("/redis")
 @AllArgsConstructor
 public class RedisController {
 
@@ -15,7 +15,6 @@ public class RedisController {
 
     @PostMapping("/save")
     public String saveToRedis(@RequestParam String key, @RequestParam String value) {
-
         redisService.save(key, value);
         return "Data saved successfully!";
     }
@@ -29,5 +28,14 @@ public class RedisController {
     public String deleteFromRedis(@RequestParam String key) {
         redisService.delete(key);
         return "Data deleted successfully!";
+    }
+    @GetMapping("/hasKey")
+    public String checkKeyExists(@RequestParam(name = "key") String key) {
+        boolean exists = redisService.hasKey(key);
+        if (exists) {
+            return "있음";
+        } else {
+            return "없음";
+        }
     }
 }

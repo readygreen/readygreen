@@ -32,6 +32,7 @@ public class MemberController {
         memberService.signup(signupRequestDTO);
         return ResponseEntity.ok("회원가입 성공");
     }
+
     @PutMapping("/birth")
     @Operation(summary = "생일 업데이트")
     public ResponseEntity<?> addBirth(@AuthenticationPrincipal UserDetails userDetails, @RequestParam("birthdate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate birthdate) {

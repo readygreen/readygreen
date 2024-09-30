@@ -27,11 +27,11 @@ public class MemberService {
                 .role(Role.USER)
                 .build());
     }
+
     @Transactional
     public void delete(String email) {
         memberRepository.deleteMemberByEmail(email);
     }
-
     public int getPoint(UserDetails userDetails) {
         String email = userDetails.getUsername();
         Member member = memberRepository.findMemberByEmail(email)
