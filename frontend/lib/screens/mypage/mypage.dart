@@ -40,7 +40,7 @@ class _MyPageState extends State<MyPage> {
 
   Future<void> _handleLogout(BuildContext context) async {
     // 저장된 토큰 삭제
-    await storage.delete(key: 'accessToken');
+    await storage.deleteAll();
 
     // 로그아웃 후 로그인 페이지로 이동
     Navigator.of(context).pushNamedAndRemoveUntil(

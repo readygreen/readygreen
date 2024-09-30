@@ -49,7 +49,7 @@ class _WeatherModalState extends State<WeatherModal> {
         children: [
           Container(
             width: deviceWidth * 0.9,
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
@@ -70,12 +70,16 @@ class _WeatherModalState extends State<WeatherModal> {
               ],
             ),
           ),
-          // 오른쪽 상단에 X 버튼 추가
+          // 닫기 버튼
           Positioned(
-            top: 0,
-            right: 0,
+            top: 10,
+            right: 10,
             child: IconButton(
-              icon: const Icon(Icons.close),
+              icon: const Icon(
+                Icons.close_rounded,
+                size: 30,
+                color: AppColors.greytext,
+              ),
               onPressed: () {
                 Navigator.of(context).pop(); // 모달 닫기
               },
@@ -132,10 +136,10 @@ class _WeatherModalState extends State<WeatherModal> {
     String weatherImage = _getWeatherImage(data['sky'], data['rainy']);
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Text(time), // 시간 출력
-        Image.asset(weatherImage, width: 50, height: 50), // 작은 이미지
+        Image.asset(weatherImage, width: 45, height: 45), // 작은 이미지
         Text(temperature), // 온도 출력
       ],
     );
