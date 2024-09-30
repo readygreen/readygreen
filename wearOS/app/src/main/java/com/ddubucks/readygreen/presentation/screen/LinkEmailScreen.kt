@@ -50,7 +50,6 @@ fun LinkEmailScreen(navController: NavController) {
             text = "이메일을 입력해주세요",
             color = White,
             style = pStyle,
-            modifier = Modifier.padding(top = 10.dp)
         )
         Spacer(modifier = Modifier.height(8.dp))
         TextField(

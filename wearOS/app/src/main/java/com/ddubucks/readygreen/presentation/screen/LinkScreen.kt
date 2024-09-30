@@ -46,13 +46,15 @@ fun LinkScreen(
             style = h1Style,
             color = Yellow,
         )
+
         Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = "인증번호를 입력해주세요",
             color = White,
             style = pStyle,
-            modifier = Modifier.padding(top = 10.dp)
         )
+
         Spacer(modifier = Modifier.height(8.dp))
 
         TextField(

@@ -40,7 +40,7 @@ class LinkViewModel() : ViewModel() {
                     val accessToken = response.string()
 
                     if (accessToken.isNotEmpty()) {
-                        Log.d("LinkViewModel", "받은 토큰: $accessToken")
+                        Log.d("LinkViewModel", "access 토큰: $accessToken")
                         TokenManager.saveToken(context, accessToken)
 
                         onResult(true, "인증 성공")

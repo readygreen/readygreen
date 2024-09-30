@@ -3,7 +3,9 @@ package com.ddubucks.readygreen.presentation.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -41,6 +43,9 @@ fun NavigationScreen(
             style = h3Style,
             color = Yellow,
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Icon(
             painter = painterResource(id = R.drawable.arrow_left),
             contentDescription = "방향",
@@ -49,19 +54,23 @@ fun NavigationScreen(
                 .size(80.dp)
                 .padding(top = 20.dp)
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = "50m 앞 신호등",
             fontWeight = FontWeight.Bold,
             style = pStyle,
             color = Color.White,
-            modifier = Modifier.padding(top = 15.dp)
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Text(
             text = "40초",
             fontWeight = FontWeight.Bold,
             style = secStyle,
             color = Red,
-            modifier = Modifier.padding(top = 6.dp)
         )
     }
 }

@@ -100,7 +100,6 @@ fun MainScreen(navController: NavHostController) {
         ButtonIconModel(R.drawable.bookmark_icon, "자주가는 목적지"),
         ButtonIconModel(R.drawable.voice_search_icon, "음성검색"),
         ButtonIconModel(R.drawable.map_icon, "주변 신호등 보기"),
-        // TODO 길안내 시작 코드와 연결
         ButtonIconModel(R.drawable.arrow_straight, "길안내"),
         ButtonIconModel(R.drawable.arrow_straight, "시작하기")
     )

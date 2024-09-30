@@ -93,7 +93,6 @@ fun SearchScreen(
         viewModel.clearSearchResults() // searchResults 초기화
     }
 
-
     // 음성 검색 시작
     LaunchedEffect(voiceResults) {
         if (voiceResults.isNotEmpty()) {
@@ -137,8 +136,8 @@ fun SearchScreen(
             text = "음성검색",
             color = Yellow,
             style = h3Style,
-            modifier = Modifier.padding(bottom = 14.dp, top = 16.dp)
         )
+        Spacer(modifier = Modifier.height(10.dp))
         Text(
             text = if (voiceResults.isEmpty()) "목적지를 말씀해주세요" else voiceResults.last(),
             style = pStyle,

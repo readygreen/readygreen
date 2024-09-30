@@ -52,7 +52,9 @@ fun SearchResultScreen(
                     style = h3Style,
                 )
             }
+
             item { Spacer(modifier = Modifier.height(20.dp)) }
+
             item {
                 if (searchResults.isNotEmpty()) {
                     Text(
@@ -68,7 +70,9 @@ fun SearchResultScreen(
                     )
                 }
             }
+
             item { Spacer(modifier = Modifier.height(10.dp)) }
+
             items(searchResults) { result ->
                 ButtonItem(item = ButtonModel(result.name), onClick = {
                     // 선택된 장소의 이름과 좌표를 navigationScreen으로 넘깁니다.
