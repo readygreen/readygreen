@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.presentation.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.presentation.theme.*
 import com.ddubucks.readygreen.presentation.viewmodel.LinkViewModel
+import com.google.firebase.messaging.FirebaseMessaging
 import h1Style
 import pStyle
 
@@ -69,7 +71,11 @@ fun LinkScreen(
 
         TextButton(
             onClick = {
-                viewModel.checkAuth(context, email, authNumber) { success, message ->
+                viewModel.checkAuth(
+                    context,
+                    email,
+                    authNumber
+                ) { success, message ->
                     if (success) {
                         navController.navigate("mainScreen") {
                             popUpTo("linkEmailScreen") { inclusive = true }

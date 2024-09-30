@@ -8,6 +8,7 @@ interface LinkApi {
     @GET("link/check")
     suspend fun checkAuth(
         @Query("email") email: String,
-        @Query("authNumber") authNumber: String
+        @Query("authNumber") authNumber: String,
+        @Query("deviceToken") deviceToken: String
     ): ResponseBody
 }
