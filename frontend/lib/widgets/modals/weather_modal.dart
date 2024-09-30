@@ -1,6 +1,6 @@
+import 'dart:convert'; // JSON 변환을 위해 필요
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:readygreen/api/main_api.dart';
 import 'package:readygreen/constants/appcolors.dart';
 
 class WeatherModal extends StatefulWidget {
@@ -12,7 +12,6 @@ class WeatherModal extends StatefulWidget {
 
 class _WeatherModalState extends State<WeatherModal> {
   List<Map<String, dynamic>> weatherData = []; // 날씨 정보를 저장하는 리스트
-  final NewMainApi api = NewMainApi();
   final FlutterSecureStorage storage = FlutterSecureStorage();
 
   @override
@@ -21,28 +20,18 @@ class _WeatherModalState extends State<WeatherModal> {
     _loadWeatherInfo(); // 모달이 열릴 때 날씨 정보를 불러옴
   }
 
-  // 날씨 정보를 스토리지에서 불러오거나 API를 통해 가져오는 함수
+  // 날씨 정보를 스토리지에서 불러오는 함수
   Future<void> _loadWeatherInfo() async {
-    // 스토리지에서 저장된 위도와 경도 읽기
-    String? lat = await storage.read(key: 'latitude');
-    String? long = await storage.read(key: 'longitude');
+    // 스토리지에서 저장된 날씨 데이터 불러오기
+    final String? storedWeatherData = await storage.read(key: 'weather');
 
-    if (lat != null && long != null) {
-      String latitude = lat.substring(0, 2);
-      String longitude = long.substring(0, 3);
+    if (storedWeatherData != null) {
+      // JSON 문자열을 리스트로 변환
+      List<dynamic> decodedWeatherData = jsonDecode(storedWeatherData);
 
-      var weatherResponse = await api.getWeather(latitude, longitude);
-
-      if (weatherResponse != null) {
-        setState(() {
-          print(weatherResponse);
-          weatherData = List<Map<String, dynamic>>.from(weatherResponse);
-        });
-      } else {
-        setState(() {
-          weatherData = [];
-        });
-      }
+      setState(() {
+        weatherData = List<Map<String, dynamic>>.from(decodedWeatherData);
+      });
     } else {
       setState(() {
         weatherData = [];
@@ -52,42 +41,47 @@ class _WeatherModalState extends State<WeatherModal> {
 
   @override
   Widget build(BuildContext context) {
-    // 기기의 너비를 가져오기 위해 MediaQuery 사용
     final deviceWidth = MediaQuery.of(context).size.width;
 
     return Dialog(
       backgroundColor: AppColors.white,
-      child: Container(
-        // 기기 너비의 90%를 사용하도록 설정 (조정 가능)
-        width: deviceWidth * 0.9,
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text(
-              '날씨 정보',
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'LogoFont',
-                  color: AppColors.blue),
+      child: Stack(
+        children: [
+          Container(
+            width: deviceWidth * 0.9,
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Text(
+                  '날씨',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'LogoFont',
+                    color: AppColors.blue,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                weatherData.isEmpty
+                    ? const Text('날씨 정보를 불러오는 중...')
+                    : _buildWeatherInfo(), // 날씨 정보를 출력하는 위젯
+                const SizedBox(height: 16),
+              ],
             ),
-            const SizedBox(height: 16),
-            weatherData.isEmpty
-                ? const Text('날씨 정보를 불러오는 중...')
-                : _buildWeatherInfo(), // 날씨 정보를 출력하는 위젯
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: TextButton(
-                child: const Text('닫기'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // 모달 닫기
-                },
-              ),
+          ),
+          // 오른쪽 상단에 X 버튼 추가
+          Positioned(
+            top: 0,
+            right: 0,
+            child: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () {
+                Navigator.of(context).pop(); // 모달 닫기
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -95,11 +89,43 @@ class _WeatherModalState extends State<WeatherModal> {
   // 시간별 날씨 정보를 출력하는 위젯
   Widget _buildWeatherInfo() {
     return Column(
-      children: weatherData.map((data) => _buildHourlyWeather(data)).toList(),
+      children: weatherData.asMap().entries.map((entry) {
+        int index = entry.key;
+        Map<String, dynamic> data = entry.value;
+
+        // 첫 번째 데이터(현재 시간)와 나머지 데이터를 구분하여 스타일 적용
+        if (index == 0) {
+          return _buildCurrentWeather(data); // 첫 번째 데이터는 크게 표시
+        } else {
+          return _buildHourlyWeather(data); // 나머지 데이터는 기본 크기로 표시
+        }
+      }).toList(),
     );
   }
 
-  // 시간별 날씨 정보를 표시하는 위젯
+  // 현재 시간의 날씨 정보를 더 크게 표시하는 위젯
+  Widget _buildCurrentWeather(Map<String, dynamic> data) {
+    String temperature = '${data['temperature']}°C';
+    String weatherImage = _getWeatherImage(data['sky'], data['rainy']);
+    String weatherStatus = _getWeatherStatus(data['sky'], data['rainy']);
+
+    return Column(
+      children: [
+        Image.asset(weatherImage, width: 120, height: 120),
+        Text(
+          temperature,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        Text(
+          weatherStatus,
+          style: const TextStyle(fontSize: 15, color: AppColors.blue),
+        ), // 날씨 상태
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  // 시간별 날씨 정보를 표시하는 기본 크기의 위젯
   Widget _buildHourlyWeather(Map<String, dynamic> data) {
     String time = '${data['time']}시';
     String temperature = '${data['temperature']}°C';
@@ -109,7 +135,7 @@ class _WeatherModalState extends State<WeatherModal> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(time), // 시간 출력
-        Image.asset(weatherImage, width: 50, height: 50), // 날씨 이미지 출력
+        Image.asset(weatherImage, width: 50, height: 50), // 작은 이미지
         Text(temperature), // 온도 출력
       ],
     );
@@ -117,13 +143,43 @@ class _WeatherModalState extends State<WeatherModal> {
 
   // sky와 rainy 값을 기반으로 날씨 이미지를 반환하는 함수
   String _getWeatherImage(int sky, int rainy) {
-    if (rainy > 50) {
-      return 'assets/images/w-rain.png';
-    } else if (sky == 1) {
-      return 'assets/images/w-sun.png';
-    } else if (sky == 3 | 4) {
-      return 'assets/images/w-cloudy.png';
+    if (sky == 1) {
+      return 'assets/images/w-sun.png'; // 맑음
+    } else if (sky == 3) {
+      return 'assets/images/w-suncloud.png'; // 구름 많음
+    } else if (sky == 4) {
+      return 'assets/images/w-cloudy.png'; // 흐림
+    } else if (rainy == 1) {
+      return 'assets/images/w-rain.png'; // 비
+    } else if (rainy == 2) {
+      return 'assets/images/w-rainsnow.png'; // 비눈
+    } else if (rainy == 3) {
+      return 'assets/images/w-snow.png'; // 눈
+    } else if (rainy == 4) {
+      return 'assets/images/w-rain.png'; // 소나기
     }
+
     return 'assets/images/w-default.png'; // 기본 이미지
+  }
+
+  // sky와 rainy 값을 기반으로 날씨 상태 텍스트 반환하는 함수
+  String _getWeatherStatus(int sky, int rainy) {
+    if (sky == 1) {
+      return '맑음';
+    } else if (sky == 3) {
+      return '구름 많음';
+    } else if (sky == 4) {
+      return '흐림';
+    } else if (rainy == 1) {
+      return '비';
+    } else if (rainy == 2) {
+      return '비와 눈';
+    } else if (rainy == 3) {
+      return '눈';
+    } else if (rainy == 4) {
+      return '소나기';
+    }
+
+    return '알 수 없음';
   }
 }
