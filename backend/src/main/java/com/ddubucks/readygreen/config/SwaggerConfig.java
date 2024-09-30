@@ -58,11 +58,12 @@ public class SwaggerConfig {
                 .pathsToMatch("/health/**")
                 .build();
     }
+
     @Bean
     public GroupedOpenApi redisApi() {
         return GroupedOpenApi.builder()
                 .group("redis")
-                .pathsToMatch("/api/redis/**")
+                .pathsToMatch("/redis/**")
                 .build();
     }
 

@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,9 +49,8 @@ public class MapController {
             return ResponseEntity.ok().body(result);
         }
     }
-
     @DeleteMapping("guide")
-    public ResponseEntity<String> deleteGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean isWatch) throws FirebaseMessagingException {
+    public ResponseEntity<String> deleteGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(name = "isWatch") boolean isWatch) throws FirebaseMessagingException {
         redisService.delete("dir|"+userDetails.getUsername());
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         if(member.getWatch()!=null)
@@ -59,12 +59,21 @@ public class MapController {
     }
 
     @PostMapping("guide")
-    public ResponseEntity<String> doneGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean isWatch) throws FirebaseMessagingException {
+    public ResponseEntity<String> doneGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(name = "isWatch") boolean isWatch) throws FirebaseMessagingException {
         redisService.delete("dir|"+userDetails.getUsername());
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         if(member.getWatch()!=null)
             fcmService.sendMessageToOtherDevice(member,isWatch,2);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("guide/check")
+    public ResponseEntity<String> checkGuide(@AuthenticationPrincipal UserDetails userDetails){
+        if(redisService.hasKey("dir|"+userDetails.getUsername())){
+            return ResponseEntity.ok("데이터 있음");
+        }else {
+            return ResponseEntity.noContent().build();
+        }
     }
 
     @GetMapping

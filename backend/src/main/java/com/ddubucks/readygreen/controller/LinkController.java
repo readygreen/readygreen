@@ -27,18 +27,23 @@ public class LinkController {
 
     @PostMapping
     @Operation(summary = "link devices", description = "스마트폰에서 인증번호 저장")
-    public ResponseEntity<String> saveAuthNumber(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String authNumber, @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken){
+    public ResponseEntity<String> saveAuthNumber(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(description = "인증번호") @RequestParam String authNumber,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String accessToken) {
         String token = accessToken.replace("Bearer ","");
         System.out.println(token);
-        redisService.saveWithTimeout(userDetails.getUsername()+authNumber, token);
+        redisService.saveWithTimeout(userDetails.getUsername() + authNumber, token);
         return ResponseEntity.ok("인증번호 저장 성공");
     }
 
     @GetMapping("check")
     @Operation(summary = "check auth", description = "워치에서 인증번호 일치하는지 확인")
-    public ResponseEntity<Object> checkAuth(@RequestParam String email, @RequestParam String authNumber) {
-        Object token = redisService.find(email+authNumber);
-        if (token!=null) {
+    public ResponseEntity<Object> checkAuth(
+            @Parameter(description = "사용자의 이메일 주소") @RequestParam String email,
+            @Parameter(description = "인증번호") @RequestParam String authNumber) {
+        Object token = redisService.find(email + authNumber);
+        if (token != null) {
             return ResponseEntity.ok(token);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 실패");
@@ -47,7 +52,9 @@ public class LinkController {
 
     @PutMapping("register")
     @Operation(summary = "워치 토큰 입력")
-    public ResponseEntity<String> addWatchToken(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String deviceToken){
+    public ResponseEntity<String> addWatchToken(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Parameter(description = "워치의 디바이스 토큰") @RequestParam String deviceToken) {
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         member.setWatch(deviceToken);
         memberRepository.save(member);
