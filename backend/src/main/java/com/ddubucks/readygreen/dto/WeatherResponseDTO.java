@@ -7,6 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@ToString
 public class WeatherResponseDTO {
     private String time;
     private float temperature;

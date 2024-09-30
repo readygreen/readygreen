@@ -52,7 +52,7 @@ public class MainController {
             return ResponseEntity.badRequest().body("생일 정보가 없습니다.");
         }
         // 프롬프트 생성
-        String prompt = String.format("당신의 이름은 %s이고, 생일은 %s입니다. 오늘의 운세를 알려주세요. 오늘의 운세는 일, 사랑, 건강, 금전, 행운의 숫자 등 다양한 측면을 포함하여 상세하게 설명해 주세요. 최대 글자수 200자 이내로 해주세요",
+        String prompt = String.format("저의 이름은 %s이고, 생일은 %s입니다. 오늘의 운세를 알려주세요. 오늘의 운세는 반드시 일, 사랑, 건강, 금전, 행운의 숫자를 포함하여 각 측면을 간단하고 긍정적으로 설명해 주세요. 글자 수는 최대 200자로 제한합니다.",
                 member.getNickname(), member.getBirth().toString());
         String apiURL = "https://api.openai.com/v1/chat/completions";
         String model = "gpt-4-turbo";
