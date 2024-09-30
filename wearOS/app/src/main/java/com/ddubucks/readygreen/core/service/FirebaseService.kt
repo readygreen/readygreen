@@ -14,7 +14,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     // 메세지 수신
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d("FCM", "From: ${remoteMessage.from}")
+        Log.d("FCM", "Message received from: ${remoteMessage.from}")
         remoteMessage.data.isNotEmpty().let {
             Log.d("FCM", "Message data payload: ${remoteMessage.data}")
             val messageBody  = remoteMessage.data["key"] ?: "No Data"
