@@ -37,7 +37,6 @@ public class LinkController {
     @GetMapping("check")
     @Operation(summary = "check auth", description = "워치에서 인증번호 일치하는지 확인")
     public ResponseEntity<Object> checkAuth(@RequestParam String email, @RequestParam String authNumber) {
-
         Object token = redisService.find(email+authNumber);
         if (token!=null) {
             return ResponseEntity.ok(token);
@@ -45,6 +44,7 @@ public class LinkController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("인증 실패");
         }
     }
+
     @PutMapping("register")
     @Operation(summary = "워치 토큰 입력")
     public ResponseEntity<String> addWatchToken(@AuthenticationPrincipal UserDetails userDetails, @RequestParam String deviceToken){
