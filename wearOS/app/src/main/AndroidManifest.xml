@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
     <!-- 인터넷 사용권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- wearOS -->
@@ -13,13 +12,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@android:style/Theme.DeviceDefault"
+        android:networkSecurityConfig="@xml/network_security_config">
         <service
             android:name=".complication.MainComplicationService"
             android:exported="true"
@@ -53,9 +52,17 @@
         <!-- Recommended for Android 9 (API level 28) and lower. -->
         <!-- Required for Android 10 (API level 29) and higher. -->
         <service
-            android:name=".core.network.LocationService"
+            android:name=".core.service.LocationService"
             android:foregroundServiceType="location">
-        <!-- Any inner elements would go here. -->
+            <!-- Any inner elements would go here. -->
+        </service>
+
+        <service
+            android:name=".core.service.FirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
         </service>
 
         <!-- Google Wear 라이브러리 사용 -->

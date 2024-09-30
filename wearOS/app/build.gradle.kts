@@ -6,6 +6,7 @@ properties.load(project.rootProject.file("local.properties").inputStream())
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -26,8 +27,6 @@ android {
         buildConfigField("String", "MAPS_API_KEY", "\"${properties.getProperty("MAPS_API_KEY")}\"")
 
     }
-
-    println("MAPS_API_KEY: ${properties.getProperty("MAPS_API_KEY")}")
 
 
     buildTypes {
@@ -76,6 +75,8 @@ dependencies {
     implementation(libs.horologist.tiles)
     implementation(libs.watchface.complications.data.source.ktx)
     implementation(libs.navigation.compose)
+    implementation(libs.material3.android)
+    implementation(libs.firebase.messaging.ktx)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
@@ -93,10 +94,17 @@ dependencies {
     implementation("androidx.wear.compose:compose-foundation:1.1.0")
     implementation("androidx.wear.compose:compose-navigation:1.1.0")
 
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")  // JSON 파싱을 위한 GSON
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")  // 로그 인터셉터 (디버깅용)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
     // Lottie
     implementation("com.airbnb.android:lottie-compose:6.0.0")
