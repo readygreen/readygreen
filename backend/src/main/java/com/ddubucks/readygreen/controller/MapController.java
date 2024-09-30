@@ -32,7 +32,8 @@ public class MapController {
         MapResponseDTO mapResponseDTO = mapService.getDestinationGuide(routeRequestDTO, userDetails.getUsername());
         redisService.save("dir|"+userDetails.getUsername(),mapResponseDTO);
         Member member = memberService.getMemberInfo(userDetails.getUsername());
-        fcmService.sendMessageToOtherDevice(member,routeRequestDTO.isWatch(),1);
+        if(member.getWatch()!=null)
+            fcmService.sendMessageToOtherDevice(member,routeRequestDTO.isWatch(),1);
         return ResponseEntity.ok(mapResponseDTO);
     }
 
@@ -53,7 +54,8 @@ public class MapController {
     public ResponseEntity<String> deleteGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean isWatch) throws FirebaseMessagingException {
         redisService.delete("dir|"+userDetails.getUsername());
         Member member = memberService.getMemberInfo(userDetails.getUsername());
-        fcmService.sendMessageToOtherDevice(member,isWatch,2);
+        if(member.getWatch()!=null)
+            fcmService.sendMessageToOtherDevice(member,isWatch,2);
         return ResponseEntity.ok().build();
     }
 
@@ -61,7 +63,8 @@ public class MapController {
     public ResponseEntity<String> doneGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean isWatch) throws FirebaseMessagingException {
         redisService.delete("dir|"+userDetails.getUsername());
         Member member = memberService.getMemberInfo(userDetails.getUsername());
-        fcmService.sendMessageToOtherDevice(member,isWatch,2);
+        if(member.getWatch()!=null)
+            fcmService.sendMessageToOtherDevice(member,isWatch,2);
         return ResponseEntity.ok().build();
     }
 

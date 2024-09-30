@@ -39,12 +39,14 @@ public class MainService {
     }
     public WeatherResponseDTO weather(String x, String y) throws Exception {
         LocalDateTime now = LocalDateTime.now();
+        String curTime = String.format("%02d00", now.getHour());
+        String time = String.format("%02d", now.getHour());
         now = now.minusHours(1);
         System.out.println(now);
 
         // 년, 월, 일, 시, 분을 추출하여 String으로 변환
         String date = String.format("%04d%02d%02d", now.getYear(), now.getMonthValue(), now.getDayOfMonth());
-        String time = String.format("%02d", now.getHour());
+
         String baseTime = String.format("%02d00", now.getHour());; // 기본 base_time 설정
 
         WeatherResponseDTO weatherResponseDTO = null;
@@ -98,7 +100,6 @@ public class MainService {
             // 정상적인 응답이 있을 경우
             JSONObject body = jsonResponse.getJSONObject("response").getJSONObject("body");
             JSONArray items = body.getJSONObject("items").getJSONArray("item");
-            System.out.println(items);
 
             weatherResponseDTO = new WeatherResponseDTO("", -1, -1, -1);
 
@@ -109,7 +110,9 @@ public class MainService {
                 String fcstTime = item.getString("fcstTime");
                 String category = item.getString("category");
                 String fcstValue = item.getString("fcstValue");
-                if (category.equals("SKY")) {
+                if((Integer.parseInt(fcstTime) < Integer.parseInt(curTime)))continue;
+                if((Integer.parseInt(fcstTime) > Integer.parseInt(curTime)))break;
+                if(category.equals("SKY")) {
                     if (fcstTime.substring(0, 2).equals(time)) {
                         weatherResponseDTO.setSky(Integer.parseInt(fcstValue));
                     }
@@ -123,19 +126,16 @@ public class MainService {
                     }
                 }
             }
-
-            // 데이터가 존재하면 반환
             if (weatherResponseDTO != null) {
                 break;
             }
         }
-
-        System.out.println(weatherResponseDTO);
         return weatherResponseDTO;
     }
 
     public List<WeatherResponseDTO> weathers(String x, String y) throws Exception {
         LocalDateTime now = LocalDateTime.now();
+        String curTime = String.format("%02d00", now.getHour());
         now = now.minusHours(1);
 
         // 년, 월, 일, 시를 추출하여 String으로 변환
@@ -178,7 +178,6 @@ public class MainService {
 
             // JSON 응답 문자열을 파싱
             JSONObject jsonResponse = new JSONObject(sb.toString());
-            System.out.println(jsonResponse);
 
             // 결과가 없는 경우(resultCode가 "03")면 1시간 전으로 다시 시도
             String resultCode = jsonResponse.getJSONObject("response").getJSONObject("header").getString("resultCode");
@@ -195,18 +194,20 @@ public class MainService {
             // 정상적인 응답이 있을 경우 데이터 파싱
             JSONObject body = jsonResponse.getJSONObject("response").getJSONObject("body");
             JSONArray items = body.getJSONObject("items").getJSONArray("item");
-            System.out.println(items);
 
             String current = "";
             WeatherResponseDTO weatherResponseDTO = null;
 
             for (int i = 0; i < items.length(); i++) {
+                if (weatherList.size() > 6) {
+                    return weatherList;
+                }
                 JSONObject item = items.getJSONObject(i);
                 String fcstTime = item.getString("fcstTime");
                 String category = item.getString("category");
                 String fcstValue = item.getString("fcstValue");
-
-                if (category.equals("SKY")) {
+                if((Integer.parseInt(fcstTime) < Integer.parseInt(curTime)))continue;
+                if(category.equals("SKY")) {
                     if (fcstTime.substring(0, 2).equals(current)) {
                         weatherResponseDTO.setSky(Integer.parseInt(fcstValue));
                     } else {
@@ -241,9 +242,7 @@ public class MainService {
                     }
                 }
 
-                if (weatherList.size() > 6) {
-                    return weatherList;
-                }
+
             }
 
             weatherList.add(weatherResponseDTO);
