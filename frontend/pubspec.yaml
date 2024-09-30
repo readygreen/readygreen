@@ -110,6 +110,8 @@ flutter:
     - assets/images/user.png
     - assets/images/w-sun.png
     - assets/images/w-rain.png
+    - assets/images/w-rainsnow.png
+    - assets/images/w-suncloud.png
     - assets/images/w-cloudy.png
     - assets/images/w-snow.png
     - assets/images/w-default.png

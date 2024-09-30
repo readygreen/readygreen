@@ -148,8 +148,10 @@ class _WatchPageState extends State<WatchPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: randomNumbers.map((number) {
                         return Container(
+                          width: 47.0,
                           margin: const EdgeInsets.all(1.0), // 박스 간격
                           padding: const EdgeInsets.all(15.0), // 내부 여백
+                          alignment: Alignment.center,
                           decoration: BoxDecoration(
                             border: Border.all(
                                 color: const Color.fromARGB(255, 207, 207, 207),

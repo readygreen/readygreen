@@ -1,4 +1,4 @@
-// import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
@@ -46,7 +46,9 @@ class _HomePageContentState extends State<HomePageContent> {
   void initState() {
     super.initState();
     _storeLocation(); // 위치 정보 저장 함수 호출
-    _storeFortune(); // 페이지가 로드될 때 운세 데이터 로드 및 저장
+    _storeFortune(); //  운세 데이터 로드 및 저장
+    _storeWeather();
+    _loadWeatherInfo();
   }
 
   // 위치 권한 요청 및 저장
@@ -81,38 +83,7 @@ class _HomePageContentState extends State<HomePageContent> {
     await storage.write(key: 'latitude', value: location.latitude.toString());
     await storage.write(key: 'longitude', value: location.longitude.toString());
     print('위치 저장 완료: ${location.latitude}, ${location.longitude}');
-
-    // // 위도 경도를 사용해 주소 찾기 (한국어로)
-    // _getAddressFromLatLng(location.latitude, location.longitude);
   }
-
-  // // Google Geocoding API를 사용하여 위도와 경도로 주소를 한국어로 찾는 함수
-  // Future<void> _getAddressFromLatLng(double latitude, double longitude) async {
-  //   final url =
-  //       'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&language=ko&key=$apiKey';
-
-  //   try {
-  //     final response = await http.get(Uri.parse(url));
-  //     if (response.statusCode == 200) {
-  //       var data = json.decode(response.body);
-  //       print(data);
-
-  //       if (data['results'].isNotEmpty) {
-  //         String address = data['results'][0]['formatted_address'];
-
-  //         // 주소를 스토리지에 저장
-  //         await storage.write(key: 'address', value: address);
-  //         print('주소 저장 완료: $address');
-  //       } else {
-  //         print("주소 데이터를 찾을 수 없습니다.");
-  //       }
-  //     } else {
-  //       print("API 호출 실패: ${response.statusCode}");
-  //     }
-  //   } catch (e) {
-  //     print("주소를 가져오는 중 오류 발생: $e");
-  //   }
-  // }
 
   // 현재 날짜 가져오기
   String _getCurrentDate() {
@@ -136,6 +107,117 @@ class _HomePageContentState extends State<HomePageContent> {
     } else {
       print('오늘은 이미 운세를 받았습니다.');
     }
+  }
+
+  // 현재 시간 가져오기
+  String _getCurrentHour() {
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd HH');
+    return formatter.format(now);
+  }
+
+  // 날씨 요청
+  List<Map<String, dynamic>> weatherData = []; // 날씨 정보를 저장하는 리스트
+  String currentWeatherStatus = '맑음'; // 기본 날씨 상태
+  String currentWeatherImage = 'assets/images/w-sun.png'; // 기본 날씨 아이콘
+
+  Future<void> _storeWeather() async {
+    // 현재 시간 비교
+    final String? currentHour = _getCurrentHour();
+    final String? storedHour = await storage.read(key: 'weatherHour');
+
+    // 스토리지에서 저장된 위도와 경도 읽기
+    String? lat = await storage.read(key: 'latitude');
+    String? long = await storage.read(key: 'longitude');
+
+    if (lat != null && long != null) {
+      String latitude = lat.substring(0, 2);
+      String longitude = long.substring(0, 3);
+
+      if (storedHour != currentHour) {
+        var weatherResponse = await api.getWeather(latitude, longitude);
+
+        if (weatherResponse != null) {
+          setState(() {
+            print(weatherResponse);
+            weatherData = List<Map<String, dynamic>>.from(weatherResponse);
+          });
+
+          String weatherJson = jsonEncode(weatherData);
+          await storage.write(key: 'weather', value: weatherJson);
+          await storage.write(key: 'weatherHour', value: currentHour);
+        } else {
+          setState(() {
+            weatherData = [];
+          });
+        }
+      } else {
+        setState(() {
+          weatherData = [];
+        });
+      }
+    }
+  }
+
+  // 저장된 날씨 정보를 스토리지에서 불러와 첫 번째 데이터 설정
+  Future<void> _loadWeatherInfo() async {
+    final String? storedWeatherData = await storage.read(key: 'weather');
+
+    if (storedWeatherData != null) {
+      List<dynamic> decodedWeatherData = jsonDecode(storedWeatherData);
+      setState(() {
+        weatherData = List<Map<String, dynamic>>.from(decodedWeatherData);
+        if (weatherData.isNotEmpty) {
+          // 첫 번째 데이터에서 현재 날씨를 가져옴
+          currentWeatherImage =
+              _getWeatherImage(weatherData[0]['sky'], weatherData[0]['rainy']);
+          currentWeatherStatus =
+              _getWeatherStatus(weatherData[0]['sky'], weatherData[0]['rainy']);
+        }
+      });
+    }
+  }
+
+  // sky와 rainy 값을 기반으로 날씨 이미지를 반환하는 함수
+  String _getWeatherImage(int sky, int rainy) {
+    if (sky == 1) {
+      return 'assets/images/w-sun.png'; // 맑음
+    } else if (sky == 3) {
+      return 'assets/images/w-suncloud.png'; // 구름 많음
+    } else if (sky == 4) {
+      return 'assets/images/w-cloudy.png'; // 흐림
+    } else if (rainy == 1) {
+      return 'assets/images/w-rain.png'; // 비
+    } else if (rainy == 2) {
+      return 'assets/images/w-rainsnow.png'; // 비눈
+    } else if (rainy == 3) {
+      return 'assets/images/w-snow.png'; // 눈
+    } else if (rainy == 4) {
+      return 'assets/images/w-rain.png'; // 소나기
+    }
+
+    return 'assets/images/w-default.png'; // 기본 이미지
+  }
+
+  // sky와 rainy 값을 기반으로 날씨 상태 텍스트 반환하는 함수
+  String _getWeatherStatus(int sky, int rainy) {
+    if (sky == 1) {
+      return '맑음';
+    } else if (sky == 3) {
+      return '구름 많음';
+    } else if (sky == 4) {
+      return '흐림';
+    } else if (rainy == 1) {
+      return '비';
+    } else if (rainy == 2) {
+      return '비와 눈';
+    } else if (rainy == 3) {
+      return '눈';
+    } else if (rainy == 4) {
+      return '소나기';
+    }
+
+    return '알 수 없음';
   }
 
   @override
@@ -180,15 +262,15 @@ class _HomePageContentState extends State<HomePageContent> {
                       );
                     },
                     child: SquareCardBox(
-                      title: '날씨',
+                      title: '현재 날씨',
                       textColor: Colors.black,
-                      imageUrl: 'assets/images/w-sun.png',
+                      imageUrl: currentWeatherImage, // 날씨 아이콘 변경
                       backgroundGradient: LinearGradient(
                         colors: [AppColors.weaherblue, AppColors.white],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                       ),
-                      subtitle: '맑음',
+                      subtitle: currentWeatherStatus, // 날씨 상태 변경
                       subtitleColor: AppColors.blue,
                     ),
                   ),
@@ -205,7 +287,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       );
                     },
                     child: SquareCardBox(
-                      title: '오늘의운세',
+                      title: '오늘의 운세',
                       backgroundColor: AppColors.darkblue,
                       textColor: AppColors.white,
                       imageUrl: 'assets/images/luck.png',
@@ -223,7 +305,7 @@ class _HomePageContentState extends State<HomePageContent> {
             const SizedBox(height: 16),
             const CardBox(title: '최근 목적지'),
             const SizedBox(height: 16),
-            const CardBox(title: '현재 위치 --동 장소 추천'),
+            const CardBox(title: '주변 장소'),
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
