@@ -12,4 +12,5 @@ class AppColors {
   static const Color darkblue = Color(0xFF2D3765); // 운세
   static const Color weaherblue = Color(0xFFC3E0FF); // 운세
   static const Color yellow = Color(0xFFFFD000); // 즐겨찾기
+  static const Color purple = Color(0xFFC68ACB); // 즐겨찾기
 }
