@@ -22,7 +22,7 @@ class FcmViewModel : ViewModel() {
     fun registerFcm(context: Context) {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("FcmViewModel", "FCM 토큰 가져오기 실패", task.exception)
+                Log.w("FcmViewModel", "device 토큰 가져오기 실패", task.exception)
                 return@addOnCompleteListener
             }
             val deviceToken = task.result
@@ -44,12 +44,12 @@ class FcmViewModel : ViewModel() {
                         fcmApi.registerFcmToken(body).awaitResponse()
                     }
                     if (response.isSuccessful) {
-                        Log.d("FcmViewModel", "FCM 토큰 전송 성공")
+                        Log.d("FcmViewModel", "device 토큰 전송 성공")
                     } else {
-                        Log.e("FcmViewModel", "FCM 토큰 전송 실패: ${response.code()}")
+                        Log.e("FcmViewModel", "device 토큰 전송 실패: ${response.code()}")
                     }
                 } catch (e: Exception) {
-                    Log.e("FcmViewModel", "FCM 토큰 전송 중 오류 발생", e)
+                    Log.e("FcmViewModel", "device 토큰 전송 중 오류 발생", e)
                 }
             }
         }
