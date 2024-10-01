@@ -17,7 +17,7 @@ import okhttp3.ResponseBody
 
 class LinkViewModel : ViewModel() {
 
-    private val fcmViewModel = FcmViewModel()  // FcmViewModel을 직접 생성
+    private val fcmViewModel = FcmViewModel()
 
     fun checkAuth(
         context: Context,
@@ -48,6 +48,6 @@ class LinkViewModel : ViewModel() {
     }
 
     private fun onLoginSuccess(context: Context, accessToken: String) {
-        fcmViewModel.registerFcm(context)  // 로그인 성공 시 FCM 토큰 등록
+        fcmViewModel.registerFcm(context)
     }
 }

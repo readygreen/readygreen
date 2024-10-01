@@ -13,7 +13,6 @@ class LocationService(private val context: Context) {
 
     private val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
-    // 위치 업데이트 요청 설정
     private var locationRequest: LocationRequest = LocationRequest.Builder(
         Priority.PRIORITY_BALANCED_POWER_ACCURACY,
         10000
@@ -22,14 +21,12 @@ class LocationService(private val context: Context) {
 
     private var locationCallback: LocationCallback? = null
 
-    // 위치 권한 체크
     private fun hasLocationPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    // 마지막 위치 가져오기
     @SuppressLint("MissingPermission")
     fun getLastLocation(onLocationReceived: (Location?) -> Unit) {
         if (hasLocationPermission()) {
@@ -45,7 +42,6 @@ class LocationService(private val context: Context) {
         }
     }
 
-    // 지속적인 위치 추적 시작
     @SuppressLint("MissingPermission")
     fun startLocationUpdates(onLocationUpdated: (Location) -> Unit) {
         if (hasLocationPermission()) {
@@ -60,14 +56,12 @@ class LocationService(private val context: Context) {
         }
     }
 
-    // 위치 업데이트 중지
     fun stopLocationUpdates() {
         locationCallback?.let {
             fusedLocationClient.removeLocationUpdates(it)
         }
     }
 
-    // 위치 서비스 최적화: 배터리 소모 줄이기 위해서 필요시 호출
     fun adjustLocationRequest(priority: Int, interval: Long) {
         locationRequest = LocationRequest.Builder(
             priority,

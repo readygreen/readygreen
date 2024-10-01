@@ -30,7 +30,6 @@ fun NavigationScreen(
     lat: Float?,
     lng: Float?
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxSize()

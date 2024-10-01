@@ -15,6 +15,7 @@ import com.ddubucks.readygreen.BuildConfig
 import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.screen.*
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
+import com.ddubucks.readygreen.presentation.viewmodel.MapViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import com.google.android.gms.location.LocationServices
 
@@ -26,10 +27,9 @@ class MainActivity : ComponentActivity() {
             ReadyGreenTheme {
                 val navController = rememberNavController()
                 val searchViewModel: SearchViewModel = viewModel()
-
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                 val locationService = remember { LocationService(this) }
-
+                val mapViewModel: MapViewModel = viewModel()
                 val sharedPreferences = getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
                 val token = sharedPreferences.getString("accessToken", null)
 
@@ -58,10 +58,11 @@ class MainActivity : ComponentActivity() {
                         SearchResultScreen(navController = navController)
                     }
 
-                    // MapScreen
+                    // MapScreen - 수정된 부분
                     composable("mapScreen") {
                         MapScreen(
                             locationService = locationService,
+                            mapViewModel = mapViewModel
                         )
                     }
 

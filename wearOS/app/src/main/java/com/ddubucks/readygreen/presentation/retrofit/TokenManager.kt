@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 
 object TokenManager {
-    private const val PREFS_NAME = "app_prefs"
+    private const val PREFS_NAME = "token_prefs"
     private const val TOKEN_KEY = "access_token"
 
     // 토큰 저장
