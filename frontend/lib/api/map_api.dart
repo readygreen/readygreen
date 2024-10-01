@@ -199,6 +199,7 @@ class MapStartAPI {
       return null;
     }
   }
+
   // 길안내 정보 요청 (GET)
   Future<Map<String, dynamic>?> fetchGuideInfo() async {
     String? accessToken = await storage.read(key: 'accessToken');
@@ -228,6 +229,7 @@ class MapStartAPI {
       return null;
     }
   }
+
   Future<bool> checkIsGuide() async {
     String? accessToken = await storage.read(key: 'accessToken');
 
@@ -261,5 +263,32 @@ class MapStartAPI {
     }
   }
 
+  // 길안내 중지 (DELETE)
+  Future<bool> guideDelete({required bool isWatch}) async {
+    String? accessToken = await storage.read(key: 'accessToken');
 
+    if (accessToken == null) {
+      print('엑세스 토큰이 없습니다.');
+      return false;
+    }
+
+    final response = await http.delete(
+      Uri.parse('$baseUrl/map/guide?isWatch=$isWatch'),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      print('check guide 200');
+      // 상태 코드가 200이면 true 반환
+      return true;
+    } else {
+      // 기타 상태 코드일 경우 false 반환
+      print('에러 코드: ${response.statusCode}');
+      return false;
+    }
+  }
 }
