@@ -109,6 +109,7 @@ flutter:
     - assets/images/badge.png
     - assets/images/place.png
     - assets/images/fortune.png
+    - assets/images/nobirth.png
     - assets/images/user.png
     - assets/images/w-sun.png
     - assets/images/w-rain.png
