@@ -38,19 +38,18 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   void initState() {
     super.initState();
     // 도착지 정보가 제대로 넘어왔는지 확인하기 위해 출력
-    if(widget.endLat!=null){
+    if (widget.endLat != null) {
       print(
-        "도착지 위도: ${widget.endLat}, 경도: ${widget.endLng}, 이름: ${widget.endPlaceName}");
-        WidgetsBinding.instance.addPostFrameCallback((_) {
+          "도착지 위도: ${widget.endLat}, 경도: ${widget.endLng}, 이름: ${widget.endPlaceName}");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         Provider.of<CurrentLocationProvider>(context, listen: false)
             .updateLocation();
         _fetchRouteData(); // 페이지가 로드될 때 API 호출
       });
-    }else{
+    } else {
       print("도착지 정보가 없습니다. 다른 API 요청 실행.");
       _fetchDefaultRouteData();
     }
-
   }
 
   // 경로 요청을 위한 함수
@@ -94,9 +93,9 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       print("No current location available.");
     }
   }
+
   void _processRouteData(Map<String, dynamic>? routeData) {
     if (routeData != null) {
-
       // 경로 데이터를 바탕으로 coordinates 처리
       List<dynamic> features = routeData['routeDTO']['features'];
       List<LatLng> coordinates = [];
@@ -142,9 +141,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     var routeData = await mapStartAPI.fetchGuideInfo();
 
     print('데이터 값~!~!~!~!~!~!~!~!~!: $routeData');
-      _processRouteData(routeData);
+    _processRouteData(routeData);
   }
-
 
   // 지도 생성 함수
   void _onMapCreated(GoogleMapController controller) {

@@ -50,6 +50,7 @@ dependencies:
   firebase_messaging: ^15.1.2
   googleapis_auth: ^1.4.1
   flutter_local_notifications: ^17.2.3
+  lottie: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -116,6 +117,7 @@ flutter:
     - assets/images/w-cloudy.png
     - assets/images/w-snow.png
     - assets/images/w-default.png
+    - assets/lottie/search_mike.json
 
   fonts:
     - family: CustomFont
