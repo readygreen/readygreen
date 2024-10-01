@@ -114,10 +114,9 @@ class _MainPageState extends State<MainPage> {
       print("메시지 수신!");
       if(message.data['type']==1){
         if (message.data['type'] == '1') {
-        // 특정 페이지로 이동하고, 특정 함수를 실행하도록 전달
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => MapDirectionPage()),
+            MaterialPageRoute(builder: (context) => const MapDirectionPage()),
           );
         }
       }

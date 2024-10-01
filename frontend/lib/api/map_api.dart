@@ -228,5 +228,38 @@ class MapStartAPI {
       return null;
     }
   }
+  Future<bool> checkIsGuide() async {
+    String? accessToken = await storage.read(key: 'accessToken');
+
+    if (accessToken == null) {
+      print('엑세스 토큰이 없습니다.');
+      return false;
+    }
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/map/guide/check'), // POST 요청으로 변경
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: '', // 빈 body 추가
+    );
+
+    if (response.statusCode == 200) {
+      print('check guide 200');
+      // 상태 코드가 200이면 true 반환
+      return true;
+    } else if (response.statusCode == 204) {
+      print('check guide 204');
+      // 상태 코드가 204이면 false 반환
+      return false;
+    } else {
+      // 기타 상태 코드일 경우 false 반환
+      print('check guide 에러 코드: ${response.statusCode}');
+      return false;
+    }
+  }
+
 
 }
