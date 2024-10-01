@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/main.dart';
 
 class DestinationBar extends StatelessWidget {
   final String currentLocation;
@@ -9,6 +11,19 @@ class DestinationBar extends StatelessWidget {
     required this.currentLocation,
     required this.destination,
   });
+
+  void handleBackNavigation(BuildContext context) {
+    if (Navigator.canPop(context)) {
+      // 스택에 화면이 남아있으면 pop
+      Navigator.pop(context);
+    } else {
+      // 스택이 비어 있으면 메인 페이지로 이동
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,51 +40,78 @@ class DestinationBar extends StatelessWidget {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black54),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: AppColors.black),
+                onPressed: () {
+                  handleBackNavigation(context);
+                },
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.share_location_rounded,
-                        color: Colors.blue),
-                    const SizedBox(width: 5),
-                    Text(
-                      currentLocation,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.grey,
+                          width: 0.8,
+                        ),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.share_location_rounded,
+                              color: AppColors.blue),
+                          const SizedBox(width: 5),
+                          Text(
+                            currentLocation,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: AppColors.grey,
+                          width: 0.8,
+                        ),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.location_on, color: AppColors.red),
+                          const SizedBox(width: 5),
+                          Text(
+                            destination,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.black,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, color: Colors.red),
-                    const SizedBox(width: 5),
-                    Text(
-                      destination,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
