@@ -4,8 +4,8 @@ import com.ddubucks.readygreen.dto.*;
 import com.ddubucks.readygreen.dto.RouteDTO.FeatureDTO;
 import com.ddubucks.readygreen.exception.UnauthorizedAccessException;
 import com.ddubucks.readygreen.model.Blinker;
-import com.ddubucks.readygreen.model.Bookmark;
 import com.ddubucks.readygreen.model.RouteRecord;
+import com.ddubucks.readygreen.model.bookmark.Bookmark;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.repository.*;
 import com.nimbusds.jose.shaded.gson.Gson;
@@ -267,6 +267,7 @@ public class MapService {
                                 getPoint(bookmarkRequestDTO.getLongitude(), bookmarkRequestDTO.getLatitude())
                         )
                         .alertTime(bookmarkRequestDTO.getAlertTime())
+                        .type(bookmarkRequestDTO.getType())
                         .member(member)
                         .build()
         );

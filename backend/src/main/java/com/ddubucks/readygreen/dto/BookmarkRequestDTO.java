@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.dto;
 
+import com.ddubucks.readygreen.model.bookmark.BookmarkType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,4 +29,7 @@ public class BookmarkRequestDTO {
 
     @DateTimeFormat(pattern = "HH:mm:ss")
     private LocalTime alertTime;
+
+    @NotNull(message = "Bookmark Type cannot be null")
+    private BookmarkType type;
 }
