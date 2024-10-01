@@ -1,5 +1,6 @@
-package com.ddubucks.readygreen.model;
+package com.ddubucks.readygreen.model.bookmark;
 
+import com.ddubucks.readygreen.model.BaseEntity;
 import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,10 @@ public class Bookmark extends BaseEntity {
     private Point destinationCoordinate;
 
     private LocalTime alertTime;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BookmarkType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

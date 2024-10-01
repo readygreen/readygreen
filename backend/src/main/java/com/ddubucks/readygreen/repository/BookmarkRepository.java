@@ -1,6 +1,6 @@
 package com.ddubucks.readygreen.repository;
 
-import com.ddubucks.readygreen.model.Bookmark;
+import com.ddubucks.readygreen.model.bookmark.Bookmark;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
