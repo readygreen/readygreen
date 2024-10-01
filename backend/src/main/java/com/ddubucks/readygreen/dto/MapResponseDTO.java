@@ -12,4 +12,6 @@ import java.util.List;
 public class MapResponseDTO {
     private RouteDTO routeDTO;
     private List<BlinkerDTO> blinkerDTOs;
+    private String origin;
+    private String destination;
 }
