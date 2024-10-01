@@ -2,10 +2,12 @@ package com.ddubucks.readygreen.controller;
 
 import com.ddubucks.readygreen.dto.ChatGPTRequestDTO;
 import com.ddubucks.readygreen.dto.ChatGPTResponseDTO;
+import com.ddubucks.readygreen.dto.PointRequestDTO;
 import com.ddubucks.readygreen.dto.WeatherResponseDTO;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.service.MainService;
 import com.ddubucks.readygreen.service.MemberService;
+import com.ddubucks.readygreen.service.PointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ public class MainController {
 
     private final MainService mainService;
     private final MemberService memberService;
+    private final PointService pointService;
 
     @Autowired
     private RestTemplate template;
@@ -48,6 +51,8 @@ public class MainController {
     @GetMapping("/fortune")
     public ResponseEntity<String> chat(@AuthenticationPrincipal UserDetails userDetails){
         Member member = memberService.getMemberInfo(userDetails.getUsername());
+        PointRequestDTO pointRequestDTO = PointRequestDTO.builder().point(77).description("운세 확인").build();
+        pointService.addPoint(userDetails.getUsername(), pointRequestDTO);
         if (member.getBirth() == null) {
             return ResponseEntity.badRequest().body("생일 정보가 없습니다.");
         }
