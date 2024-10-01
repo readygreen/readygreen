@@ -44,10 +44,10 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi userFeedbackApi() {
+    public GroupedOpenApi feedbackApi() {
         return GroupedOpenApi.builder()
                 .group("건의함")
-                .pathsToMatch("/user/feedback/**")
+                .pathsToMatch("/feedback/**")
                 .build();
     }
 
