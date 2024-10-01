@@ -24,10 +24,10 @@ class MapViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val response = mapApi?.getMap(latitude, longitude, radius) // Retrofit 호출
+                val response = mapApi?.getMap(latitude, longitude, radius)
                 if (response != null) {
                     _mapData.value = response
-                    Log.d("MapViewModel", "API Response: $response") // 응답 로그 추가
+                    Log.d("MapViewModel", "교통 신호 정보 조회 성공")
                 } else {
                     Log.e("MapViewModel", "교통 신호 정보 조회 실패")
                 }
