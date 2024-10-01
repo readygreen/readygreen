@@ -27,11 +27,11 @@ class _MyPageState extends State<MyPage> {
   @override
   void initState() {
     super.initState();
-    _fetchProfileData();
+    _getProfile();
   }
 
-  Future<void> _fetchProfileData() async {
-    final data = await userApi.fetchProfileData(); // ApiService에서 데이터 받아오기
+  Future<void> _getProfile() async {
+    final data = await userApi.getProfile();
     setState(() {
       profileData = data;
       isLoading = false; // 데이터 로딩 완료
@@ -40,6 +40,8 @@ class _MyPageState extends State<MyPage> {
 
   Future<void> _handleLogout(BuildContext context) async {
     // 저장된 토큰 삭제
+    await storage.delete(key: 'accessToken');
+    await storage.deleteAll();
     await storage.deleteAll();
 
     // 로그아웃 후 로그인 페이지로 이동
