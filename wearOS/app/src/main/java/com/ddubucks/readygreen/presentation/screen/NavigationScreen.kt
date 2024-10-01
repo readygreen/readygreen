@@ -13,6 +13,7 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.presentation.theme.Red
+import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Yellow
 import h3Style
 import pStyle
@@ -31,16 +32,25 @@ fun NavigationScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(
+            text = "경로 안내",
+            style = h3Style,
+            color = Yellow,
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         if (navigationState.isNavigating) {
-            // 경로 안내 화면
+
             Text(
-                text = "경로 안내: ${navigationState.destinationName}",
-                style = h3Style,
-                color = Yellow,
+                text = "${navigationState.destinationName}",
+                style = pStyle,
+                color = White,
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // TODO 방향 출력
             Icon(
                 painter = painterResource(id = R.drawable.arrow_left),
                 contentDescription = "방향",
@@ -53,26 +63,17 @@ fun NavigationScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "목적지 좌표: 위도 ${navigationState.destinationLat}, 경도 ${navigationState.destinationLng}",
-                fontWeight = FontWeight.Bold,
-                style = pStyle,
-                color = Color.White,
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "남은 거리: 50m",
+                text = "우회전 후 보행자도로 을 따라 40m 이동",
                 fontWeight = FontWeight.Bold,
                 style = secStyle,
                 color = Red,
             )
         } else {
-            // 길안내 중이 아닐 때
+
             Text(
                 text = "길안내 중이 아닙니다.",
-                style = h3Style,
-                color = Color.White
+                style = pStyle,
+                color = White
             )
         }
     }
