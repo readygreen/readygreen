@@ -146,15 +146,7 @@ class _HomePageContentState extends State<HomePageContent> {
           String weatherJson = jsonEncode(weatherData);
           await storage.write(key: 'weather', value: weatherJson);
           await storage.write(key: 'weatherHour', value: currentHour);
-        } else {
-          setState(() {
-            weatherData = [];
-          });
         }
-      } else {
-        setState(() {
-          weatherData = [];
-        });
       }
     }
   }

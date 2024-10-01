@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
-class SquareCardBox extends StatelessWidget {
+class SquareCardMypage extends StatelessWidget {
   final String title;
   final Color? backgroundColor;
   final Gradient? backgroundGradient;
   final Color textColor;
   final String? imageUrl;
-  final String? subtitle; // 하단에 표시할 작은 텍스트 추가
+  final String? subtitle;
   final Color subtitleColor;
   final Widget? child;
 
-  const SquareCardBox({
+  const SquareCardMypage({
     super.key,
     required this.title,
     this.backgroundColor = Colors.white,
     this.backgroundGradient,
     this.textColor = Colors.black,
     this.imageUrl,
-    this.subtitle, // subtitle 매개변수 추가
+    this.subtitle,
     this.subtitleColor = Colors.black,
     this.child,
   });
@@ -41,14 +41,14 @@ class SquareCardBox extends StatelessWidget {
           horizontal: 16,
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start, // 아이템 중앙 정렬
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               title,
               style: TextStyle(
                 fontSize: 15,
-                // fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.bold,
                 color: textColor,
               ),
             ),

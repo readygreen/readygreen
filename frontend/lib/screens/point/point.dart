@@ -19,22 +19,6 @@ class PointPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20), // 여백 추가
-
-              // 테스트용 버튼 추가
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MapDirectionPage(
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text('지도 페이지로 이동'),
-                ),
-              ),
             ],
           ),
         ),
