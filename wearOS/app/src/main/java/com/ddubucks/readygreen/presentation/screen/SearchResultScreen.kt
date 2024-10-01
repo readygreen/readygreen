@@ -1,12 +1,12 @@
 package com.ddubucks.readygreen.presentation.screen
 
-import NavigationViewModel
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -19,15 +19,17 @@ import com.ddubucks.readygreen.presentation.retrofit.search.SearchCandidate
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
-
 
 @Composable
 fun SearchResultScreen(
     navController: NavHostController,
     navigationViewModel: NavigationViewModel = viewModel()
 ) {
+
+    val context = LocalContext.current
 
     val searchResults = navController.previousBackStackEntry
         ?.savedStateHandle
@@ -78,14 +80,11 @@ fun SearchResultScreen(
 
             items(searchResults) { result ->
                 ButtonItem(item = ButtonModel(result.name), onClick = {
-
                     val name = result.name
                     val lat = result.geometry.location.lat
                     val lng = result.geometry.location.lng
 
-                    // 길안내 시작
-                    navigationViewModel.startNavigation(name, lat, lng)
-
+                    navigationViewModel.startNavigation(context, lat, lng, name)
                     navController.navigate("navigationScreen")
                 })
             }

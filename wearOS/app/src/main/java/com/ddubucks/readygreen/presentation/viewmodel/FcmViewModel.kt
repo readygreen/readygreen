@@ -11,8 +11,10 @@ import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import retrofit2.awaitResponse
 
@@ -26,18 +28,14 @@ class FcmViewModel : ViewModel() {
                 return@addOnCompleteListener
             }
             val deviceToken = task.result
-            val accessToken = TokenManager.getToken(context)
 
-            if (accessToken.isNullOrEmpty()) {
-                Log.e("FcmViewModel", "Access Token이 없습니다.")
-                return@addOnCompleteListener
-            }
-
-            val formBody = okhttp3.FormBody.Builder()
+            // FormBody 생성
+            val formBody = FormBody.Builder()
                 .add("deviceToken", deviceToken)
                 .build()
 
-            val fcmApi = RestClient.createService(FcmApi::class.java, accessToken)
+            // RestClient에서 accessToken 처리 포함한 FcmApi 생성
+            val fcmApi = RestClient.createService(FcmApi::class.java, context)
 
             viewModelScope.launch {
                 try {
@@ -58,12 +56,6 @@ class FcmViewModel : ViewModel() {
 
     // FCM 메시지 전송
     fun sendFcmMessage(context: Context, message: String, distEmail: String, messageType: Int, watch: Boolean) {
-        val accessToken = TokenManager.getToken(context)
-
-        if (accessToken.isNullOrEmpty()) {
-            Log.e("FcmViewModel", "Access Token이 없습니다.")
-            return
-        }
 
         val fcmRequest = JSONObject(
             mapOf(
@@ -74,8 +66,9 @@ class FcmViewModel : ViewModel() {
             )
         ).toString()
 
-        val fcmApi = RestClient.createService(FcmApi::class.java, accessToken)
-        val body = RequestBody.create("application/json".toMediaTypeOrNull(), fcmRequest)
+        // FCM API 호출을 위한 서비스 생성 (자동으로 토큰 처리)
+        val fcmApi = RestClient.createService(FcmApi::class.java, context)
+        val body = fcmRequest.toRequestBody("application/json".toMediaTypeOrNull())
 
         viewModelScope.launch {
             try {

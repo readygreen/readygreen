@@ -27,7 +27,7 @@ class LinkViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val linkApi = RestClient.createService(LinkApi::class.java, "")
+                val linkApi = RestClient.createService(LinkApi::class.java, context)
                 val response = linkApi.checkAuth(email, authNumber)
                 val accessToken = response.string()
 

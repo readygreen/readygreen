@@ -1,3 +1,5 @@
+package com.ddubucks.readygreen.presentation.screen
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
@@ -15,9 +17,9 @@ import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.presentation.theme.Red
 import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
-import secStyle
 
 @Composable
 fun NavigationScreen(
@@ -41,39 +43,47 @@ fun NavigationScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         if (navigationState.isNavigating) {
-
             Text(
-                text = "${navigationState.destinationName}",
+                text = navigationState.destinationName ?: "목적지 정보 없음",
                 style = pStyle,
                 color = White,
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // TODO 방향 출력
             Icon(
-                painter = painterResource(id = R.drawable.arrow_left),
+                painter = painterResource(
+                    id = when (navigationState.nextDirection) {
+                        11 -> R.drawable.arrow_straight
+                        12 -> R.drawable.arrow_left
+                        13 -> R.drawable.arrow_right
+                        else -> R.drawable.arrow_straight
+                    }
+                ),
                 contentDescription = "방향",
                 tint = Color.Unspecified,
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(top = 20.dp)
+                modifier = Modifier.size(80.dp)
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = "우회전 후 보행자도로 을 따라 40m 이동",
+                text = navigationState.currentDescription ?: "안내 없음",
                 fontWeight = FontWeight.Bold,
-                style = secStyle,
                 color = Red,
             )
-        } else {
+
+            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
+                text = "남은 거리: ${navigationState.remainingDistance?.toInt() ?: 0}m",
+                fontWeight = FontWeight.Bold,
+                color = White,
+            )
+        } else {
+            Text(
                 text = "길안내 중이 아닙니다.",
-                style = pStyle,
-                color = White
+                color = Color.White
             )
         }
     }

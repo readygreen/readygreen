@@ -1,7 +1,5 @@
 package com.ddubucks.readygreen.presentation.activity
 
-import NavigationScreen
-import NavigationViewModel
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,6 +16,7 @@ import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.screen.*
 import com.ddubucks.readygreen.presentation.theme.ReadyGreenTheme
 import com.ddubucks.readygreen.presentation.viewmodel.MapViewModel
+import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import com.google.android.gms.location.LocationServices
 

@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.presentation.retrofit
 
+import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,17 +10,15 @@ object RestClient {
 
     private const val BASE_URL = "http://j11b108.p.ssafy.io/api/v1/"
 
-    fun create(accessToken: String): Retrofit {
+    fun create(context: Context): Retrofit {
 
-        // 로깅 인터셉터
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
-        // OkHttp 클라이언트 생성 시 토큰 인터셉터 추가
         val client = OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .addInterceptor(TokenInterceptor(accessToken))
+            .addInterceptor(TokenInterceptor(context))
             .build()
 
         return Retrofit.Builder()
@@ -29,7 +28,7 @@ object RestClient {
             .build()
     }
 
-    fun <T> createService(serviceClass: Class<T>, accessToken: String): T {
-        return create(accessToken).create(serviceClass)
+    fun <T> createService(serviceClass: Class<T>, context: Context): T {
+        return create(context).create(serviceClass)
     }
 }
