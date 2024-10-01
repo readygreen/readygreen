@@ -44,10 +44,10 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi userFeedbackApi() {
+    public GroupedOpenApi feedbackApi() {
         return GroupedOpenApi.builder()
                 .group("건의함")
-                .pathsToMatch("/user/feedback/**")
+                .pathsToMatch("/feedback/**")
                 .build();
     }
 
@@ -118,6 +118,13 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("FCM")
                 .pathsToMatch("/fcm/**")
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi PlaceApi(){
+        return GroupedOpenApi.builder()
+                .group("장소")
+                .pathsToMatch("/place/**")
                 .build();
     }
 }

@@ -23,13 +23,13 @@ public class FeedbackController {
     }
 
     // 특정 사용자의 건의사항 조회 (사용자)
-    @GetMapping("/user/{memberId}")
+    @GetMapping("/{memberId}") // 경로 변수 추가 필요
     public List<FeedbackDTO> getFeedbacksByMember(@PathVariable Integer memberId) {
         return feedbackService.getFeedbacksByMember(memberId);
     }
 
     // 사용자가 처리 상태에 따라 자신의 건의사항 조회
-    @GetMapping("/user/{memberId}/status")
+    @GetMapping("/status")
     public List<FeedbackDTO> getFeedbacksByMemberAndStatus(@PathVariable Integer memberId, @RequestParam FeedbackStatus status) {
         return feedbackService.getFeedbacksByMemberAndStatus(memberId, status);
     }
