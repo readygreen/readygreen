@@ -87,9 +87,11 @@ class NewUserApi {
     required String password,
     required String socialType,
     required String profileImg,
-    String? smartphone,
+    // required String smartphone,
   }) async {
     String? deviceToken = await storage.read(key: 'deviceToken');
+    print("디바이스토큰");
+    print(deviceToken);
 
     Map<String, String> requestBody = {
       'email': email,

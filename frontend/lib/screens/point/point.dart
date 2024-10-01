@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 
 class PointPage extends StatelessWidget {
@@ -17,7 +18,23 @@ class PointPage extends StatelessWidget {
                   style: TextStyle(fontSize: 24),
                 ),
               ),
-              // 다른 위젯 추가 가능
+              const SizedBox(height: 20), // 여백 추가
+
+              // 테스트용 버튼 추가
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MapDirectionPage(
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('지도 페이지로 이동'),
+                ),
+              ),
             ],
           ),
         ),
