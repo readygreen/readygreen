@@ -35,7 +35,7 @@ class LinkViewModel : ViewModel() {
                     Log.d("LinkViewModel", "access 토큰: $accessToken")
                     TokenManager.saveToken(context, accessToken)
 
-                    onLoginSuccess(context, accessToken)
+                    onLoginSuccess(context)
                     onResult(true, "인증 성공")
                 } else {
                     onResult(false, "토큰이 없습니다.")
@@ -47,7 +47,7 @@ class LinkViewModel : ViewModel() {
         }
     }
 
-    private fun onLoginSuccess(context: Context, accessToken: String) {
+    private fun onLoginSuccess(context: Context) {
         fcmViewModel.registerFcm(context)
     }
 }

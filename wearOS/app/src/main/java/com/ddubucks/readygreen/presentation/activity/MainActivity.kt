@@ -32,12 +32,19 @@ class MainActivity : ComponentActivity() {
                 val locationService = remember { LocationService(this) }
                 val mapViewModel: MapViewModel = viewModel()
                 val navigationViewModel: NavigationViewModel = viewModel()
+
                 val sharedPreferences = getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
-                val token = sharedPreferences.getString("accessToken", null)
+                val token = sharedPreferences.getString("access_token", null)
+
+                val startDestination = if (token.isNullOrEmpty()) {
+                    "linkEmailScreen"
+                } else {
+                    "mainScreen"
+                }
 
                 NavHost(
                     navController = navController,
-                    startDestination = if (token.isNullOrEmpty()) "linkEmailScreen" else "mainScreen"
+                    startDestination = startDestination
                 ) {
                     // MainScreen
                     composable("mainScreen") { MainScreen(navController) }

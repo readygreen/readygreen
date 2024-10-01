@@ -85,7 +85,9 @@ fun SearchResultScreen(
                     val lng = result.geometry.location.lng
 
                     navigationViewModel.startNavigation(context, lat, lng, name)
-                    navController.navigate("navigationScreen")
+                    navController.navigate("navigationScreen") {
+                        popUpTo("mainScreen") { inclusive = true }
+                    }
                 })
             }
             item {

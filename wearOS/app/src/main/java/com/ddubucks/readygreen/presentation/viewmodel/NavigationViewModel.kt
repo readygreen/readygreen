@@ -26,46 +26,58 @@ class NavigationViewModel : ViewModel() {
     // 길안내 시작 함수
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
 
-        val navigationApi = RestClient.createService(NavigationApi::class.java, context)
+        locationService = LocationService(context)
 
-        val navigationRequest = NavigationRequest(
-            startX = lat,
-            startY = lng,
-            endX = lat,
-            endY = lng,
-            startName = "현재 위치",
-            endName = name,
-            watch = true
-        )
+        // 마지막 위치 가져오기
+        locationService?.getLastLocation { location ->
+            location?.let {
+                val curLat = it.latitude
+                val curLng = it.longitude
 
-        viewModelScope.launch {
-            navigationApi.startNavigation(navigationRequest).enqueue(object : Callback<NavigationResponse> {
-                override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { navigationResponse ->
-                            // 경로 데이터를 저장
-                            route = navigationResponse.routeDTO.features
+                val navigationApi = RestClient.createService(NavigationApi::class.java, context)
 
-                            // 실시간 위치 추적 시작
-                            locationService = LocationService(context)
-                            locationService?.startLocationUpdates { location ->
-                                updateNavigation(location)
+                val navigationRequest = NavigationRequest(
+                    startX = roundToSix(curLng),
+                    startY = roundToSix(curLat),
+                    endX = roundToSix(lng),
+                    endY = roundToSix(lat),
+                    startName = "현재 위치",
+                    endName = name,
+                    watch = true
+                )
+
+                viewModelScope.launch {
+                    navigationApi.startNavigation(navigationRequest).enqueue(object : Callback<NavigationResponse> {
+                        override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
+                            if (response.isSuccessful) {
+                                response.body()?.let { navigationResponse ->
+                                    // 경로 데이터를 저장
+                                    route = navigationResponse.routeDTO.features
+
+                                    // 실시간 위치 추적 시작
+                                    locationService?.startLocationUpdates { location ->
+                                        updateNavigation(location)
+                                    }
+
+                                    // 길안내 시작 상태로 업데이트
+                                    _navigationState.value = _navigationState.value.copy(isNavigating = true)
+                                }
+                            } else {
+                                // API 요청이 실패할 경우 처리 (로그 남기기 등)
+                                _navigationState.value = NavigationState(isNavigating = false)
                             }
-
-                            // 길안내 시작 상태로 업데이트
-                            _navigationState.value = _navigationState.value.copy(isNavigating = true)
                         }
-                    } else {
-                        // API 요청이 실패할 경우 처리 (로그 남기기 등)
-                        _navigationState.value = NavigationState(isNavigating = false)
-                    }
-                }
 
-                override fun onFailure(call: Call<NavigationResponse>, t: Throwable) {
-                    // 요청 실패 시 로그를 남기거나 오류 처리
-                    _navigationState.value = NavigationState(isNavigating = false)
+                        override fun onFailure(call: Call<NavigationResponse>, t: Throwable) {
+                            // 요청 실패 시 로그를 남기거나 오류 처리
+                            _navigationState.value = NavigationState(isNavigating = false)
+                        }
+                    })
                 }
-            })
+            } ?: run {
+                // 위치를 가져올 수 없는 경우 처리
+                _navigationState.value = NavigationState(isNavigating = false)
+            }
         }
     }
 
@@ -120,5 +132,10 @@ class NavigationViewModel : ViewModel() {
             longitude = lng2
         }
         return location1.distanceTo(location2).toDouble() // 미터 단위 거리 반환
+    }
+
+    // 좌표 정리
+    private fun roundToSix(value: Double): Double {
+        return String.format("%.6f", value).toDouble()
     }
 }
