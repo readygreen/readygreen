@@ -46,4 +46,6 @@ public class Member extends BaseEntity {
     private String smartphone;
 
     private String watch;
+
+    private Double speed;
 }

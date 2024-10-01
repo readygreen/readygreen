@@ -2,6 +2,7 @@ package com.ddubucks.readygreen.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
@@ -17,4 +18,5 @@ public class MapResponseDTO {
     private Double endlat;
     private Double endlng;
     private Double distance;
+    private LocalDateTime time;
 }
