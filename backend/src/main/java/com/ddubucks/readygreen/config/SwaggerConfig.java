@@ -119,4 +119,11 @@ public class SwaggerConfig {
                 .pathsToMatch("/fcm/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi PlaceApi(){
+        return GroupedOpenApi.builder()
+                .group("장소")
+                .pathsToMatch("/place/**")
+                .build();
+    }
 }
