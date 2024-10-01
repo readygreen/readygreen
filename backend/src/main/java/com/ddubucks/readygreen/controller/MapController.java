@@ -33,8 +33,12 @@ public class MapController {
     @PostMapping("start")
     public ResponseEntity<MapResponseDTO> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         MapResponseDTO mapResponseDTO = mapService.getDestinationGuide(routeRequestDTO, userDetails.getUsername());
+        Double distance = mapService.getDistance(mapResponseDTO.getRouteDTO().getFeatures());
         mapResponseDTO.setOrigin(routeRequestDTO.getStartName());
         mapResponseDTO.setDestination(routeRequestDTO.getEndName());
+        mapResponseDTO.setEndlng(routeRequestDTO.getEndX());
+        mapResponseDTO.setEndlat(routeRequestDTO.getEndY());
+        mapResponseDTO.setDistance(distance);
         redisService.save("dir|"+userDetails.getUsername(),mapResponseDTO);
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         if(member.getWatch()!=null)

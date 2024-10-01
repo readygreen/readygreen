@@ -25,7 +25,6 @@ public class PointController {
         Integer point = memberService.getPoint(userDetails);
         return ResponseEntity.ok(point);
     }
-
     @PostMapping
     public ResponseEntity<String> addPoint(@AuthenticationPrincipal UserDetails userDetails, @RequestBody PointRequestDTO pointRequestDTO) {
         pointService.addPoint(userDetails.getUsername(), pointRequestDTO);

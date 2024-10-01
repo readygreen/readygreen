@@ -14,4 +14,7 @@ public class MapResponseDTO {
     private List<BlinkerDTO> blinkerDTOs;
     private String origin;
     private String destination;
+    private Double endlat;
+    private Double endlng;
+    private Double distance;
 }

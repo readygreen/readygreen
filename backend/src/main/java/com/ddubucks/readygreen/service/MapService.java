@@ -13,11 +13,14 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.task.TaskExecutionProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -44,6 +47,7 @@ public class MapService {
     private final RouteRecordRepository routeRecordRepository;
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final TaskExecutionProperties taskExecutionProperties;
 
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
@@ -285,25 +289,46 @@ public class MapService {
     }
 
     public RouteRecordResponseDTO getRouteRecord(String email) {
-        List<RouteRecord> routeRecords = routeRecordRepository.findAllByEmail(email);
-
-        List<RouteRecordDTO> routeRecordDTOs = new ArrayList<>();
-        for (RouteRecord routeRecord : routeRecords) {
-            routeRecordDTOs.add(
-                    RouteRecordDTO
-                            .builder()
-                            .id(routeRecord.getId())
-                            .startName(routeRecord.getStartName())
-                            .startLatitude(routeRecord.getStartCoordinate().getY())
-                            .startLongitude(routeRecord.getStartCoordinate().getX())
-                            .endName(routeRecord.getEndName())
-                            .endLatitude(routeRecord.getEndCoordinate().getY())
-                            .endLongitude(routeRecord.getEndCoordinate().getX())
-                            .build()
-            );
-        }
-        return RouteRecordResponseDTO.builder()
-                .routeRecordDTOs(routeRecordDTOs)
-                .build();
+        return null;
     }
+
+    public Double getDistance(List<FeatureDTO> features) {
+        double totalHaversineDistance = 0.0;
+
+        for (int i = 0; i < features.size(); i++) {
+            FeatureDTO feature = features.get(i);
+            String geometryType = feature.getGeometry().getType();
+
+            if (geometryType.equals("LineString")) {
+                List<List<Double>> coordinates = (List<List<Double>>) feature.getGeometry().getCoordinates();
+                // 각 좌표 사이의 거리를 계산
+                for (int j = 0; j < coordinates.size() - 1; j++) {
+                    List<Double> startPoint = coordinates.get(j);
+                    List<Double> endPoint = coordinates.get(j + 1);
+                    double startX = startPoint.get(0);
+                    double startY = startPoint.get(1);
+                    double endX = endPoint.get(0);
+                    double endY = endPoint.get(1);
+                    // 하버사인 거리 계산
+                    double haversineDistance = haversineDistance(startY, startX, endY, endX);
+                    totalHaversineDistance += haversineDistance;
+                }
+            }
+        }
+        System.out.println("Total Haversine Distance: " + totalHaversineDistance + " meters");
+        return totalHaversineDistance;
+    }
+
+    public double haversineDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371000; // 지구 반지름 (미터 단위)
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = R * c; // 거리를 미터로 계산
+        return distance;
+    }
+
 }
