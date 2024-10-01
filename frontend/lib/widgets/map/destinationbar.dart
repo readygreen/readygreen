@@ -47,17 +47,19 @@ class DestinationBar extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back, color: AppColors.black),
+                icon: const Icon(Icons.arrow_back_ios_rounded,
+                    color: AppColors.black),
                 onPressed: () {
                   handleBackNavigation(context);
                 },
               ),
-              const SizedBox(width: 20),
+              const SizedBox(width: 5),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.015),
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/main.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/destinationbar.dart';
 import 'package:readygreen/widgets/map/draggable_route.dart';
@@ -33,6 +34,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   final loc.Location _location = loc.Location();
   final Set<Marker> _markers = {};
   final List<LatLng> _routeCoordinates = []; // 경로 좌표 리스트
+  String? _destinationName; // 도착지 이름 저장할 변수
 
   @override
   void initState() {
@@ -88,13 +90,13 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       // 응답 데이터 출력
       print('데이터 값~!~!~!~!~!~!~!~!~!: $routeData');
 
-      _processRouteData(routeData);
+      _processRouteData(routeData, 2);
     } else {
       print("No current location available.");
     }
   }
 
-  void _processRouteData(Map<String, dynamic>? routeData) {
+  void _processRouteData(Map<String, dynamic>? routeData, int type) {
     if (routeData != null) {
       // 경로 데이터를 바탕으로 coordinates 처리
       List<dynamic> features = routeData['routeDTO']['features'];
@@ -120,13 +122,26 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       setState(() {
         _routeCoordinates.addAll(coordinates);
         // 도착지에 마커 추가
-        _markers.add(
-          Marker(
-            markerId: const MarkerId('destination'),
-            position: LatLng(widget.endLat ?? 0.0, widget.endLng ?? 0.0),
-            infoWindow: InfoWindow(title: widget.endPlaceName),
-          ),
-        );
+        if (type == 2) {
+          _markers.add(
+            Marker(
+              markerId: const MarkerId('destination'),
+              position: LatLng(widget.endLat ?? 0.0, widget.endLng ?? 0.0),
+              infoWindow: InfoWindow(title: widget.endPlaceName),
+            ),
+          );
+        } else {
+          _markers.add(
+            Marker(
+              markerId: const MarkerId('destination'),
+              position: LatLng(
+                  routeData['endlat'] ?? 0.0, routeData['endlng'] ?? 0.0),
+              infoWindow: InfoWindow(title: widget.endPlaceName),
+            ),
+          );
+        }
+        // routeData에서 도착지 정보 가져오기
+        _destinationName = routeData['destination'] ?? 'Unknown Destination';
       });
     } else {
       print("No route data received.");
@@ -141,7 +156,9 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     var routeData = await mapStartAPI.fetchGuideInfo();
 
     print('데이터 값~!~!~!~!~!~!~!~!~!: $routeData');
-    _processRouteData(routeData);
+    _processRouteData(routeData, 1);
+    print('$routeData[endlat]');
+    print('$routeData[endlng]');
   }
 
   // 지도 생성 함수
@@ -181,6 +198,19 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     ));
   }
 
+  void handleBackNavigation(BuildContext context) {
+    if (Navigator.canPop(context)) {
+      // 스택에 화면이 남아있으면 pop
+      Navigator.pop(context);
+    } else {
+      // 스택이 비어 있으면 메인 페이지로 이동
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -189,75 +219,123 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(
-                // 초기 카메라 위치를 사용자 현재 위치로 설정
-                locationProvider.currentPosition?.latitude ?? 0.0,
-                locationProvider.currentPosition?.longitude ?? 0.0,
-              ),
-              zoom: 17.0,
+      body: Stack(children: [
+        GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: LatLng(
+              // 초기 카메라 위치를 사용자 현재 위치로 설정
+              locationProvider.currentPosition?.latitude ?? 0.0,
+              locationProvider.currentPosition?.longitude ?? 0.0,
             ),
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            compassEnabled: true,
-            zoomControlsEnabled: false,
-            markers: _markers,
-            polylines: {
-              Polyline(
-                polylineId: const PolylineId('route'),
-                points: _routeCoordinates, // 경로 좌표 리스트
-                color: AppColors.blue,
-                width: 7,
-                startCap: Cap.roundCap, // 시작 지점을 둥글게
-                endCap: Cap.roundCap, // 끝 지점을 둥글게
-              ),
-            },
+            zoom: 17.0,
           ),
-          Positioned(
-            top: screenHeight * 0.8,
-            right: screenWidth * 0.05,
-            child: LocationButton(
-              onTap: _currentLocation,
-              screenWidth: screenWidth,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          compassEnabled: true,
+          zoomControlsEnabled: false,
+          markers: _markers,
+          polylines: {
+            Polyline(
+              polylineId: const PolylineId('route'),
+              points: _routeCoordinates, // 경로 좌표 리스트
+              color: AppColors.green,
+              width: 7,
+              startCap: Cap.roundCap, // 시작 지점을 둥글게
+              endCap: Cap.roundCap, // 끝 지점을 둥글게
             ),
+          },
+        ),
+        Positioned(
+          top: screenHeight * 0.8,
+          right: screenWidth * 0.05,
+          child: LocationButton(
+            onTap: _currentLocation,
+            screenWidth: screenWidth,
           ),
-          Positioned(
-            top: screenHeight * 0,
-            left: screenWidth * 0,
-            right: screenWidth * 0,
-            child: DestinationBar(
-              currentLocation:
-                  locationProvider.currentPlaceName ?? 'Loading...',
-              destination: widget.endPlaceName ?? '', // 전달받은 도착지 이름
-            ),
+        ),
+        Positioned(
+          top: screenHeight * 0,
+          left: screenWidth * 0,
+          right: screenWidth * 0,
+          child: DestinationBar(
+            currentLocation: locationProvider.currentPlaceName ?? '',
+            destination:
+                widget.endPlaceName ?? _destinationName ?? '', // 전달받은 도착지 이름
           ),
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Container(
-              height: screenHeight * 0.11,
-              decoration: BoxDecoration(
-                color: AppColors.blue,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 6.0,
-                    spreadRadius: 2.0,
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: SizedBox(
+            height: screenHeight * 0.09, // 더 큰 높이 설정으로 아래 공간을 꽉 채움
+            child: Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      print("상세 경로 클릭");
+                    },
+                    child: Container(
+                      color: AppColors.green,
+                      alignment: Alignment.center, // 가운데 정렬
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.menu, color: AppColors.white),
+                          SizedBox(width: 8),
+                          Text(
+                            "상세 경로",
+                            style:
+                                TextStyle(color: AppColors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ),
-              child: const Center(
-                child: Text("상세 경로"),
-              ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      // 안내 중지 클릭 처리
+                      print("안내 중지 클릭");
+                      MapStartAPI mapStartAPI = MapStartAPI();
+                      bool result =
+                          await mapStartAPI.guideDelete(isWatch: false);
+                      if (result) {
+                        print("안내가 중지되었습니다.");
+                        handleBackNavigation(context);
+                      } else {
+                        print("안내 중지 실패");
+                      }
+                    },
+                    child: Container(
+                      color: AppColors.grey,
+                      alignment: Alignment.center, // 가운데 정렬
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.stop,
+                            color: AppColors.white,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            "안내 중지",
+                            style:
+                                TextStyle(color: AppColors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        ),
+      ]),
     );
   }
 }
