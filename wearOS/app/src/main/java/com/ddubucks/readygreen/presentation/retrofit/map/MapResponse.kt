@@ -9,8 +9,8 @@ data class BlinkerDTO(
     val lastAccessTime: String,
     val greenDuration: Int,
     val redDuration: Int,
-    val currentState: String,
-    val remainingTime: Int,
+    var currentState: String,
+    var remainingTime: Int,
     val latitude: Double,
     val longitude: Double
 )

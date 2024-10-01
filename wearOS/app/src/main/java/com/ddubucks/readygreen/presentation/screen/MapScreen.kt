@@ -40,6 +40,13 @@ fun MapScreen(
     LaunchedEffect(latitude, longitude) {
         if (latitude != null && longitude != null) {
             mapViewModel.getMap(context, latitude!!, longitude!!)
+            mapViewModel.startCountdown()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mapViewModel.stopCountdown()
         }
     }
 
