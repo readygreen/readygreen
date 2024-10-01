@@ -6,6 +6,7 @@ import com.ddubucks.readygreen.service.FcmService;
 import com.ddubucks.readygreen.service.MapService;
 import com.ddubucks.readygreen.service.MemberService;
 import com.ddubucks.readygreen.service.RedisService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class MapController {
     private final RedisService redisService;
     private final FcmService fcmService;
     private final MemberService memberService;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("start")
     public ResponseEntity<MapResponseDTO> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
@@ -39,15 +41,16 @@ public class MapController {
     }
 
     @GetMapping("guide")
-    public ResponseEntity<MapResponseDTO> getCheckAlreadyGuide(@AuthenticationPrincipal UserDetails userDetails){
+    public ResponseEntity<Object> getCheckAlreadyGuide(@AuthenticationPrincipal UserDetails userDetails){
         System.out.println(userDetails.getUsername());
-        MapResponseDTO result = (MapResponseDTO)redisService.find("dir|"+userDetails.getUsername());
-        System.out.println(result);
-        if(result==null){
+        // Redis에서 데이터를 가져옴
+        Object redisData = redisService.find("dir|" + userDetails.getUsername());
+        // 데이터가 없을 경우
+        if (redisData == null) {
             return ResponseEntity.noContent().build();
-        }else{
-            return ResponseEntity.ok().body(result);
         }
+        System.out.println(redisData);
+        return ResponseEntity.ok().body(redisData);
     }
     @DeleteMapping("guide")
     public ResponseEntity<String> deleteGuide(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(name = "isWatch") boolean isWatch) throws FirebaseMessagingException {
