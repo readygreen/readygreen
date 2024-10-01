@@ -1,9 +1,10 @@
 package com.ddubucks.readygreen.presentation.retrofit.navigation
 
-import retrofit2.http.GET
 import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.POST
 
 interface NavigationApi {
-    @GET("map/start")
-    fun getNavigation(): Call<NavigationResponse>
+    @POST("map/start")
+    fun startNavigation(@Body navigationRequest: NavigationRequest): Call<NavigationResponse>
 }

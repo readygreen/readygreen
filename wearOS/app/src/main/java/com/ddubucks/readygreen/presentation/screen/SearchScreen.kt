@@ -35,11 +35,11 @@ fun SearchScreen(
     navController: NavHostController,
     apiKey: String,
     fusedLocationClient: FusedLocationProviderClient,
-    viewModel: SearchViewModel
+    searchViewModel: SearchViewModel
 ) {
     val mike by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
     var voiceResults by remember { mutableStateOf(emptyList<String>()) }
-    val searchResults by viewModel.searchResults.collectAsState()
+    val searchResults by searchViewModel.searchResults.collectAsState()
     val context = LocalContext.current
     val locationService = remember { LocationService(context) }
 
@@ -89,7 +89,7 @@ fun SearchScreen(
     // voiceResults와 searchResults 초기화
     LaunchedEffect(navController.currentBackStackEntry) {
         voiceResults = emptyList()
-        viewModel.clearSearchResults()
+        searchViewModel.clearSearchResults()
     }
 
     // 음성 검색과 위치 추적
@@ -103,7 +103,7 @@ fun SearchScreen(
                     Log.d("SearchScreen", "현재 위치: $latitude, $longitude")
 
                     // 검색 수행
-                    viewModel.searchPlaces(
+                    searchViewModel.searchPlaces(
                         latitude = latitude,
                         longitude = longitude,
                         keyword = voiceResults.first(),

@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.presentation.screen
 
+import NavigationViewModel
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,6 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
@@ -23,9 +25,10 @@ import pStyle
 
 @Composable
 fun SearchResultScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    navigationViewModel: NavigationViewModel = viewModel()
 ) {
-    // SearchCandidate 리스트를 받습니다.
+
     val searchResults = navController.previousBackStackEntry
         ?.savedStateHandle
         ?.get<List<SearchCandidate>>("searchResults") ?: emptyList()
@@ -75,15 +78,15 @@ fun SearchResultScreen(
 
             items(searchResults) { result ->
                 ButtonItem(item = ButtonModel(result.name), onClick = {
-                    // 선택된 장소의 이름과 좌표를 navigationScreen으로 넘깁니다.
+
                     val name = result.name
                     val lat = result.geometry.location.lat
                     val lng = result.geometry.location.lng
 
-                    // navigationScreen으로 이동하며 데이터 전달
-                    navController.navigate("navigationScreen/$name/$lat/$lng")
+                    // 길안내 시작
+                    navigationViewModel.startNavigation(name, lat, lng)
 
-                    Log.d("SearchResultScreen", "선택한 장소: $name, 좌표: $lat, $lng")
+                    navController.navigate("navigationScreen")
                 })
             }
             item {

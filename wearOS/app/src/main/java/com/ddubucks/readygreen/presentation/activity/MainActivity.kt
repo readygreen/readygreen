@@ -1,5 +1,7 @@
 package com.ddubucks.readygreen.presentation.activity
 
+import NavigationScreen
+import NavigationViewModel
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -30,6 +32,7 @@ class MainActivity : ComponentActivity() {
                 val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                 val locationService = remember { LocationService(this) }
                 val mapViewModel: MapViewModel = viewModel()
+                val navigationViewModel: NavigationViewModel = viewModel()
                 val sharedPreferences = getSharedPreferences("token_prefs", Context.MODE_PRIVATE)
                 val token = sharedPreferences.getString("accessToken", null)
 
@@ -48,17 +51,20 @@ class MainActivity : ComponentActivity() {
                         SearchScreen(
                             navController = navController,
                             fusedLocationClient = fusedLocationClient,
-                            viewModel = searchViewModel,
+                            searchViewModel = searchViewModel,
                             apiKey = BuildConfig.MAPS_API_KEY
                         )
                     }
 
                     // SearchResultScreen
                     composable("searchResultScreen") {
-                        SearchResultScreen(navController = navController)
+                        SearchResultScreen(
+                            navController = navController,
+                            navigationViewModel = navigationViewModel
+                        )
                     }
 
-                    // MapScreen - 수정된 부분
+                    // MapScreen
                     composable("mapScreen") {
                         MapScreen(
                             locationService = locationService,
@@ -67,18 +73,10 @@ class MainActivity : ComponentActivity() {
                     }
 
                     // NavigationScreen
-                    composable(
-                        "navigationScreen/{name}/{lat}/{lng}",
-                        arguments = listOf(
-                            navArgument("name") { type = NavType.StringType },
-                            navArgument("lat") { type = NavType.FloatType },
-                            navArgument("lng") { type = NavType.FloatType }
+                    composable("navigationScreen") {
+                        NavigationScreen(
+                            navigationViewModel = navigationViewModel
                         )
-                    ) { backStackEntry ->
-                        val name = backStackEntry.arguments?.getString("name")
-                        val lat = backStackEntry.arguments?.getFloat("lat")
-                        val lng = backStackEntry.arguments?.getFloat("lng")
-                        NavigationScreen(name = name, lat = lat, lng = lng)
                     }
 
                     // Authentication
