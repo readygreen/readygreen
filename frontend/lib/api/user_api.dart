@@ -128,7 +128,7 @@ class NewUserApi {
   }
 
   // 프로필 불러오기 함수
-  Future<Map<String, dynamic>?> fetchProfileData() async {
+  Future<Map<String, dynamic>?> getProfile() async {
     String? accessToken = await storage.read(key: 'accessToken');
     print('프로필 accessToken');
     print(accessToken);

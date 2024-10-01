@@ -5,6 +5,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart' as loc;
 import 'package:google_maps_webservice/places.dart' as places;
 import 'package:geocoding/geocoding.dart';
+import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/map/mapsearchbar.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/draggable_favorites.dart';
@@ -22,6 +23,7 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  final MapStartAPI mapStartAPI = MapStartAPI();
   late GoogleMapController mapController;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
@@ -36,6 +38,7 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
+    _checkIsGuide();
     // 앱 시작 시 위치 정보를 업데이트하고 신호등 정보를 한 번만 요청
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final locationProvider =
@@ -53,6 +56,13 @@ class _MapPageState extends State<MapPage> {
     _controller.complete(controller);
   }
 
+  Future<void> _checkIsGuide() async {
+  if(await mapStartAPI.checkIsGuide()){
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MapDirectionPage()),
+    );}
+  }
   // 신호등 정보를 받아와 지도에 동그라미로 표시하는 함수
   Future<void> _fetchTrafficLightInfo(double latitude, double longitude) async {
     const int radius = 500; // 반경 500미터로 설정(임의)

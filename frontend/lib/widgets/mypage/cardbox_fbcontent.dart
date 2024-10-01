@@ -11,7 +11,7 @@ class FeedbackContent extends StatelessWidget {
   const FeedbackContent({
     super.key,
     this.title, // required 제거
-    this.height = 540,
+    this.height = 450,
     this.backgroundColor = Colors.white,
     this.textColor = Colors.black,
     this.child,
