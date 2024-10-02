@@ -98,8 +98,9 @@ class _HomePageContentState extends State<HomePageContent> {
     final String? storedDate = await storage.read(key: 'fortuneDate');
     final String? storedFortune = await storage.read(key: 'fortune');
 
-    //
+    // 현재 날짜와 저장 날짜가 다를때
     if (currentDate != storedDate) {
+      print('현재날짜 $currentDate // 저장날짜 $storedDate');
       final fortune = await api.getFortune();
       if (fortune != null) {
         // 운세가 정상적으로 반환되면 스토리지에 저장
@@ -162,11 +163,12 @@ class _HomePageContentState extends State<HomePageContent> {
         var weatherResponse = await api.getWeather(latitude, longitude);
 
         if (weatherResponse != null) {
-          setState(() {
-            print(weatherResponse);
-            weatherData = List<Map<String, dynamic>>.from(weatherResponse);
-          });
-
+          if (mounted) {
+            setState(() {
+              print(weatherResponse);
+              weatherData = List<Map<String, dynamic>>.from(weatherResponse);
+            });
+          }
           String weatherJson = jsonEncode(weatherData);
           await storage.write(key: 'weather', value: weatherJson);
           await storage.write(key: 'weatherHour', value: currentHour);
