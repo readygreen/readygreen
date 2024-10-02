@@ -2,6 +2,7 @@ package com.ddubucks.readygreen.model.bookmark;
 
 import com.ddubucks.readygreen.model.BaseEntity;
 import com.ddubucks.readygreen.model.member.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,7 @@ public class Bookmark extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private BookmarkType type;
-
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
