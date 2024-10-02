@@ -4,6 +4,7 @@ import 'package:readygreen/screens/mypage/feedback.dart';
 import 'package:readygreen/screens/mypage/feedback_list.dart';
 import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
+import 'package:readygreen/widgets/modals/birth_modal.dart';
 import 'package:readygreen/widgets/mypage/cardbox_mypage.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/constants/appcolors.dart';
@@ -32,10 +33,12 @@ class _MyPageState extends State<MyPage> {
 
   Future<void> _getProfile() async {
     final data = await userApi.getProfile();
-    setState(() {
-      profileData = data;
-      isLoading = false; // 데이터 로딩 완료
-    });
+    if (mounted) {
+      setState(() {
+        profileData = data;
+        isLoading = false; // 데이터 로딩 완료
+      });
+    }
   }
 
   Future<void> _handleLogout(BuildContext context) async {
@@ -64,7 +67,7 @@ class _MyPageState extends State<MyPage> {
                     // 프로필 정보
                     CardBox(
                       title: '내 정보',
-                      height: 160,
+                      height: 150,
                       backgroundColor: Colors.white,
                       textColor: Colors.black,
                       child: Row(
@@ -121,25 +124,26 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-// 프로필 정보 섹션
+// 프로필 텍스트 부분
   Widget _buildProfileSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const Text(
-              '이름   ',
+              '        이름',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               profileData?['nickname'] ?? 'Unknown',
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 16,
               ),
             ),
           ],
@@ -149,12 +153,13 @@ class _MyPageState extends State<MyPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              '이메일   ',
+              '     이메일',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               profileData?['email'] ?? 'Unknown',
               style: const TextStyle(
@@ -168,12 +173,13 @@ class _MyPageState extends State<MyPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              '생년월일   ',
+              ' 생년월일',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
             ),
+            const SizedBox(width: 8),
             Row(
               children: [
                 Text(
@@ -182,16 +188,21 @@ class _MyPageState extends State<MyPage> {
                     fontSize: 14,
                   ),
                 ),
-                const SizedBox(width: 5),
-                // IconButton(
-                //   icon: const Icon(
-                //     Icons.edit,
-                //     size: 16,
-                //   ),
-                //   onPressed: () {
-                //     // 생년월일 수정 기능 추가
-                //   },
-                // ),
+                const SizedBox(width: 15),
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const BirthModal();
+                      },
+                    );
+                  },
+                  child: const Icon(
+                    Icons.edit,
+                    size: 16,
+                  ),
+                ),
               ],
             ),
           ],
@@ -301,7 +312,10 @@ class _MyPageState extends State<MyPage> {
           ),
           const SizedBox(height: 10),
           GestureDetector(
-            onTap: () {},
+            onTap: () async {
+              await userApi.deleteUser();
+              _handleLogout(context);
+            },
             child: _buildItem('회원탈퇴'),
           ),
         ],
