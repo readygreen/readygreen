@@ -13,30 +13,25 @@ class NewMainApi {
     print('운세 accessToken');
     print(accessToken);
 
-    if (accessToken != null) {
-      try {
-        final response = await http.get(
-          Uri.parse('$baseUrl/main/fortune'),
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-            'accept': '*/*',
-          },
-        );
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/main/fortune'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'accept': '*/*',
+        },
+      );
 
-        if (response.statusCode == 200) {
-          return response.body;
-        } else if (response.statusCode == 400) {
-          return response.body;
-        } else {
-          print('운세 로드 실패 ${response.statusCode}');
-          return null;
-        }
-      } catch (e) {
-        print('운세 에러 발생: $e');
+      if (response.statusCode == 200) {
+        return response.body;
+      } else if (response.statusCode == 400) {
+        return response.body;
+      } else {
+        print('운세 로드 실패 ${response.statusCode}');
         return null;
       }
-    } else {
-      print('accessToken이 없습니다.');
+    } catch (e) {
+      print('운세 에러 발생: $e');
       return null;
     }
   }
@@ -49,32 +44,27 @@ class NewMainApi {
     print('날씨 API accessToken');
     print(accessToken);
 
-    if (accessToken != null) {
-      try {
-        final response = await http.get(
-          Uri.parse('$baseUrl/main/weather?x=$latitude&y=$longitude'),
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-            'accept': 'application/json',
-          },
-        );
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/main/weather?x=$latitude&y=$longitude'),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'accept': 'application/json',
+        },
+      );
 
-        if (response.statusCode == 200) {
-          // JSON 응답을 List로 파싱
-          List<dynamic> decodedResponse = json.decode(response.body);
+      if (response.statusCode == 200) {
+        // JSON 응답을 List로 파싱
+        List<dynamic> decodedResponse = json.decode(response.body);
 
-          // 각 항목이 Map 형식인 List로 변환하여 반환
-          return decodedResponse.map((e) => e as Map<String, dynamic>).toList();
-        } else {
-          print('날씨 정보 로드 실패 ${response.statusCode}');
-          return null;
-        }
-      } catch (e) {
-        print('날씨 API 요청 중 오류 발생: $e');
+        // 각 항목이 Map 형식인 List로 변환하여 반환
+        return decodedResponse.map((e) => e as Map<String, dynamic>).toList();
+      } else {
+        print('날씨 정보 로드 실패 ${response.statusCode}');
         return null;
       }
-    } else {
-      print('accessToken이 없습니다.');
+    } catch (e) {
+      print('날씨 API 요청 중 오류 발생: $e');
       return null;
     }
   }

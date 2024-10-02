@@ -115,7 +115,7 @@ class _FortuneModalState extends State<FortuneModal> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      '이용을 원하시면 생일을 등록해주세요!',
+                      '이용을 원하시면 생일 등록 후 \n새로고침 해주세요!',
                       style: const TextStyle(
                         fontSize: 14,
                       ),
