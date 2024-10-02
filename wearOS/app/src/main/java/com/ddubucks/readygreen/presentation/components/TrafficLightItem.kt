@@ -35,4 +35,3 @@ fun createTrafficlightBitmap(item: BlinkerDTO): Bitmap {
 
     return trafficlight
 }
-

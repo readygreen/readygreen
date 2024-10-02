@@ -36,14 +36,17 @@ fun MainScreen(navController: NavHostController) {
         verticalArrangement = Arrangement.Center
     ) {
 
-        Text(
-            text = "언제그린",
-            color = Yellow,
-            style = h1Style,
-            modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
-        )
-
         ScalingLazyColumn {
+
+            item {
+                Text(
+                    text = "언제그린",
+                    color = Yellow,
+                    style = h1Style,
+                    modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
+                )
+            }
+
             items(buttonList) { item ->
                 ButtonIconItem(item = item, onClick = {
                     when (item.label) {

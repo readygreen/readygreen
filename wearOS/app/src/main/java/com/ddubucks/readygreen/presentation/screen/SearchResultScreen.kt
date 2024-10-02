@@ -86,7 +86,7 @@ fun SearchResultScreen(
 
                     navigationViewModel.startNavigation(context, lat, lng, name)
                     navController.navigate("navigationScreen") {
-                        popUpTo("mainScreen") { inclusive = true }
+                        popUpTo("mainScreen") { inclusive = false }
                     }
                 })
             }
