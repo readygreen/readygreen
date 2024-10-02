@@ -58,7 +58,7 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _checkIsGuide() async {
   if(await mapStartAPI.checkIsGuide()){
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => MapDirectionPage()),
     );}

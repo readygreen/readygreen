@@ -114,7 +114,7 @@ class _MainPageState extends State<MainPage> {
       print("메시지 수신!");
       if(message.data['type']==1){
         if (message.data['type'] == '1') {
-          Navigator.pushReplacement(
+          Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const MapDirectionPage()),
           );
