@@ -11,7 +11,7 @@ class FortuneModal extends StatefulWidget {
 }
 
 class _FortuneModalState extends State<FortuneModal> {
-  String fortune = 'Loading...';
+  String fortune = 'Loading...'; // 로딩 중일 때 표시할 기본 값
   String? fortuneWork;
   String? fortuneLove;
   String? fortuneHealth;
@@ -25,13 +25,18 @@ class _FortuneModalState extends State<FortuneModal> {
   @override
   void initState() {
     super.initState();
-    _loadStoreFortune();
+    _loadStoreFortune(); // 운세 불러오기
   }
 
   // 로컬 스토리지에서 운세 데이터를 불러오는 함수
   Future<void> _loadStoreFortune() async {
+    setState(() {
+      fortune = '로딩 중...'; // 로딩 중일 때 표시할 텍스트
+    });
+
     final storedFortune = await storage.read(key: 'fortune'); // 저장된 운세 불러오기
     print(storedFortune);
+
     if (storedFortune != null) {
       // 생일 정보가 없을 경우의 처리
       if (storedFortune.contains('생일 정보가 없습니다')) {
@@ -43,7 +48,7 @@ class _FortuneModalState extends State<FortuneModal> {
       }
     } else {
       setState(() {
-        fortune = '운세 정보를 불러올 수 없습니다.';
+        fortune = '운세 정보를 불러올 수 없습니다.'; // 운세가 없을 때 메시지
       });
     }
   }
@@ -156,23 +161,26 @@ class _FortuneModalState extends State<FortuneModal> {
                     ),
                     const SizedBox(height: 30),
 
-                    _buildFortuneItem('  일 💻', fortuneWork ?? '내용 없음'),
-                    const SizedBox(height: 10),
-                    _buildFortuneItem('사랑💕', fortuneLove ?? '내용 없음'),
-                    const SizedBox(height: 10),
-                    _buildFortuneItem('건강💪', fortuneHealth ?? '내용 없음'),
-                    const SizedBox(height: 10),
-                    _buildFortuneItem('금전💵', fortuneMoney ?? '내용 없음'),
+                    _buildFortuneItem(
+                        '  일 💻', fortuneWork ?? fortune), // 로딩 중 표시
                     const SizedBox(height: 10),
                     _buildFortuneItem(
-                        '행운의 숫자 🍀', fortuneLuckyNumber ?? '내용 없음'),
+                        '사랑💕', fortuneLove ?? fortune), // 로딩 중 표시
+                    const SizedBox(height: 10),
+                    _buildFortuneItem(
+                        '건강💪', fortuneHealth ?? fortune), // 로딩 중 표시
+                    const SizedBox(height: 10),
+                    _buildFortuneItem(
+                        '금전💵', fortuneMoney ?? fortune), // 로딩 중 표시
+                    const SizedBox(height: 10),
+                    _buildFortuneItem(
+                        '행운의 숫자 🍀', fortuneLuckyNumber ?? fortune), // 로딩 중 표시
                     const SizedBox(height: 16),
 
                     // 마지막 문장 출력
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        // color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
