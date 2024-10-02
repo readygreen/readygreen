@@ -24,9 +24,9 @@ public class FeedbackService {
     private final BlinkerRepository blinkerRepository;
 
     // 건의사항 제출
-    public FeedbackDTO submitFeedback(Integer memberId, Integer blinkerId, String feedbackType) {
+    public FeedbackDTO submitFeedback(String email, Integer blinkerId, String feedbackType) {
         // memberId로 사용자(Member) 조회
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         // blinkerId로 Blinker 객체 조회

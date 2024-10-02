@@ -3,6 +3,8 @@ package com.ddubucks.readygreen.model;
 import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "notice")
@@ -18,6 +20,7 @@ public class Notice extends BaseEntity {
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;  // 작성자 (관리자)
 

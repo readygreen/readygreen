@@ -34,4 +34,6 @@ public class ReportController {
     public List<ReportDTO> getReportsByMemberAndStatus(@PathVariable Integer memberId, @RequestParam ReportStatus status) {
         return reportService.getReportsByMemberAndStatus(memberId, status);
     }
+
+
 }

@@ -1,8 +1,11 @@
 package com.ddubucks.readygreen.model.member;
 
-import com.ddubucks.readygreen.model.BaseEntity;
+import com.ddubucks.readygreen.model.*;
 import jakarta.persistence.*;
 import lombok.*;
+import com.ddubucks.readygreen.model.report.Report;
+import com.ddubucks.readygreen.model.feedback.Feedback;
+import java.util.List;
 
 import java.time.LocalDate;
 
@@ -48,4 +51,31 @@ public class Member extends BaseEntity {
     private String watch;
 
     private Double speed;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Feedback> feedbacks;
+
+    // Report 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports;
+
+    // Notice 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notice> notices;
+
+    // Point 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Point> points;
+
+    // Question 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Question> questions;
+
+    // Steps 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Steps> steps;
+
+    // Route_recordd 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RouteRecord> routeRecords;
 }

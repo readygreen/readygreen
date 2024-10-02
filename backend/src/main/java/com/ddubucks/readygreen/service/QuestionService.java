@@ -19,8 +19,8 @@ public class QuestionService {
     private final MemberRepository memberRepository;
 
     // 질문 제출
-    public QuestionDTO submitQuestion(Integer memberId, String title, String content) {
-        Member member = memberRepository.findById(memberId)
+    public QuestionDTO submitQuestion(String email, String title, String content) {
+        Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         Question question = Question.builder()
@@ -35,8 +35,8 @@ public class QuestionService {
     }
 
     // 특정 사용자의 질문 조회 (처리 상태별 조회 추가)
-    public List<QuestionDTO> getQuestionsByMemberAndStatus(Integer memberId, boolean answered) {
-        Member member = memberRepository.findById(memberId)
+    public List<QuestionDTO> getQuestionsByMemberAndStatus(String email, boolean answered) {
+        Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         return questionRepository.findByMemberAndAnswered(member, answered).stream()
@@ -59,8 +59,8 @@ public class QuestionService {
     }
 
     // 특정 사용자의 질문 조회
-    public List<QuestionDTO> getQuestionsByMember(Integer memberId) {
-        Member member = memberRepository.findById(memberId)
+    public List<QuestionDTO> getQuestionsByMember(String email) {
+        Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         return questionRepository.findByMember(member).stream()
@@ -83,12 +83,8 @@ public class QuestionService {
     // Helper method to convert Question entity to DTO
     private QuestionDTO mapToQuestionDTO(Question question) {
         QuestionDTO questionDTO = new QuestionDTO();
-        questionDTO.setId(question.getId());
         questionDTO.setTitle(question.getTitle());
         questionDTO.setContent(question.getContent());
-        questionDTO.setReply(question.getReply());
-        questionDTO.setAnswered(question.isAnswered());
-        questionDTO.setCreatedAt(question.getCreateDate());
         return questionDTO;
     }
 }
