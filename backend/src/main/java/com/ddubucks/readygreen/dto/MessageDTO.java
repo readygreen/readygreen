@@ -1,16 +1,13 @@
 package com.ddubucks.readygreen.dto;
-
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
-public class MainRequest {
-    private String x;
-    private String y;
+public class MessageDTO {
+    private String role;
+    private String content;
 
 }
