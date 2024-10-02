@@ -127,4 +127,11 @@ public class SwaggerConfig {
                 .pathsToMatch("/place/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi QuestionApi() {
+        return GroupedOpenApi.builder()
+                .group("질문")
+                .pathsToMatch("/question/**")
+                .build();
+    }
 }

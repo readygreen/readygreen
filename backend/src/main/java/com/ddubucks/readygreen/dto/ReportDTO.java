@@ -11,6 +11,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class ReportDTO {
+
     private Long id;
     private Integer blinkerId;
     private LocalTime greenStartTime;

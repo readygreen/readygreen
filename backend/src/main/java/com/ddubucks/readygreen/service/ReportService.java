@@ -98,7 +98,6 @@ public class ReportService {
 
     private ReportDTO mapToReportDTO(Report report) {
         ReportDTO reportDTO = new ReportDTO();
-        reportDTO.setId(report.getId());
         reportDTO.setBlinkerId(report.getBlinker().getId());
         reportDTO.setGreenStartTime(report.getGreenStartTime());
         reportDTO.setRedStartTime(report.getRedStartTime());

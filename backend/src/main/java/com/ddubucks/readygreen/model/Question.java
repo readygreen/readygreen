@@ -4,6 +4,8 @@ import com.ddubucks.readygreen.model.BaseEntity;
 import com.ddubucks.readygreen.model.member.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "question")
@@ -19,6 +21,7 @@ public class Question extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "user_id", nullable = false)
     private Member member;
 

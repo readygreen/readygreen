@@ -11,10 +11,6 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @Builder
 public class QuestionDTO {
-    private Long id;
     private String title;
     private String content;
-    private String reply;
-    private boolean answered;
-    private LocalDateTime createdAt;
 }

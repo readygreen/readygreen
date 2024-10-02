@@ -3,6 +3,8 @@ package com.ddubucks.readygreen.model;
 import jakarta.persistence.*;
 import lombok.*;
 import com.ddubucks.readygreen.model.member.Member;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ public class Steps {
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 

@@ -3,6 +3,8 @@ package com.ddubucks.readygreen.controller;
 import com.ddubucks.readygreen.dto.QuestionDTO;
 import com.ddubucks.readygreen.service.QuestionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,19 +18,19 @@ public class QuestionController {
 
     // 질문 제출 (사용자)
     @PostMapping
-    public QuestionDTO submitQuestion(@RequestParam Integer memberId, @RequestBody QuestionDTO questionDTO) {
-        return questionService.submitQuestion(memberId, questionDTO.getTitle(), questionDTO.getContent());
+    public QuestionDTO submitQuestion(@AuthenticationPrincipal UserDetails userDetails, @RequestBody QuestionDTO questionDTO) {
+        return questionService.submitQuestion(userDetails.getUsername(), questionDTO.getTitle(), questionDTO.getContent());
     }
 
     // 특정 사용자의 질문 조회 (사용자)
-    @GetMapping("/user/{memberId}")
-    public List<QuestionDTO> getQuestionsByMember(@PathVariable Integer memberId) {
-        return questionService.getQuestionsByMember(memberId);
+    @GetMapping("/user")
+    public List<QuestionDTO> getQuestionsByMember(@AuthenticationPrincipal UserDetails userDetails) {
+        return questionService.getQuestionsByMember(userDetails.getUsername());
     }
 
     // 사용자가 답변 완료/미완료에 따라 자신의 질문 조회
-    @GetMapping("/user/{memberId}/status")
-    public List<QuestionDTO> getQuestionsByMemberAndStatus(@PathVariable Integer memberId, @RequestParam boolean answered) {
-        return questionService.getQuestionsByMemberAndStatus(memberId, answered);
+    @GetMapping("/user/status")
+    public List<QuestionDTO> getQuestionsByMemberAndStatus(@AuthenticationPrincipal UserDetails userDetails, @RequestParam boolean answered) {
+        return questionService.getQuestionsByMemberAndStatus(userDetails.getUsername(), answered);
     }
 }
