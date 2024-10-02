@@ -4,6 +4,7 @@ import 'package:readygreen/screens/mypage/feedback.dart';
 import 'package:readygreen/screens/mypage/feedback_list.dart';
 import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
+import 'package:readygreen/widgets/modals/birth_modal.dart';
 import 'package:readygreen/widgets/mypage/cardbox_mypage.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/constants/appcolors.dart';
@@ -32,10 +33,12 @@ class _MyPageState extends State<MyPage> {
 
   Future<void> _getProfile() async {
     final data = await userApi.getProfile();
-    setState(() {
-      profileData = data;
-      isLoading = false; // 데이터 로딩 완료
-    });
+    if (mounted) {
+      setState(() {
+        profileData = data;
+        isLoading = false; // 데이터 로딩 완료
+      });
+    }
   }
 
   Future<void> _handleLogout(BuildContext context) async {
@@ -64,7 +67,7 @@ class _MyPageState extends State<MyPage> {
                     // 프로필 정보
                     CardBox(
                       title: '내 정보',
-                      height: 160,
+                      height: 150,
                       backgroundColor: Colors.white,
                       textColor: Colors.black,
                       child: Row(
@@ -121,25 +124,26 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-// 프로필 정보 섹션
+// 프로필 텍스트 부분
   Widget _buildProfileSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             const Text(
-              '이름   ',
+              '        이름',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               profileData?['nickname'] ?? 'Unknown',
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 16,
               ),
             ),
           ],
@@ -149,12 +153,13 @@ class _MyPageState extends State<MyPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              '이메일   ',
+              '     이메일',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
             ),
+            const SizedBox(width: 8),
             Text(
               profileData?['email'] ?? 'Unknown',
               style: const TextStyle(
@@ -168,12 +173,13 @@ class _MyPageState extends State<MyPage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              '생년월일   ',
+              ' 생년월일',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey,
               ),
             ),
+            const SizedBox(width: 8),
             Row(
               children: [
                 Text(
@@ -182,16 +188,21 @@ class _MyPageState extends State<MyPage> {
                     fontSize: 14,
                   ),
                 ),
-                const SizedBox(width: 5),
-                // IconButton(
-                //   icon: const Icon(
-                //     Icons.edit,
-                //     size: 16,
-                //   ),
-                //   onPressed: () {
-                //     // 생년월일 수정 기능 추가
-                //   },
-                // ),
+                const SizedBox(width: 15),
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const BirthModal();
+                      },
+                    );
+                  },
+                  child: const Icon(
+                    Icons.edit,
+                    size: 16,
+                  ),
+                ),
               ],
             ),
           ],
@@ -301,7 +312,9 @@ class _MyPageState extends State<MyPage> {
           ),
           const SizedBox(height: 10),
           GestureDetector(
-            onTap: () {},
+            onTap: () async {
+              _showDeleteConfirmationDialog(context); // 탈퇴 확인 창 호출
+            },
             child: _buildItem('회원탈퇴'),
           ),
         ],
@@ -315,6 +328,56 @@ class _MyPageState extends State<MyPage> {
       padding: const EdgeInsets.symmetric(vertical: 0.0),
       child: Text(title,
           style: const TextStyle(fontSize: 16, color: AppColors.greytext)),
+    );
+  }
+
+  // 탈퇴 알림창
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 다른 곳을 눌러도 창이 닫히지 않게 설정
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                '정말 탈퇴하시겠습니까?',
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          content: const Text(
+            '회원 정보 및 포인트 등 모든 내역이 삭제됩니다.',
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                '취소',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // 알림창 닫기
+              },
+            ),
+            TextButton(
+              child: const Text(
+                '확인',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () async {
+                Navigator.of(context).pop(); // 알림창 닫기
+                await userApi.deleteUser(); // 탈퇴 API 호출
+                _handleLogout(context); // 로그아웃 처리
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

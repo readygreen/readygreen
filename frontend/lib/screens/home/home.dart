@@ -92,20 +92,45 @@ class _HomePageContentState extends State<HomePageContent> {
     return formatter.format(now);
   }
 
-  // 운세 요청
+// 운세 요청
   Future<void> _storeFortune() async {
     final String currentDate = _getCurrentDate();
     final String? storedDate = await storage.read(key: 'fortuneDate');
+    final String? storedFortune = await storage.read(key: 'fortune');
 
-    if (storedDate != currentDate) {
+    // 현재 날짜와 저장 날짜가 다를때
+    if (currentDate != storedDate) {
+      print('현재날짜 $currentDate // 저장날짜 $storedDate');
       final fortune = await api.getFortune();
       if (fortune != null) {
+        // 운세가 정상적으로 반환되면 스토리지에 저장
         await storage.write(key: 'fortune', value: fortune);
         await storage.write(key: 'fortuneDate', value: currentDate); // 현재 날짜 저장
-        print('운세 저장 완료: $fortune');
+
+        // 저장 후 데이터를 읽어와서 확인
+        final String? savedFortune = await storage.read(key: 'fortune');
+        final String? savedDate = await storage.read(key: 'fortuneDate');
+        print('저장 후 운세: $savedFortune');
+        print('저장 후 날짜: $savedDate');
       }
     } else {
-      print('오늘은 이미 운세를 받았습니다.');
+      if (storedFortune != null && storedFortune.contains('생일 정보가 없습니다')) {
+        final fortune = await api.getFortune();
+        if (fortune != null) {
+          // 운세가 정상적으로 반환되면 스토리지에 저장
+          await storage.write(key: 'fortune', value: fortune);
+          await storage.write(
+              key: 'fortuneDate', value: currentDate); // 현재 날짜 저장
+
+          // 저장 후 데이터를 읽어와서 확인
+          final String? savedFortune = await storage.read(key: 'fortune');
+          final String? savedDate = await storage.read(key: 'fortuneDate');
+          print('저장 후 운세: $savedFortune');
+          print('저장 후 날짜: $savedDate');
+        }
+      } else {
+        print('이미 운세를 받았습니다');
+      }
     }
   }
 
@@ -138,11 +163,12 @@ class _HomePageContentState extends State<HomePageContent> {
         var weatherResponse = await api.getWeather(latitude, longitude);
 
         if (weatherResponse != null) {
-          setState(() {
-            print(weatherResponse);
-            weatherData = List<Map<String, dynamic>>.from(weatherResponse);
-          });
-
+          if (mounted) {
+            setState(() {
+              print(weatherResponse);
+              weatherData = List<Map<String, dynamic>>.from(weatherResponse);
+            });
+          }
           String weatherJson = jsonEncode(weatherData);
           await storage.write(key: 'weather', value: weatherJson);
           await storage.write(key: 'weatherHour', value: currentHour);

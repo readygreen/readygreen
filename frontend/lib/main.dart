@@ -71,7 +71,7 @@ class App extends StatelessWidget {
         title: 'Flutter Navigation Example',
         theme: ThemeData(
           fontFamily: 'CustomFont',
-          primarySwatch: Colors.green,
+          // primarySwatch: Colors.green,
         ),
         initialRoute: '/',
         routes: {

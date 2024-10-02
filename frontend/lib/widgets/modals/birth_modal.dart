@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/api/main_api.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:intl/intl.dart'; // 날짜 포맷을 위해 추가
+import 'package:readygreen/api/user_api.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class BirthModal extends StatefulWidget {
   const BirthModal({Key? key}) : super(key: key);
@@ -10,6 +14,9 @@ class BirthModal extends StatefulWidget {
 
 class _BirthModalState extends State<BirthModal> {
   DateTime _selectedDate = DateTime.now();
+  final FlutterSecureStorage storage = FlutterSecureStorage();
+  final NewUserApi userApi = NewUserApi();
+  final NewMainApi mainApi = NewMainApi();
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +68,20 @@ class _BirthModalState extends State<BirthModal> {
                 const SizedBox(height: 20),
                 // 등록 버튼
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(_selectedDate);
+                  onPressed: () async {
+                    // 날짜를 yyyy-MM-dd 형식으로 변환
+                    String formattedDate =
+                        DateFormat('yyyy-MM-dd').format(_selectedDate);
+                    print(formattedDate);
+                    try {
+                      // API 요청
+                      await userApi.updateBirth(formattedDate);
+
+                      Navigator.of(context).pop(_selectedDate);
+                    } catch (e) {
+                      // 오류 처리
+                      print('생일 업데이트 실패: $e');
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.green,
