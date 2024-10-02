@@ -54,34 +54,6 @@ class MapStartAPI {
     }
   }
 
-  // 길안내 정보 요청 (GET)
-  Future<Map<String, dynamic>?> fetchGuide() async {
-    String? accessToken = await storage.read(key: 'accessToken');
-
-    if (accessToken == null) {
-      print('엑세스 토큰이 없습니다.');
-      return null;
-    }
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/map/guide'),
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': '*/*',
-        'Authorization': 'Bearer $accessToken',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      print('길안내 정보 조회 성공');
-      return jsonDecode(response.body);
-    } else {
-      print('길안내 정보 조회 실패: ${response.statusCode}');
-      print('Response body: ${response.body}');
-      return null;
-    }
-  }
-
   // 즐겨찾기 목록 조회 (GET)
   Future<List<dynamic>?> fetchBookmarks() async {
     final response = await http.get(
@@ -223,7 +195,7 @@ class MapStartAPI {
 
     if (response.statusCode == 200) {
       print('길안내 정보 조회 성공');
-      return jsonDecode(response.body);
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } else {
       print('길안내 정보 조회 실패: ${response.statusCode}');
       return null;

@@ -23,14 +23,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: const HomePageContent(),
+    return const Scaffold(
+      body: HomePageContent(),
     );
   }
 }
 
 class HomePageContent extends StatefulWidget {
-  const HomePageContent({Key? key}) : super(key: key);
+  const HomePageContent({super.key});
 
   @override
   _HomePageContentState createState() => _HomePageContentState();
@@ -38,7 +38,7 @@ class HomePageContent extends StatefulWidget {
 
 class _HomePageContentState extends State<HomePageContent> {
   final NewMainApi api = NewMainApi();
-  final FlutterSecureStorage storage = FlutterSecureStorage();
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
 
@@ -123,7 +123,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
   Future<void> _storeWeather() async {
     // 현재 시간 비교
-    final String? currentHour = _getCurrentHour();
+    final String currentHour = _getCurrentHour();
     final String? storedHour = await storage.read(key: 'weatherHour');
 
     // 스토리지에서 저장된 위도와 경도 읽기
@@ -220,12 +220,12 @@ class _HomePageContentState extends State<HomePageContent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 35),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: const [
+                  children: [
                     Text(
                       '언제그린',
                       style: TextStyle(
@@ -257,7 +257,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       title: '현재 날씨',
                       textColor: Colors.black,
                       imageUrl: currentWeatherImage, // 날씨 아이콘 변경
-                      backgroundGradient: LinearGradient(
+                      backgroundGradient: const LinearGradient(
                         colors: [AppColors.weaherblue, AppColors.white],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -278,7 +278,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         },
                       );
                     },
-                    child: SquareCardBox(
+                    child: const SquareCardBox(
                       title: '오늘의 운세',
                       backgroundColor: AppColors.darkblue,
                       textColor: AppColors.white,
@@ -289,8 +289,8 @@ class _HomePageContentState extends State<HomePageContent> {
               ],
             ),
             const SizedBox(height: 16),
-            Column(
-              children: const [
+            const Column(
+              children: [
                 CardBox(title: '자주가는목적지', height: 180),
               ],
             ),
@@ -299,9 +299,9 @@ class _HomePageContentState extends State<HomePageContent> {
             const SizedBox(height: 16),
             const CardBox(title: '주변 장소'),
             const SizedBox(height: 16),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: const [
+              children: [
                 CustomButton(),
               ],
             ),

@@ -246,6 +246,41 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             ),
           },
         ),
+        // DraggableScrollableSheet 추가
+        DraggableScrollableSheet(
+          initialChildSize: 0.3, // 처음 나타나는 크기
+          minChildSize: 0.1, // 최소 크기
+          maxChildSize: 0.6, // 최대 크기
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6.0,
+                    spreadRadius: 2.0,
+                  ),
+                ],
+              ),
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: 5, // 예시 경로 설명 개수
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading:
+                        const Icon(Icons.directions, color: AppColors.green),
+                    title: Text('경로 설명 $index'),
+                    subtitle: Text('${(index + 1) * 100} m'),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+
         Positioned(
           top: screenHeight * 0.8,
           right: screenWidth * 0.05,

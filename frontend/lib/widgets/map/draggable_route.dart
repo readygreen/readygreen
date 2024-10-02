@@ -13,8 +13,8 @@ class DraggableRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.04,
-      minChildSize: 0.04, // 최소 높이
+      initialChildSize: 0.05,
+      minChildSize: 0.05, // 최소 높이
       maxChildSize: 0.85, // 최대 높이
       builder: (BuildContext context, ScrollController scrollController) {
         return Container(

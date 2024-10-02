@@ -74,9 +74,11 @@ class _MapPageState extends State<MapPage> {
       longitude: longitude,
       markers: _trafficLightMarkers,
       onMarkersUpdated: (newMarkers) {
-        setState(() {
-          _trafficLightMarkers.addAll(newMarkers); // 기존 신호등 마커 업데이트
-        });
+        if (mounted) {
+          setState(() {
+            _trafficLightMarkers.addAll(newMarkers); // 기존 신호등 마커 업데이트
+          });
+        }
       },
     );
   }
