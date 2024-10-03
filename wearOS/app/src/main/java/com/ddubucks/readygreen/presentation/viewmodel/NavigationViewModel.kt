@@ -25,11 +25,10 @@ class NavigationViewModel : ViewModel() {
     private var route: List<Feature>? = null
 
 
-    // 네비게이션을 시작
+    // 네비게이션 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
         locationService = LocationService(context)
 
-        // 목적지 이름을 NavigationState에 저장
         _navigationState.value = _navigationState.value.copy(destinationName = name)
 
         // 위치 권한 확인
@@ -38,7 +37,7 @@ class NavigationViewModel : ViewModel() {
             locationService?.getLastLocation { location ->
                 if (location != null) {
                     Log.d("NavigationViewModel", "Current Location: ${location.latitude}, ${location.longitude}")
-                    initiateNavigation(context, location.latitude, location.longitude, lat, lng, name)
+                    initiateNavigation(location.latitude, location.longitude, lat, lng, name)
                 } else {
                     Log.d("NavigationViewModel", "Failed to get current location")
                     _navigationState.value = NavigationState(isNavigating = false)
@@ -51,7 +50,7 @@ class NavigationViewModel : ViewModel() {
     }
 
 
-    private fun initiateNavigation(context: Context, curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
+    private fun initiateNavigation(curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
         val navigationApi = RestClient.createService(NavigationApi::class.java)
         val navigationRequest = NavigationRequest(
             startX = roundToSix(curLng),
@@ -92,23 +91,21 @@ class NavigationViewModel : ViewModel() {
             response.body()?.let { navigationResponse ->
 
                 Log.d("NavigationViewModel", "Received route data: ${navigationResponse.routeDTO.features}")
-                route = navigationResponse.routeDTO.features  // 경로 데이터를 저장
+                route = navigationResponse.routeDTO.features
 
                 // 네비게이션 활성화 시 위치 업데이트 빈도 및 정확도 조정
                 locationService?.adjustLocationRequest(
                     priority = Priority.PRIORITY_HIGH_ACCURACY,
-                    interval = 5000 // 5초 간격
+                    interval = 5000
                 )
 
-                // 위치 업데이트를 시작 -> 네비게이션 상태 업데이트
                 locationService?.startLocationUpdates { location -> updateNavigation(location) }
 
-                // distance와 time 정보를 포함해 네비게이션 상태 업데이트
                 _navigationState.value = _navigationState.value.copy(
                     isNavigating = true,
-                    destinationName = _navigationState.value.destinationName ?: "Green Browne", // 목적지 이름이 없으면 기본값 설정
-                    remainingDistance = navigationResponse.distance,  // 총 거리 정보 업데이트
-                    startTime = navigationResponse.time  // 출발 시간 정보 업데이트
+                    destinationName = _navigationState.value.destinationName ?: "Green Browne",
+                    remainingDistance = navigationResponse.distance,
+                    startTime = navigationResponse.time
                 )
             }
         } else {
@@ -159,23 +156,22 @@ class NavigationViewModel : ViewModel() {
                 }
             }
 
-            // 최종 목적지에 도착 확인
+            // 최종 목적지에 도착시 네비게이션 완료
             if (hasReachedDestination(routeFeatures.last(), currentLat, currentLng)) {
                 Log.d("NavigationViewModel", "Reached destination")
-                finishNavigation()  // 도착 시 네비게이션 완료
+                finishNavigation()
             }
         }
     }
 
 
-    // 최종 목적지까지의 거리를 계산하여 도착 여부를 확인
+    // 도착 여부를 확인
     private fun hasReachedDestination(feature: Feature, currentLat: Double, currentLng: Double): Boolean {
         val destinationLat: Double
         val destinationLng: Double
 
         when (feature.geometry.type) {
             "Point" -> {
-                // Point 타입 좌표 처리
                 val coordinates = feature.geometry.getCoordinatesAsDoubleArray()
                 if (coordinates != null && coordinates.size >= 2) {
                     destinationLat = coordinates[1]
@@ -188,7 +184,7 @@ class NavigationViewModel : ViewModel() {
             "LineString" -> {
                 val coordinates = feature.geometry.getCoordinatesAsLineString()
                 if (coordinates != null && coordinates.isNotEmpty()) {
-                    val lastPoint = coordinates.last() // 마지막 좌표 사용
+                    val lastPoint = coordinates.last()
                     destinationLat = lastPoint[1]
                     destinationLng = lastPoint[0]
                 } else {
@@ -204,13 +200,43 @@ class NavigationViewModel : ViewModel() {
 
         // 목적지와 현재 위치 사이 거리 계산
         val distance = calculateDistance(currentLat, currentLng, destinationLat, destinationLng)
-        return distance < 5 // 5미터 이내면 도착으로 간주
+        return distance < 5
     }
 
 
     // 네비게이션 완료
     fun finishNavigation() {
+        val currentState = navigationState.value
 
+        val request = NavigationfinishRequest(
+            distance = currentState.remainingDistance ?: 0.0,
+            startTime = currentState.startTime ?: "",
+            watch = true
+        )
+
+        val navigationApi = RestClient.createService(NavigationApi::class.java)
+        navigationApi.finishNavigation(request).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Log.d("NavigationViewModel", "길안내 완료 성공")
+
+                    _navigationState.value = _navigationState.value.copy(
+                        isNavigating = false,
+                        destinationName = null,
+                        currentDescription = null,
+                        nextDirection = null
+                    )
+
+                    locationService?.stopLocationUpdates()
+                } else {
+                    Log.d("NavigationViewModel", "길안내 완료 실패: ${response.errorBody()?.string()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.d("NavigationViewModel", "길안내 완료 실패: ${t.message}")
+            }
+        })
     }
 
 
@@ -221,10 +247,9 @@ class NavigationViewModel : ViewModel() {
         viewModelScope.launch {
             navigationApi.stopNavigation(isWatch = true).enqueue(object : Callback<Void> {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                    if (response.isSuccessful) {  // HTTP 상태 코드가 200~299 범위에 속하는 경우
+                    if (response.isSuccessful) {
                         Log.d("NavigationViewModel", "길안내 중단 성공")
 
-                        // 상태 업데이트
                         _navigationState.value = _navigationState.value.copy(
                             isNavigating = false,
                             destinationName = null,
@@ -232,7 +257,6 @@ class NavigationViewModel : ViewModel() {
                             nextDirection = null
                         )
 
-                        // 위치 업데이트 중단
                         locationService?.stopLocationUpdates()
 
                         Log.d("NavigationViewModel", "길안내 중단 상태반영 완료. 길안내 상태: ${_navigationState.value.isNavigating}")
