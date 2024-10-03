@@ -63,7 +63,6 @@ class MapViewModel : ViewModel() {
                         }
                         _mapData.value = mapResponse.copy(blinkerDTOs = updatedBlinkers)
                     }
-
                     delay(1000L)
                 }
             }

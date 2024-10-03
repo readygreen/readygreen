@@ -10,3 +10,6 @@ data class NavigationRequest(
     val watch: Boolean
 )
 
+data class NavigationfinishRequest(
+    val isWatch: Boolean
+)

@@ -15,6 +15,7 @@ import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.data.model.ButtonModel
 import com.ddubucks.readygreen.presentation.components.ButtonItem
+import com.ddubucks.readygreen.presentation.components.ModalItem
 import com.ddubucks.readygreen.presentation.retrofit.search.SearchCandidate
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.White
@@ -30,6 +31,8 @@ fun SearchResultScreen(
 ) {
 
     val context = LocalContext.current
+    var showConfirmationDialog by remember { mutableStateOf(false) }
+    var selectedPlace by remember { mutableStateOf<SearchCandidate?>(null) }
 
     val searchResults = navController.previousBackStackEntry
         ?.savedStateHandle
@@ -80,14 +83,8 @@ fun SearchResultScreen(
 
             items(searchResults) { result ->
                 ButtonItem(item = ButtonModel(result.name), onClick = {
-                    val name = result.name
-                    val lat = result.geometry.location.lat
-                    val lng = result.geometry.location.lng
-
-                    navigationViewModel.startNavigation(context, lat, lng, name)
-                    navController.navigate("navigationScreen") {
-                        popUpTo("mainScreen") { inclusive = false }
-                    }
+                    selectedPlace = result
+                    showConfirmationDialog = true
                 })
             }
             item {
@@ -96,5 +93,30 @@ fun SearchResultScreen(
                 })
             }
         }
+    }
+
+    if (showConfirmationDialog && selectedPlace != null) {
+        ModalItem(
+            title = "길 안내 시작",
+            message = "${selectedPlace?.name}로 길 안내를 시작하시겠습니까?",
+            onConfirm = {
+                val place = selectedPlace
+                if (place != null) {
+                    navigationViewModel.startNavigation(
+                        context,
+                        place.geometry.location.lat,
+                        place.geometry.location.lng,
+                        place.name
+                    )
+                    navController.navigate("navigationScreen") {
+                        popUpTo("mainScreen") { inclusive = false }
+                    }
+                }
+                showConfirmationDialog = false
+            },
+            onCancel = {
+                showConfirmationDialog = false
+            }
+        )
     }
 }

@@ -139,8 +139,8 @@ class NavigationViewModel : ViewModel() {
                     else -> null
                 }
 
-                if (distance != null && distance < 50) {
-                    // 특정 지점에 50미터 이내로 접근했을 때 상태 업데이트
+                if (distance != null && distance < 5) {
+                    // 특정 지점에 5미터 이내로 접근했을 때 상태 업데이트
                     Log.d("NavigationViewModel", "Within 50 meters of feature: ${feature.properties.name}")
                     _navigationState.value = _navigationState.value.copy(
                         isNavigating = true,
@@ -197,7 +197,7 @@ class NavigationViewModel : ViewModel() {
 
         // 목적지와 현재 위치 사이 거리 계산
         val distance = calculateDistance(currentLat, currentLng, destinationLat, destinationLng)
-        return distance < 50 // 50미터 이내면 도착으로 간주
+        return distance < 5 // 5미터 이내면 도착으로 간주
     }
 
     // 네비게이션 완료
