@@ -53,6 +53,19 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
+  Future<void> _openBirthModal() async {
+    DateTime? selectedDate = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        return const BirthModal();
+      },
+    );
+
+    if (selectedDate != null) {
+      await _getProfile();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -190,14 +203,7 @@ class _MyPageState extends State<MyPage> {
                 ),
                 const SizedBox(width: 15),
                 InkWell(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return const BirthModal();
-                      },
-                    );
-                  },
+                  onTap: _openBirthModal,
                   child: const Icon(
                     Icons.edit,
                     size: 16,
@@ -313,8 +319,7 @@ class _MyPageState extends State<MyPage> {
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () async {
-              await userApi.deleteUser();
-              _handleLogout(context);
+              _showDeleteConfirmationDialog(context); // 탈퇴 확인 창 호출
             },
             child: _buildItem('회원탈퇴'),
           ),
@@ -329,6 +334,63 @@ class _MyPageState extends State<MyPage> {
       padding: const EdgeInsets.symmetric(vertical: 0.0),
       child: Text(title,
           style: const TextStyle(fontSize: 16, color: AppColors.greytext)),
+    );
+  }
+
+  // 탈퇴 알림창
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // 다른 곳을 눌러도 창이 닫히지 않게 설정
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              const SizedBox(height: 20),
+              const Text(
+                '정말 탈퇴하시겠습니까?',
+                style: TextStyle(fontSize: 20),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          content: const Text(
+            '회원 정보 및 포인트 등 모든 내역이 삭제됩니다.',
+            textAlign: TextAlign.center,
+          ),
+          backgroundColor: Colors.white,
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                '취소',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                if (mounted) {
+                  Navigator.of(context).pop(); // 알림창 닫기
+                }
+              },
+            ),
+            TextButton(
+              child: const Text(
+                '확인',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () async {
+                if (mounted) {
+                  Navigator.of(context).pop(); // 알림창 닫기
+                }
+
+                await userApi.deleteUser(); // 탈퇴 API 호출
+                if (mounted) {
+                  _handleLogout(context); // 로그아웃 처리
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

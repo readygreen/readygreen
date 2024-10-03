@@ -110,6 +110,9 @@ flutter:
     - assets/images/walk.png
     - assets/images/coin.png
     - assets/images/coins.png
+    - assets/images/icon.png
+    - assets/images/map.png
+    - assets/images/kakao.png
     - assets/images/luck.png
     - assets/images/mic.png
     - assets/images/badge.png
