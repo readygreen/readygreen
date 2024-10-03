@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'dart:async'; // Timer를 사용하기 위해 추가
 import 'package:readygreen/widgets/modals/birth_modal.dart';
 
 class FortuneModal extends StatefulWidget {
-  const FortuneModal({Key? key}) : super(key: key);
-
   @override
   _FortuneModalState createState() => _FortuneModalState();
 }
 
 class _FortuneModalState extends State<FortuneModal> {
-  String fortune = 'Loading...'; // 로딩 중일 때 표시할 기본 값
+  bool isLoadingFortune = true; // 운세 로딩 상태를 전달받음
+  String fortune = '로딩 중...'; // 로딩 중일 때 표시할 기본 값
   String? fortuneWork;
   String? fortuneLove;
   String? fortuneHealth;
@@ -19,6 +19,7 @@ class _FortuneModalState extends State<FortuneModal> {
   String? fortuneLuckyNumber;
   String? closingMessage; // 마지막 문장 저장 변수
   String? birthdayMessage; // 생일 메시지 변수
+  Timer? _fortuneTimer;
 
   final storage = FlutterSecureStorage();
 
@@ -28,29 +29,50 @@ class _FortuneModalState extends State<FortuneModal> {
     _loadStoreFortune(); // 운세 불러오기
   }
 
-  // 로컬 스토리지에서 운세 데이터를 불러오는 함수
+  @override
+  void dispose() {
+    // 타이머가 실행 중이면 종료
+    _fortuneTimer?.cancel(); // 타이머를 중지하여 위젯이 사라진 후에도 setState()가 호출되지 않도록 합니다.
+    super.dispose();
+  }
+
   Future<void> _loadStoreFortune() async {
-    setState(() {
-      fortune = '로딩 중...'; // 로딩 중일 때 표시할 텍스트
-    });
+    // 기존 타이머가 실행 중이면 종료
+    _fortuneTimer?.cancel();
 
-    final storedFortune = await storage.read(key: 'fortune'); // 저장된 운세 불러오기
-    print(storedFortune);
+    _fortuneTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
+      var storedFortune = await storage.read(key: 'fortune');
+      print('운세모달정보: $storedFortune');
 
-    if (storedFortune != null) {
-      // 생일 정보가 없을 경우의 처리
-      if (storedFortune.contains('생일 정보가 없습니다')) {
-        setState(() {
-          birthdayMessage = '생일 정보가 없습니다.';
-        });
+      if (storedFortune != null) {
+        // 생일 정보가 없는 경우
+        if (storedFortune == '111') {
+          if (mounted) {
+            setState(() {
+              birthdayMessage = '생일 정보가 없습니다.';
+              isLoadingFortune = false; // 로딩 상태를 종료
+            });
+          }
+          timer.cancel(); // 타이머 종료
+          _fortuneTimer = null; // 타이머 리셋
+        }
+        // 운세 정보가 있는 경우
+        else {
+          timer.cancel(); // 타이머 종료
+          _fortuneTimer = null; // 타이머 리셋
+          if (mounted) {
+            _parseFortune(storedFortune); // mounted 상태에서만 실행
+          }
+        }
       } else {
-        _parseFortune(storedFortune); // 파싱 함수 호출
+        // 운세 요청 중인 경우 로딩 상태 유지
+        if (mounted) {
+          setState(() {
+            isLoadingFortune = true;
+          });
+        }
       }
-    } else {
-      setState(() {
-        fortune = '운세 정보를 불러올 수 없습니다.'; // 운세가 없을 때 메시지
-      });
-    }
+    });
   }
 
   // 운세 데이터를 카테고리별로 파싱하는 함수
@@ -73,6 +95,7 @@ class _FortuneModalState extends State<FortuneModal> {
       // 총운 값 추출
       closingMessage = closingMessageExp.firstMatch(fortuneText)?.group(1) ??
           '행운이 가득한 하루 보내세요!';
+      isLoadingFortune = false;
     });
   }
 
@@ -104,8 +127,18 @@ class _FortuneModalState extends State<FortuneModal> {
                     ),
                   ),
 
-                  // 생일 정보가 없는 경우 메시지 표시
-                  if (birthdayMessage != null) ...[
+                  // 로딩 중일 때
+                  if (isLoadingFortune) ...[
+                    const SizedBox(height: 30),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 20),
+                    const Text(
+                      '운세를 불러오는 중입니다...',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 30),
+                  ] else if (birthdayMessage != null) ...[
+                    // 생일 정보가 없는 경우 메시지 표시
                     const SizedBox(height: 30),
                     Image.asset(
                       'assets/images/nobirth.png',
@@ -120,22 +153,27 @@ class _FortuneModalState extends State<FortuneModal> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      '이용을 원하시면 생일 등록 후 \n새로고침 해주세요!',
+                      '이용을 원하시면 생일 등록 후 \n이용 해주세요!',
                       style: const TextStyle(
                         fontSize: 14,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-                    // '등록하러가기' 버튼
+                    // 생일 등록 모달 열기
                     ElevatedButton(
-                      onPressed: () {
-                        showDialog(
+                      onPressed: () async {
+                        bool? isBirthRegistered = await showDialog<bool>(
                           context: context,
                           builder: (BuildContext context) {
                             return const BirthModal();
                           },
                         );
+
+                        // 생일이 등록되었으면 운세 다시 요청
+                        if (isBirthRegistered == true) {
+                          await _loadStoreFortune();
+                        }
                       },
                       child: const Text(
                         '등록하러 가기',
@@ -150,7 +188,6 @@ class _FortuneModalState extends State<FortuneModal> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 30),
                   ] else ...[
                     const SizedBox(height: 16),

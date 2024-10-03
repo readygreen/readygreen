@@ -41,6 +41,7 @@ class _HomePageContentState extends State<HomePageContent> {
   final FlutterSecureStorage storage = FlutterSecureStorage();
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
+  bool isLoadingFortune = false; // 운세 로딩중
 
   @override
   void initState() {
@@ -92,44 +93,63 @@ class _HomePageContentState extends State<HomePageContent> {
     return formatter.format(now);
   }
 
-// 운세 요청
+// 운세 요청 및 저장
   Future<void> _storeFortune() async {
+    setState(() {
+      isLoadingFortune = true; // 운세 로딩 시작
+    });
+
     final String currentDate = _getCurrentDate();
     final String? storedDate = await storage.read(key: 'fortuneDate');
     final String? storedFortune = await storage.read(key: 'fortune');
 
-    // 현재 날짜와 저장 날짜가 다를때
     if (currentDate != storedDate) {
       print('현재날짜 $currentDate // 저장날짜 $storedDate');
       final fortune = await api.getFortune();
       if (fortune != null) {
-        // 운세가 정상적으로 반환되면 스토리지에 저장
-        await storage.write(key: 'fortune', value: fortune);
-        await storage.write(key: 'fortuneDate', value: currentDate); // 현재 날짜 저장
-
-        // 저장 후 데이터를 읽어와서 확인
-        final String? savedFortune = await storage.read(key: 'fortune');
-        final String? savedDate = await storage.read(key: 'fortuneDate');
-        print('저장 후 운세: $savedFortune');
-        print('저장 후 날짜: $savedDate');
-      }
-    } else {
-      if (storedFortune != null && storedFortune.contains('생일 정보가 없습니다')) {
-        final fortune = await api.getFortune();
-        if (fortune != null) {
+        if (fortune.contains('생일 정보가 없습니다')) {
+          await storage.write(key: 'fortune', value: '111');
+          print('운세1 $fortune');
+          setState(() {
+            isLoadingFortune = false; // 로딩 종료
+          });
+        } else {
           // 운세가 정상적으로 반환되면 스토리지에 저장
           await storage.write(key: 'fortune', value: fortune);
+          print('운세2 $fortune');
           await storage.write(
               key: 'fortuneDate', value: currentDate); // 현재 날짜 저장
-
-          // 저장 후 데이터를 읽어와서 확인
-          final String? savedFortune = await storage.read(key: 'fortune');
-          final String? savedDate = await storage.read(key: 'fortuneDate');
-          print('저장 후 운세: $savedFortune');
-          print('저장 후 날짜: $savedDate');
+          setState(() {
+            isLoadingFortune = false; // 로딩 종료
+          });
+        }
+      }
+    } else {
+      if (storedFortune == '111') {
+        final fortune = await api.getFortune();
+        if (fortune != null) {
+          if (fortune.contains('생일 정보가 없습니다')) {
+            await storage.write(key: 'fortune', value: '111');
+            print('운세3 $fortune');
+            setState(() {
+              isLoadingFortune = false; // 로딩 종료
+            });
+          } else {
+            // 운세가 정상적으로 반환되면 스토리지에 저장
+            await storage.write(key: 'fortune', value: fortune);
+            print('운세4 $fortune');
+            await storage.write(
+                key: 'fortuneDate', value: currentDate); // 현재 날짜 저장
+            setState(() {
+              isLoadingFortune = false; // 로딩 종료
+            });
+          }
         }
       } else {
         print('이미 운세를 받았습니다');
+        setState(() {
+          isLoadingFortune = false; // 로딩 종료
+        });
       }
     }
   }
@@ -300,7 +320,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return const FortuneModal();
+                          return FortuneModal();
                         },
                       );
                     },
