@@ -38,7 +38,7 @@ class CardboxMypage extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                title, // title이 이미 Widget이므로 Text로 감싸지 않음
+                title,
                 const SizedBox(
                   height: 10,
                 ),

@@ -10,6 +10,7 @@ import 'package:readygreen/widgets/map/mapsearchbar.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/draggable_favorites.dart';
 import 'package:readygreen/widgets/map/placecard.dart';
+import 'package:readygreen/widgets/map/trafficlight.dart'; // trafficlight.dart 추가
 import 'package:readygreen/screens/map/mapsearch.dart';
 import 'package:readygreen/provider/current_location.dart';
 import 'package:provider/provider.dart';
@@ -27,8 +28,11 @@ class _MapPageState extends State<MapPage> {
   late GoogleMapController mapController;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
-  final Set<Marker> _markers = {};
-  final Set<Circle> _circles = {}; // Circle set 추가
+
+  final Set<Marker> _placeMarkers = {}; // 장소 선택 마커
+  final Set<Marker> _trafficLightMarkers = {}; // 신호등 마커
+  final TrafficLightService _trafficLightService =
+      TrafficLightService(); // 신호등 서비스 추가
 
   String _selectedPlaceName = ''; // 선택된 장소 이름
   String _selectedAddress = ''; // 선택된 주소
@@ -45,10 +49,8 @@ class _MapPageState extends State<MapPage> {
           Provider.of<CurrentLocationProvider>(context, listen: false);
       await locationProvider.updateLocation();
       // 신호등 정보 요청
-      _fetchTrafficLightInfo(
-        locationProvider.currentPosition!.latitude,
-        locationProvider.currentPosition!.longitude,
-      );
+      _updateTrafficLights(locationProvider.currentPosition!.latitude,
+          locationProvider.currentPosition!.longitude);
     });
   }
 
@@ -57,66 +59,29 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _checkIsGuide() async {
-  if(await mapStartAPI.checkIsGuide()){
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MapDirectionPage()),
-    );}
-  }
-  // 신호등 정보를 받아와 지도에 동그라미로 표시하는 함수
-  Future<void> _fetchTrafficLightInfo(double latitude, double longitude) async {
-    const int radius = 500; // 반경 500미터로 설정(임의)
-
-    final MapStartAPI api = MapStartAPI(); // MapStartAPI 클래스 인스턴스 생성
-    final List<dynamic>? trafficLightData = await api.fetchBlinkerInfo(
-      latitude: latitude,
-      longitude: longitude,
-      radius: radius,
-    );
-
-    if (trafficLightData != null) {
-      print('신호등 데이터: $trafficLightData');
-
-      // 지도에 동그라미 추가
-      setState(() {
-        _circles.clear();
-        for (var trafficLight in trafficLightData) {
-          double lat = trafficLight['latitude'];
-          double lng = trafficLight['longitude'];
-          String currentState = trafficLight['currentState'];
-          int remainingTime = trafficLight['remainingTime'];
-
-          // currentState에 따른 색상 설정
-          Color circleColor;
-          if (currentState == "RED") {
-            circleColor = AppColors.red;
-          } else if (currentState == "GREEN") {
-            circleColor = AppColors.green;
-          } else {
-            circleColor = AppColors.grey; // 상태가 없을 때 기본 회색
-          }
-
-          // 지도에 동그라미 추가
-          _circles.add(
-            Circle(
-              circleId: CircleId(trafficLight['id'].toString()),
-              center: LatLng(lat, lng),
-              radius: 4, // 동그라미 반경
-              fillColor: circleColor,
-              strokeColor: circleColor,
-              strokeWidth: 2,
-            ),
-          );
-          print(
-              '신호등 ${trafficLight['id']} 남은 시간: $remainingTime초, 상태: $currentState');
-        }
-      });
-    } else {
-      print('신호등 데이터를 가져오지 못했습니다.');
+    if (await mapStartAPI.checkIsGuide()) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MapDirectionPage()),
+      );
     }
   }
 
-  // 새로운 장소로 이동하고 마커 추가하는 함수
+  // 신호등 정보를 업데이트하는 함수
+  Future<void> _updateTrafficLights(double latitude, double longitude) async {
+    await _trafficLightService.addTrafficLightsToMap(
+      latitude: latitude,
+      longitude: longitude,
+      markers: _trafficLightMarkers,
+      onMarkersUpdated: (newMarkers) {
+        setState(() {
+          _trafficLightMarkers.addAll(newMarkers); // 기존 신호등 마커 업데이트
+        });
+      },
+    );
+  }
+
+  // 새로운 장소로 이동하고 장소 선택 마커 추가하는 함수
   void _goToPlace(
       double lat, double lng, String placeName, String address) async {
     final GoogleMapController controller = await _controller.future;
@@ -124,10 +89,10 @@ class _MapPageState extends State<MapPage> {
     // 지도 이동
     controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
 
-    // 마커 추가
+    // 장소 선택 마커 추가
     setState(() {
-      _markers.clear();
-      _markers.add(
+      _placeMarkers.clear(); // 이전 장소 선택 마커 제거 (항상 1개 유지)
+      _placeMarkers.add(
         Marker(
           markerId: MarkerId(placeName),
           position: LatLng(lat, lng),
@@ -139,9 +104,6 @@ class _MapPageState extends State<MapPage> {
       _selectedLat = lat; // 선택된 위도 업데이트
       _selectedLng = lng; // 선택된 경도 업데이트
     });
-
-    // 신호등 정보 요청 및 동그라미 추가
-    _fetchTrafficLightInfo(lat, lng);
   }
 
   @override
@@ -169,19 +131,20 @@ class _MapPageState extends State<MapPage> {
                   compassEnabled: true,
                   zoomControlsEnabled: false,
                   mapToolbarEnabled: false,
-                  markers: _markers,
-                  circles: _circles, // 추가된 동그라미들
+                  markers: _trafficLightMarkers
+                      .union(_placeMarkers), // 신호등 마커와 장소 마커 모두 표시
                   onTap: (LatLng tappedLocation) {
-                    if (_markers.isNotEmpty) {
-                      setState(() {
-                        _markers.clear(); // 기존 마커 제거
-                        _selectedPlaceName = ''; // 장소 이름 초기화
-                        _selectedAddress = ''; // 주소 초기화
-                      });
-                    } else {
-                      // 클릭한 위치에 마커 추가
-                      _addMarkerWithPlaceName(tappedLocation);
-                    }
+                    setState(() {
+                      if (_placeMarkers.isNotEmpty) {
+                        // 장소 선택 마커가 있을 경우 마커를 제거
+                        _placeMarkers.clear();
+                        _selectedPlaceName = ''; // PlaceCard 숨김
+                        _selectedAddress = '';
+                      } else {
+                        // 장소 선택 마커가 없을 경우 장소 마커 추가
+                        _addMarkerWithPlaceName(tappedLocation);
+                      }
+                    });
                   },
                 ),
           // Search bar
@@ -205,7 +168,7 @@ class _MapPageState extends State<MapPage> {
                   ),
                 );
 
-                // 검색 결과를 받아서 마커 표시
+                // 검색 결과를 받아서 장소 선택 마커 표시
                 if (result != null) {
                   _goToPlace(
                       result['lat'], result['lng'], result['name'], '주소 정보 없음');
@@ -241,7 +204,7 @@ class _MapPageState extends State<MapPage> {
                   );
 
                   // 신호등 정보 요청
-                  _fetchTrafficLightInfo(
+                  _updateTrafficLights(
                     locationProvider.currentPosition!.latitude,
                     locationProvider.currentPosition!.longitude,
                   );
@@ -295,8 +258,8 @@ class _MapPageState extends State<MapPage> {
       print('위도: ${tappedLocation.latitude}, 경도: ${tappedLocation.longitude}');
 
       setState(() {
-        _markers.clear(); // 기존 마커 제거
-        _markers.add(
+        _placeMarkers.clear(); // 기존 장소 마커 제거
+        _placeMarkers.add(
           Marker(
             markerId: MarkerId(tappedLocation.toString()),
             position: tappedLocation,
@@ -311,8 +274,8 @@ class _MapPageState extends State<MapPage> {
         _selectedLng = tappedLocation.longitude; // 선택된 경도 업데이트
       });
 
-      // 신호등 정보 요청 및 동그라미 추가
-      _fetchTrafficLightInfo(_selectedLat, _selectedLng);
+      // 신호등 정보 요청 및 마커 추가
+      _updateTrafficLights(_selectedLat, _selectedLng);
     } else {
       print('장소 이름을 가져오지 못했습니다.');
     }

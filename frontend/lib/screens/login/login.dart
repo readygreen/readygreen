@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:readygreen/main.dart';
-// import 'package:readygreen/screens/login/signup.dart';
 import 'package:readygreen/api/user_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:readygreen/screens/login/signup.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -18,6 +17,8 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   final NewUserApi loginService = NewUserApi(); // LoginService 객체 생성
   final storage = const FlutterSecureStorage();
+
+  /// 카카오 로그인 처리
   Future<void> signInWithKakao() async {
     try {
       print('카카오 로그인 KakaoSdk.origin');
@@ -80,6 +81,50 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  /// 일반 이메일 로그인 처리
+  Future<void> signInWithEmailPassword() async {
+    String email = emailController.text;
+    String password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      // 이메일이나 비밀번호가 비어있을 때 에러 메시지 처리
+      print('이메일과 비밀번호를 입력하세요.');
+      return;
+    }
+
+    try {
+      // 일반 로그인 요청
+      String? accessToken = await loginService.login(
+        email: email,
+        password: password,
+        nickname: '', // 일반 로그인의 경우 닉네임은 빈 문자열로 설정
+        socialType: 'BASIC', // 일반 로그인의 소셜 타입을 EMAIL로 설정
+        profileImg: '', // 일반 로그인에 프로필 이미지가 없으므로 빈 문자열로 설정
+      );
+
+      if (accessToken != null) {
+        // 로그인 성공 시 메인 페이지로 이동
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      } else {
+        print('로그인 실패');
+      }
+    } catch (error) {
+      print('일반 로그인 도중 에러 발생: $error');
+    }
+  }
+
+  /// 회원가입 페이지로 이동
+  void _navigateToSignUp() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SignUpPage()),
+    );
+  }
+
+  /// 카카오 로그인 버튼 UI
   Widget getKakaoLoginButton() {
     return InkWell(
       onTap: () {
@@ -112,12 +157,69 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // void _navigateToSignUp() {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => SignUpPage()),
-  //   );
-  // }
+  /// 일반 로그인 버튼 UI
+  Widget getEmailLoginButton() {
+    return InkWell(
+      onTap: () {
+        signInWithEmailPassword(); // 일반 로그인 요청 함수 호출
+      },
+      child: Card(
+        margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+        elevation: 2,
+        child: Container(
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.blue, // 버튼 색상 설정
+            borderRadius: BorderRadius.circular(7),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.email, color: Colors.white), // 이메일 아이콘
+              SizedBox(width: 10),
+              Text(
+                "이메일로 로그인",
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// 회원가입 버튼 UI
+  Widget getSignUpButton() {
+    return InkWell(
+      onTap: () {
+        _navigateToSignUp(); // 회원가입 페이지로 이동
+      },
+      child: Card(
+        margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+        elevation: 2,
+        child: Container(
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.green, // 회원가입 버튼 색상
+            borderRadius: BorderRadius.circular(7),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(Icons.person_add, color: Colors.white), // 회원가입 아이콘
+              SizedBox(width: 10),
+              Text(
+                "회원가입",
+                style: TextStyle(color: Colors.white, fontSize: 17),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,14 +242,11 @@ class _LoginPageState extends State<LoginPage> {
               obscureText: true,
             ),
             const SizedBox(height: 20),
+            getEmailLoginButton(), // 일반 로그인 버튼
             const SizedBox(height: 20),
-            getKakaoLoginButton(),
+            getKakaoLoginButton(), // 카카오 로그인 버튼
             const SizedBox(height: 20),
-            const SizedBox(height: 10),
-            // TextButton(
-            //   onPressed: _navigateToSignUp, // 회원가입 페이지로 이동
-            //   child: Text('회원가입'),
-            // ),
+            getSignUpButton(), // 회원가입 버튼
           ],
         ),
       ),

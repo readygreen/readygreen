@@ -4,12 +4,13 @@ import 'package:readygreen/screens/mypage/feedback.dart';
 import 'package:readygreen/screens/mypage/feedback_list.dart';
 import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
+import 'package:readygreen/widgets/modals/birth_modal.dart';
 import 'package:readygreen/widgets/mypage/cardbox_mypage.dart';
-import 'package:readygreen/widgets/common/squarecardbox.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/api/user_api.dart';
 import 'package:readygreen/screens/mypage/notice.dart';
+import 'package:readygreen/widgets/mypage/squarecard_mypage.dart';
 
 class MyPage extends StatefulWidget {
   const MyPage({Key? key}) : super(key: key);
@@ -32,16 +33,17 @@ class _MyPageState extends State<MyPage> {
 
   Future<void> _getProfile() async {
     final data = await userApi.getProfile();
-    setState(() {
-      profileData = data;
-      isLoading = false; // 데이터 로딩 완료
-    });
+    if (mounted) {
+      setState(() {
+        profileData = data;
+        isLoading = false; // 데이터 로딩 완료
+      });
+    }
   }
 
   Future<void> _handleLogout(BuildContext context) async {
     // 저장된 토큰 삭제
     await storage.delete(key: 'accessToken');
-    await storage.deleteAll();
     await storage.deleteAll();
 
     // 로그아웃 후 로그인 페이지로 이동
@@ -65,14 +67,14 @@ class _MyPageState extends State<MyPage> {
                     // 프로필 정보
                     CardBox(
                       title: '내 정보',
-                      height: 160,
+                      height: 150,
                       backgroundColor: Colors.white,
                       textColor: Colors.black,
                       child: Row(
                         children: [
                           // 프로필 이미지
                           CircleAvatar(
-                            radius: 40,
+                            radius: 35,
                             backgroundImage: profileData?['profileImageUrl'] !=
                                     null
                                 ? NetworkImage(profileData!['profileImageUrl'])
@@ -81,21 +83,7 @@ class _MyPageState extends State<MyPage> {
                           ),
                           const SizedBox(width: 13),
                           // 프로필 텍스트 정보
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  '이름: ${profileData?['nickname'] ?? 'Unknown'}',
-                                  style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
-                              Text('이메일: ${profileData?['email'] ?? 'Unknown'}',
-                                  style: const TextStyle(fontSize: 14)),
-                              Text(
-                                  '생년월일: ${profileData?['birth'] ?? '생일을 등록해주세요'}',
-                                  style: const TextStyle(fontSize: 14)),
-                            ],
-                          ),
+                          _buildProfileSection(),
                         ],
                       ),
                     ),
@@ -105,7 +93,7 @@ class _MyPageState extends State<MyPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: SquareCardBox(
+                          child: SquareCardMypage(
                             title: '내 배지',
                             imageUrl: 'assets/images/badge.png',
                             subtitle: '설정하기',
@@ -113,7 +101,7 @@ class _MyPageState extends State<MyPage> {
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: SquareCardBox(
+                          child: SquareCardMypage(
                             title: '내 장소',
                             backgroundColor: Colors.white,
                             textColor: Colors.black,
@@ -133,6 +121,93 @@ class _MyPageState extends State<MyPage> {
                 ),
         ),
       ),
+    );
+  }
+
+// 프로필 텍스트 부분
+  Widget _buildProfileSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const Text(
+              '        이름',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              profileData?['nickname'] ?? 'Unknown',
+              style: const TextStyle(
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              '     이메일',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              profileData?['email'] ?? 'Unknown',
+              style: const TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              ' 생년월일',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Row(
+              children: [
+                Text(
+                  profileData?['birth'] ?? '생일을 등록해주세요',
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 15),
+                InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return const BirthModal();
+                      },
+                    );
+                  },
+                  child: const Icon(
+                    Icons.edit,
+                    size: 16,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 
@@ -237,7 +312,10 @@ class _MyPageState extends State<MyPage> {
           ),
           const SizedBox(height: 10),
           GestureDetector(
-            onTap: () {},
+            onTap: () async {
+              await userApi.deleteUser();
+              _handleLogout(context);
+            },
             child: _buildItem('회원탈퇴'),
           ),
         ],

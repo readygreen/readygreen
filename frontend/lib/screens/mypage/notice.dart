@@ -89,14 +89,14 @@ class _NoticePageState extends State<NoticePage> {
                                   width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 2,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 3), // 그림자 위치 조정
-                                  ),
-                                ],
+                                // boxShadow: [
+                                //   BoxShadow(
+                                //     color: Colors.grey.withOpacity(0.5),
+                                //     spreadRadius: 2,
+                                //     blurRadius: 5,
+                                //     offset: Offset(0, 3), // 그림자 위치 조정
+                                //   ),
+                                // ],
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

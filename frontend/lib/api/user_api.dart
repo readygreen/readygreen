@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:readygreen/constants/baseurl.dart';
+import 'package:readygreen/api/main_api.dart';
 
 class NewUserApi {
   final storage = const FlutterSecureStorage();
@@ -160,31 +161,43 @@ class NewUserApi {
     }
   }
 
-  // 신호등 정보 요청 (GET)
-  Future<List<dynamic>?> fetchBlinkerInfo({
-    required double latitude,
-    required double longitude,
-    required int radius,
-  }) async {
-    String? accessToken = await storage.read(key: 'accessToken');
+  // 생일 등록
+  final NewMainApi mainApi = NewMainApi();
 
-    final response = await http.get(
-      Uri.parse(
-          '$baseUrl/map?latitude=$latitude&longitude=$longitude&radius=$radius'),
+  Future<void> updateBirth(String birthdate) async {
+    String? accessToken = await storage.read(key: 'accessToken');
+    final response = await http.put(
+      Uri.parse('$baseUrl/auth/birth?birthdate=$birthdate'),
       headers: {
         'Content-Type': 'application/json',
-        'accept': '*/*',
         'Authorization': 'Bearer $accessToken',
       },
     );
 
     if (response.statusCode == 200) {
-      print('신호등 정보 조회 성공');
-      return jsonDecode(response.body)['blinkerDTOs'];
+      print('생일 등록 완료');
+
+      getProfile();
     } else {
-      print('신호등 정보 조회 실패: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      print('생일 등록 실패: ${response.statusCode}');
       return null;
+    }
+  }
+
+  // 회원 탈퇴
+  Future<void> deleteUser() async {
+    String? accessToken = await storage.read(key: 'accessToken');
+    try {
+      final response = await http.delete(Uri.parse('$baseUrl/auth'), headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      });
+
+      if (response.statusCode == 200) {
+        print('회원탈퇴 완료');
+      }
+    } catch (e) {
+      print('회원탈퇴 에러: $e');
     }
   }
 }

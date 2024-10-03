@@ -10,6 +10,7 @@ import 'package:readygreen/screens/place/place.dart';
 import 'package:readygreen/screens/mypage/mypage.dart';
 import 'package:provider/provider.dart';
 import 'provider/current_location.dart';
+import 'package:readygreen/screens/point/pointDetail.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -71,7 +72,7 @@ class App extends StatelessWidget {
         title: 'Flutter Navigation Example',
         theme: ThemeData(
           fontFamily: 'CustomFont',
-          primarySwatch: Colors.green,
+          // primarySwatch: Colors.green,
         ),
         initialRoute: '/',
         routes: {
@@ -103,6 +104,7 @@ class _MainPageState extends State<MainPage> {
     const MapPage(),
     PlacePage(),
     const MyPage(),
+    PointDetailPage()
   ];
   // 저장된 accessToken 확인하여 자동 로그인 처리
 

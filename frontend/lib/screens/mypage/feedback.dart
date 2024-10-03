@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:readygreen/api/feedback_api.dart';
+import 'package:readygreen/screens/mypage/mypage.dart';
 import 'package:readygreen/widgets/mypage/bgcontainer_feedback.dart';
 import 'package:readygreen/widgets/mypage/cardbox_feedback.dart';
 import 'package:readygreen/widgets/mypage/cardbox_fbcontent.dart';
@@ -40,7 +41,10 @@ class FeedbackPage extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context); // 모달 닫기
-                    Navigator.pushNamed(context, '/profile'); // 프로필 페이지로 이동
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MyPage()),
+                    ); // 프로필 페이지로 이동
                   },
                   child: const Text('확인'),
                 ),
@@ -112,7 +116,7 @@ class FeedbackPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: submitFeedback,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.greybg, // 초록색 배경
+                  backgroundColor: AppColors.routegreen, // 초록색 배경
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
