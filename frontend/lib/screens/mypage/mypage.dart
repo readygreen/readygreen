@@ -53,6 +53,19 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
+  Future<void> _openBirthModal() async {
+    DateTime? selectedDate = await showDialog<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        return const BirthModal();
+      },
+    );
+
+    if (selectedDate != null) {
+      await _getProfile();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -190,14 +203,7 @@ class _MyPageState extends State<MyPage> {
                 ),
                 const SizedBox(width: 15),
                 InkWell(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return const BirthModal();
-                      },
-                    );
-                  },
+                  onTap: _openBirthModal,
                   child: const Icon(
                     Icons.edit,
                     size: 16,
@@ -361,7 +367,9 @@ class _MyPageState extends State<MyPage> {
                 style: TextStyle(color: Colors.black),
               ),
               onPressed: () {
-                Navigator.of(context).pop(); // 알림창 닫기
+                if (mounted) {
+                  Navigator.of(context).pop(); // 알림창 닫기
+                }
               },
             ),
             TextButton(
@@ -370,9 +378,14 @@ class _MyPageState extends State<MyPage> {
                 style: TextStyle(color: Colors.red),
               ),
               onPressed: () async {
-                Navigator.of(context).pop(); // 알림창 닫기
+                if (mounted) {
+                  Navigator.of(context).pop(); // 알림창 닫기
+                }
+
                 await userApi.deleteUser(); // 탈퇴 API 호출
-                _handleLogout(context); // 로그아웃 처리
+                if (mounted) {
+                  _handleLogout(context); // 로그아웃 처리
+                }
               },
             ),
           ],

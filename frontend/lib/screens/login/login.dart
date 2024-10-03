@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/main.dart';
 import 'package:readygreen/api/user_api.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -126,29 +127,33 @@ class _LoginPageState extends State<LoginPage> {
 
   /// 카카오 로그인 버튼 UI
   Widget getKakaoLoginButton() {
+    final deviceWidth = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
         signInWithKakao();
       },
       child: Card(
-        margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         elevation: 2,
         child: Container(
+          width: deviceWidth * 0.79,
           height: 50,
           decoration: BoxDecoration(
-            color: Colors.yellow,
-            borderRadius: BorderRadius.circular(7),
+            color: const Color.fromARGB(255, 251, 228, 16),
+            borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/badge.png',
-                  height: 30), // Kakao 이미지로 변경 필요
+              Image.asset('assets/images/kakao.png',
+                  height: 25), // Kakao 이미지로 변경 필요
               const SizedBox(width: 10),
               const Text(
-                "카카오로 실행하기",
-                style: TextStyle(color: Colors.white, fontSize: 17),
+                "카카오로 시작하기",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -158,28 +163,28 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   /// 일반 로그인 버튼 UI
-  Widget getEmailLoginButton() {
+  Widget getLoginButton() {
+    final deviceWidth = MediaQuery.of(context).size.width;
     return InkWell(
       onTap: () {
         signInWithEmailPassword(); // 일반 로그인 요청 함수 호출
       },
       child: Card(
-        margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
-        elevation: 2,
+        // margin: const EdgeInsets.symmetric(horizontal: 50),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        // elevation: 2,
         child: Container(
           height: 50,
+          width: deviceWidth * 0.79,
           decoration: BoxDecoration(
-            color: Colors.blue, // 버튼 색상 설정
-            borderRadius: BorderRadius.circular(7),
+            color: AppColors.green, // 버튼 색상 설정
+            borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
-              Icon(Icons.email, color: Colors.white), // 이메일 아이콘
-              SizedBox(width: 10),
               Text(
-                "이메일로 로그인",
+                "로그인",
                 style: TextStyle(color: Colors.white, fontSize: 17),
               ),
             ],
@@ -191,31 +196,17 @@ class _LoginPageState extends State<LoginPage> {
 
   /// 회원가입 버튼 UI
   Widget getSignUpButton() {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         _navigateToSignUp(); // 회원가입 페이지로 이동
       },
-      child: Card(
-        margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
-        elevation: 2,
-        child: Container(
-          height: 50,
-          decoration: BoxDecoration(
-            color: Colors.green, // 회원가입 버튼 색상
-            borderRadius: BorderRadius.circular(7),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Icon(Icons.person_add, color: Colors.white), // 회원가입 아이콘
-              SizedBox(width: 10),
-              Text(
-                "회원가입",
-                style: TextStyle(color: Colors.white, fontSize: 17),
-              ),
-            ],
-          ),
+      child: const Text(
+        "회원가입",
+        style: TextStyle(
+          color: AppColors.greytext,
+          fontSize: 14,
+          decoration: TextDecoration.underline,
+          decorationColor: AppColors.greytext,
         ),
       ),
     );
@@ -223,31 +214,124 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final deviceWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextFormField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: '이메일'),
-            ),
-            TextFormField(
-              controller: passwordController,
-              decoration: const InputDecoration(labelText: '비밀번호'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 20),
-            getEmailLoginButton(), // 일반 로그인 버튼
-            const SizedBox(height: 20),
-            getKakaoLoginButton(), // 카카오 로그인 버튼
-            const SizedBox(height: 20),
-            getSignUpButton(), // 회원가입 버튼
-          ],
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 60),
+              Image.asset(
+                'assets/images/map.png',
+                height: 180,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                '언제그린',
+                style: TextStyle(
+                  fontFamily: 'LogoFont',
+                  color: AppColors.green,
+                  fontSize: 35,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                width: deviceWidth * 0.8,
+                child: TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: '이메일',
+                    labelStyle: TextStyle(
+                      color: AppColors.grey, // 라벨 텍스트 색상
+                      fontSize: 18, // 라벨 텍스트 크기
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: AppColors.grey, width: 1), // 비활성화 시 테두리 색상
+                      borderRadius: BorderRadius.circular(8), // 테두리 둥글기 설정
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: AppColors.green, width: 2), // 포커스 시 테두리 색상
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.all(16), // 내부 패딩
+                  ),
+                  style: TextStyle(
+                    fontSize: 16, // 입력 텍스트 크기
+                    color: Colors.black, // 입력 텍스트 색상
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                width: deviceWidth * 0.8,
+                child: TextFormField(
+                  controller: passwordController,
+                  obscureText: true, // 비밀번호 필드
+                  decoration: InputDecoration(
+                    labelText: '비밀번호',
+                    labelStyle: TextStyle(
+                      color: AppColors.grey, // 라벨 텍스트 색상
+                      fontSize: 18, // 라벨 텍스트 크기
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: AppColors.grey, width: 1), // 비활성화 시 테두리 색상
+                      borderRadius: BorderRadius.circular(8), // 테두리 둥글기 설정
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                          color: AppColors.green, width: 2), // 포커스 시 테두리 색상
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.all(16), // 내부 패딩
+                  ),
+                  style: TextStyle(
+                    fontSize: 16, // 입력 텍스트 크기
+                    color: Colors.black, // 입력 텍스트 색상
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              getLoginButton(), // 일반 로그인 버튼
+              const SizedBox(height: 25),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Divider(
+                      color: AppColors.grey, // 구분 선 색상
+                      thickness: 1, // 구분 선 두께
+                      indent: 20, // 왼쪽 여백
+                      endIndent: 10, // 오른쪽 여백
+                    ),
+                  ),
+                  const Text(
+                    "간편로그인", // 가운데 텍스트
+                    style: TextStyle(color: AppColors.grey),
+                  ),
+                  Expanded(
+                    child: Divider(
+                      color: AppColors.grey, // 구분 선 색상
+                      thickness: 1, // 구분 선 두께
+                      indent: 10, // 왼쪽 여백
+                      endIndent: 20, // 오른쪽 여백
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 15),
+              getKakaoLoginButton(), // 카카오 로그인 버튼
+              const SizedBox(height: 30),
+              getSignUpButton(), // 회원가입 버튼
+            ],
+          ),
         ),
       ),
     );

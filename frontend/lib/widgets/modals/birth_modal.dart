@@ -77,10 +77,17 @@ class _BirthModalState extends State<BirthModal> {
                       // API 요청
                       await userApi.updateBirth(formattedDate);
 
-                      Navigator.of(context).pop(_selectedDate);
+                      if (mounted) {
+                        // 성공 시 true 반환
+                        Navigator.of(context).pop(true);
+                      }
                     } catch (e) {
                       // 오류 처리
                       print('생일 업데이트 실패: $e');
+                      // 실패 시 false 반환
+                      if (mounted) {
+                        Navigator.of(context).pop(false);
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(
