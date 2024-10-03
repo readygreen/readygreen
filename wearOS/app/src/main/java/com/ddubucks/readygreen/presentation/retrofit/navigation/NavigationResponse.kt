@@ -24,10 +24,9 @@ data class Feature(
 
 data class Geometry(
     val type: String,
-    val coordinates: Any // 다양한 좌표 형식을 처리할 수 있도록 Any 타입으로 선언
+    val coordinates: Any
 ) {
     fun getCoordinatesAsDoubleArray(): List<Double>? {
-        // Point 타입일 경우, 좌표를 double 리스트로 반환
         return if (type == "Point") {
             coordinates as? List<Double>
         } else {
@@ -36,7 +35,6 @@ data class Geometry(
     }
 
     fun getCoordinatesAsLineString(): List<List<Double>>? {
-        // LineString 타입일 경우, 이중 리스트로 좌표 반환
         return if (type == "LineString") {
             coordinates as? List<List<Double>>
         } else {

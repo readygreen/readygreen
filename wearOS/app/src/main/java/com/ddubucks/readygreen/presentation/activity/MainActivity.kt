@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
                     // NavigationScreen
                     composable("navigationScreen") {
                         NavigationScreen(
+                            navController = navController,
                             navigationViewModel = navigationViewModel
                         )
                     }
