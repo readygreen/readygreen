@@ -32,7 +32,6 @@ import secStyle
 // TODO map/guide/check : 어플 시작시 길안내중인지 아닌지 확인 -> 맞으면 map/guide get 요청으로 안내 불러오기, 아니면 냅두기
 // TODO map/guide get : 길안내중이라는 알림 받았을때 요청 불러오기
 // TODO map/guide post : 길안내 완료
-// TODO map/guide delete : 길안내 중단
 
 @Composable
 fun NavigationScreen(
@@ -43,12 +42,11 @@ fun NavigationScreen(
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
 
-    // 길 안내 중일 때만 뒤로 가기 핸들러가 작동
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
-            setShowExitDialog(true)  // 길안내 중일 때 모달 띄우기
+            setShowExitDialog(true)
         } else {
-            navController.popBackStack()  // 길 안내 중이 아닐 경우 바로 뒤로가기
+            navController.popBackStack()
         }
     }
 
@@ -72,15 +70,14 @@ fun NavigationScreen(
         }
     }
 
-    // 모달 처리: 길 안내 중일 때만 표시
     if (showExitDialog) {
         ModalItem(
             title = "길 안내 중지",
             message = "길 안내를 중지하시겠습니까? 아니오를 누르면 백그라운드에서 길안내가 유지됩니다.",
             onConfirm = {
-                navigationViewModel.stopNavigation(context)  // 길 안내 중지
+                navigationViewModel.stopNavigation(context)
                 setShowExitDialog(false)
-                navController.popBackStack()  // 뒤로 가기
+                navController.popBackStack()
             },
             onCancel = {
                 setShowExitDialog(false)
@@ -91,7 +88,6 @@ fun NavigationScreen(
 
 @Composable
 fun NavigationInfo(navigationState: NavigationState) {
-    // 네비게이션 정보 UI 구성
     Text(
         text = navigationState.destinationName ?: "목적지 정보 없음",
         style = pStyle,
@@ -123,7 +119,7 @@ fun NavigationInfo(navigationState: NavigationState) {
     Spacer(modifier = Modifier.height(10.dp))
 
     Text(
-        text = "45초", // 예시 시간 표시
+        text = "45초",
         style = secStyle,
         color = Red
     )

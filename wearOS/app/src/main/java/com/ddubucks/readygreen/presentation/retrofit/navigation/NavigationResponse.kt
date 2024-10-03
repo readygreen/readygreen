@@ -8,7 +8,9 @@ import kotlin.collections.List
 
 data class NavigationResponse(
     val routeDTO: RouteDTO,
-    val blinkerDTOs: List<BlinkerDTO>
+    val blinkerDTOs: List<BlinkerDTO>,
+    val distance: Double,
+    val time: String
 )
 
 data class RouteDTO(

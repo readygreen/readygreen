@@ -51,7 +51,6 @@ class NavigationViewModel : ViewModel() {
     }
 
 
-    // 네비게이션을 초기화 후 API에 요청
     private fun initiateNavigation(context: Context, curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
         val navigationApi = RestClient.createService(NavigationApi::class.java, context)
         val navigationRequest = NavigationRequest(
@@ -68,7 +67,6 @@ class NavigationViewModel : ViewModel() {
 
         viewModelScope.launch {
             navigationApi.startNavigation(navigationRequest).enqueue(object : Callback<NavigationResponse> {
-                // API 응답 성공
                 override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
                     if (response.isSuccessful) {
                         Log.d("NavigationViewModel", "Navigation API successful")
@@ -79,7 +77,6 @@ class NavigationViewModel : ViewModel() {
                     }
                 }
 
-                // API 요청 실패
                 override fun onFailure(call: Call<NavigationResponse>, t: Throwable) {
                     Log.d("NavigationViewModel", "Navigation API request failed: ${t.message}")
                     _navigationState.value = NavigationState(isNavigating = false)
@@ -93,6 +90,7 @@ class NavigationViewModel : ViewModel() {
     private fun handleNavigationResponse(response: Response<NavigationResponse>) {
         if (response.isSuccessful) {
             response.body()?.let { navigationResponse ->
+
                 Log.d("NavigationViewModel", "Received route data: ${navigationResponse.routeDTO.features}")
                 route = navigationResponse.routeDTO.features  // 경로 데이터를 저장
 
@@ -104,9 +102,13 @@ class NavigationViewModel : ViewModel() {
 
                 // 위치 업데이트를 시작 -> 네비게이션 상태 업데이트
                 locationService?.startLocationUpdates { location -> updateNavigation(location) }
+
+                // distance와 time 정보를 포함해 네비게이션 상태 업데이트
                 _navigationState.value = _navigationState.value.copy(
                     isNavigating = true,
-                    destinationName = _navigationState.value.destinationName
+                    destinationName = _navigationState.value.destinationName ?: "Green Browne", // 목적지 이름이 없으면 기본값 설정
+                    remainingDistance = navigationResponse.distance,  // 총 거리 정보 업데이트
+                    startTime = navigationResponse.time  // 출발 시간 정보 업데이트
                 )
             }
         } else {
@@ -208,19 +210,6 @@ class NavigationViewModel : ViewModel() {
 
     // 네비게이션 완료
     fun finishNavigation() {
-        Log.d("NavigationViewModel", "Stopping navigation")
-        _navigationState.value = NavigationState(isNavigating = false)
-        locationService?.stopLocationUpdates()  // 위치 업데이트 중단
-
-        // TODO map/guide post : 길안내 완료
-
-        // 네비게이션 완료 시 위치 요청을 낮춤
-        locationService?.adjustLocationRequest(
-            priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-            interval = 10000
-        )
-
-        locationService = null
     }
 
 

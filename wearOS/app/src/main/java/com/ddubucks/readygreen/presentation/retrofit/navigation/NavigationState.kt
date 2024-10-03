@@ -5,5 +5,8 @@ data class NavigationState(
     val destinationName: String? = null,
     val currentDescription: String? = null,
     val nextDirection: Int? = null,
-    val remainingDistance: Double? = null
+    val remainingDistance: Double? = null,
+    val startTime: String? = null,
+    val totalDistance: Double? = null
 )
+
