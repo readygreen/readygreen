@@ -43,7 +43,6 @@ data class Geometry(
     }
 }
 
-
 data class Properties(
     val description: String,
     val turnType: Int,

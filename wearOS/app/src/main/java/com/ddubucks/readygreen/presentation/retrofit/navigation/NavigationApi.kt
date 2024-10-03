@@ -14,12 +14,14 @@ interface NavigationApi {
 
     @POST("map/guide")
     fun finishNavigation()
+        // TODO 길안내 완료
 
     @DELETE("map/guide")
     fun stopNavigation(
         @Query("isWatch") isWatch: Boolean
-    )
+    ): Call<Void>
 
     @GET("map/guide")
     fun getNavigation()
+        // TODO 길안내 정보 불러오기
 }

@@ -4,12 +4,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,11 +39,17 @@ fun NavigationScreen(
     navController: NavHostController,
     navigationViewModel: NavigationViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
 
-    BackHandler {
-        setShowExitDialog(true)
+    // 길 안내 중일 때만 뒤로 가기 핸들러가 작동
+    BackHandler(enabled = navigationState.isNavigating) {
+        if (navigationState.isNavigating) {
+            setShowExitDialog(true)  // 길안내 중일 때 모달 띄우기
+        } else {
+            navController.popBackStack()  // 길 안내 중이 아닐 경우 바로 뒤로가기
+        }
     }
 
     Column(
@@ -56,24 +64,26 @@ fun NavigationScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         if (navigationState.isNavigating) {
+            // 네비게이션이 활성화되어 있을 때 안내 정보를 보여줌
             NavigationInfo(navigationState)
         } else {
+            // 네비게이션이 비활성화 상태일 때
             Text(text = "길안내 중이 아닙니다.", color = Color.White)
         }
     }
 
+    // 모달 처리: 길 안내 중일 때만 표시
     if (showExitDialog) {
         ModalItem(
             title = "길 안내 중지",
             message = "길 안내를 중지하시겠습니까? 아니오를 누르면 백그라운드에서 길안내가 유지됩니다.",
             onConfirm = {
-                navigationViewModel.stopNavigation()
+                navigationViewModel.stopNavigation(context)  // 길 안내 중지
                 setShowExitDialog(false)
-                navController.popBackStack()
+                navController.popBackStack()  // 뒤로 가기
             },
             onCancel = {
                 setShowExitDialog(false)
-                navController.popBackStack()
             }
         )
     }
@@ -81,6 +91,7 @@ fun NavigationScreen(
 
 @Composable
 fun NavigationInfo(navigationState: NavigationState) {
+    // 네비게이션 정보 UI 구성
     Text(
         text = navigationState.destinationName ?: "목적지 정보 없음",
         style = pStyle,
@@ -112,7 +123,7 @@ fun NavigationInfo(navigationState: NavigationState) {
     Spacer(modifier = Modifier.height(10.dp))
 
     Text(
-        text = "45초",
+        text = "45초", // 예시 시간 표시
         style = secStyle,
         color = Red
     )
