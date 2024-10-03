@@ -1,4 +1,4 @@
-import 'dart:async'; // Timer 클래스 사용을 위해 추가
+import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -64,6 +64,72 @@ class TrafficLightService {
       longitude: longitude,
       radius: radius,
     );
+
+    if (trafficLightData != null) {
+      Set<Marker> newMarkers = {};
+
+      for (var trafficLight in trafficLightData) {
+        double lat = trafficLight['latitude'];
+        double lng = trafficLight['longitude'];
+        String currentState = trafficLight['currentState'];
+        int remainingTime = trafficLight['remainingTime'];
+        int greenDuration = trafficLight['greenDuration'];
+        int redDuration = trafficLight['redDuration'];
+
+        // 상태에 따른 색상 설정
+        Color circleColor =
+            currentState == "RED" ? AppColors.red : AppColors.green;
+
+        // 커스텀 마커 생성 및 초기 표시
+        BitmapDescriptor customMarker =
+            await createCircleMarker('$remainingTime', circleColor);
+
+        // 신호등의 Marker 추가
+        Marker trafficMarker = Marker(
+          markerId: MarkerId(trafficLight['id'].toString()),
+          position: LatLng(lat, lng),
+          icon: customMarker, // 커스텀 마커 사용
+          infoWindow: InfoWindow(
+            title: '신호등 상태: $currentState',
+            snippet: '남은 시간: $remainingTime초',
+          ),
+        );
+
+        // 마커 업데이트 세트에 추가
+        newMarkers.add(trafficMarker);
+
+        // 타이머 시작 (남은 시간 카운트다운)
+        _startCountdown(
+          trafficLightId: trafficLight['id'].toString(),
+          currentState: currentState,
+          remainingTime: remainingTime,
+          greenDuration: greenDuration,
+          redDuration: redDuration,
+          latitude: lat,
+          longitude: lng,
+          onStateChanged: (newMarker) {
+            newMarkers.add(newMarker); // 상태가 변경된 마커 추가
+            onMarkersUpdated(newMarkers); // 업데이트된 마커 전달
+          },
+        );
+      }
+
+      // 마커를 업데이트하는 콜백 호출
+      onMarkersUpdated(newMarkers);
+    } else {
+      print('신호등 정보를 가져오지 못했습니다.');
+    }
+  }
+
+  // 신호등 ID로 신호등 정보를 받아와 지도에 표시하는 함수
+  Future<void> addTrafficLightsByIdToMap({
+    required List<int> blinkerIds,
+    required Set<Marker> markers,
+    required Function(Set<Marker>) onMarkersUpdated,
+  }) async {
+    // 신호등 정보 요청 (ID로)
+    final List<dynamic>? trafficLightData =
+        await api.fetchBlinkerInfoByIds(blinkerIds: blinkerIds);
 
     if (trafficLightData != null) {
       Set<Marker> newMarkers = {};
