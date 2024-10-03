@@ -11,8 +11,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -40,10 +45,28 @@ public class PointService {
         memberRepository.save(member);
     }
 
-    public List<Point> getPointsByMember(String email) {
+    public Map<LocalDate, List<Point>> getPointsByMember(String email) {
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return pointRepository.findPointsByMember(member);
+        List<Point> points = pointRepository.findPointsByMember(member);
+//        Map<LocalDate, List<Point>> groupedPoints = groupPointsByDate(points);
+        return groupPointsByDate(points);
+//        groupedPoints.forEach((date, pointList) -> {
+//            System.out.println("Date: " + date);
+//            for (Point point : pointList) {
+//                System.out.println("  " + point.getDescription() + ": " + point.getPoint() + " points");
+//            }
+//        });
+    }
+    private Map<LocalDate, List<Point>> groupPointsByDate(List<Point> points) {
+        Map<LocalDate, List<Point>> groupedPoints = new HashMap<>();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        for (Point point : points) {
+            LocalDate date = point.getCreateDate().toLocalDate();
+            groupedPoints.putIfAbsent(date, new ArrayList<>());
+            groupedPoints.get(date).add(point);
+        }
+        return groupedPoints;
     }
 
 //    public List<Step> getStepsByMember(String email){

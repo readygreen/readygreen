@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,8 +36,8 @@ public class PointController {
         return ResponseEntity.ok("포인트가 성공적으로 추가되었습니다.");
     }
     @GetMapping("/list")
-    public ResponseEntity<List<Point>> getPoints(@AuthenticationPrincipal UserDetails userDetails) {
-        List<Point> points = pointService.getPointsByMember(userDetails.getUsername());
+    public ResponseEntity<Map<LocalDate, List<Point>>> getPoints(@AuthenticationPrincipal UserDetails userDetails) {
+        Map<LocalDate, List<Point>> points = pointService.getPointsByMember(userDetails.getUsername());
         return ResponseEntity.ok(points);
     }
     @GetMapping("/steps")

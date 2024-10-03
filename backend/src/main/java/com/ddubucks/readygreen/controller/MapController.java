@@ -75,7 +75,7 @@ public class MapController {
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         if(member.getWatch()!=null)
             fcmService.sendMessageToOtherDevice(member,isWatch,2);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("길안내 중단 성공");
     }
 
     @PostMapping("guide")
