@@ -47,7 +47,7 @@ class _StartLoadingPageState extends State<StartLoadingPage> {
     
     if (accessToken != null) {
       // accessToken이 있으면 MainPage로 이동
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MainPage()),
       );

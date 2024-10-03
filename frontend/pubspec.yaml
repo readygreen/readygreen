@@ -104,6 +104,12 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
   assets:
+    - assets/images/foot.png
+    - assets/images/star.png
+    - assets/images/rainbow.png
+    - assets/images/walk.png
+    - assets/images/coin.png
+    - assets/images/coins.png
     - assets/images/icon.png
     - assets/images/map.png
     - assets/images/kakao.png

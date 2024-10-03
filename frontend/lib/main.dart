@@ -10,6 +10,7 @@ import 'package:readygreen/screens/place/place.dart';
 import 'package:readygreen/screens/mypage/mypage.dart';
 import 'package:provider/provider.dart';
 import 'provider/current_location.dart';
+import 'package:readygreen/screens/point/pointDetail.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -103,6 +104,7 @@ class _MainPageState extends State<MainPage> {
     const MapPage(),
     PlacePage(),
     const MyPage(),
+    PointDetailPage()
   ];
   // 저장된 accessToken 확인하여 자동 로그인 처리
 
@@ -112,12 +114,13 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("메시지 수신!");
-      if (message.data['type'] == 1) {
-        // 특정 페이지로 이동하고, 특정 함수를 실행하도록 전달
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MapDirectionPage()),
-        );
+      if(message.data['type']==1){
+        if (message.data['type'] == '1') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MapDirectionPage()),
+          );
+        }
       }
       // Notification 메시지 출력 (알림)
       if (message.notification != null) {
