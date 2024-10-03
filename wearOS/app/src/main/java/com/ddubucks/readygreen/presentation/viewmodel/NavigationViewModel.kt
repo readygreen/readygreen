@@ -52,7 +52,7 @@ class NavigationViewModel : ViewModel() {
 
 
     private fun initiateNavigation(context: Context, curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
-        val navigationApi = RestClient.createService(NavigationApi::class.java, context)
+        val navigationApi = RestClient.createService(NavigationApi::class.java)
         val navigationRequest = NavigationRequest(
             startX = roundToSix(curLng),
             startY = roundToSix(curLat),
@@ -210,12 +210,13 @@ class NavigationViewModel : ViewModel() {
 
     // 네비게이션 완료
     fun finishNavigation() {
+
     }
 
 
     // 네비게이션을 중단
-    fun stopNavigation(context: Context) {
-        val navigationApi = RestClient.createService(NavigationApi::class.java, context)
+    fun stopNavigation() {
+        val navigationApi = RestClient.createService(NavigationApi::class.java)
 
         viewModelScope.launch {
             navigationApi.stopNavigation(isWatch = true).enqueue(object : Callback<Void> {
@@ -247,12 +248,10 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
-
     // 네비게이션 체크
     fun checkNavigation() {
         // TODO map/guide/check : 어플 시작시 길안내중인지 아닌지 확인 -> 맞으면 map/guide get 요청으로 안내 불러오기, 아니면 냅두기
     }
-
 
     // 네이게이션 정보 불러오기
     fun getNavigation() {
@@ -266,7 +265,6 @@ class NavigationViewModel : ViewModel() {
         val location2 = Location("").apply { latitude = lat2; longitude = lng2 }
         return location1.distanceTo(location2).toDouble()
     }
-
 
     // 좌표 반올림
     private fun roundToSix(value: Double): Double {

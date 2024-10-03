@@ -27,13 +27,13 @@ class LinkViewModel : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
-                val linkApi = RestClient.createService(LinkApi::class.java, context)
+                val linkApi = RestClient.createService(LinkApi::class.java)
                 val response = linkApi.checkAuth(email, authNumber)
                 val accessToken = response.string()
 
                 if (accessToken.isNotEmpty()) {
                     Log.d("LinkViewModel", "access 토큰: $accessToken")
-                    TokenManager.saveToken(context, accessToken)
+                    TokenManager.saveToken(accessToken)
 
                     onLoginSuccess(context)
                     onResult(true, "인증 성공")

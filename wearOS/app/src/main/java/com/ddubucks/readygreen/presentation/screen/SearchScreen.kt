@@ -34,7 +34,6 @@ import pStyle
 fun SearchScreen(
     navController: NavHostController,
     apiKey: String,
-    fusedLocationClient: FusedLocationProviderClient,
     searchViewModel: SearchViewModel
 ) {
     val mike by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
@@ -51,13 +50,13 @@ fun SearchScreen(
             val data = result.data
             val matches = data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
             matches?.let {
-                voiceResults = listOf(it[0]) // 음성인식 결과로 voiceResults를 갱신
+                voiceResults = listOf(it[0])
             }
         }
     }
 
     // 음성인식 시작
-    fun startSpeechRecognition(context: Context, speechLauncher: androidx.activity.result.ActivityResultLauncher<Intent>) {
+    fun startSpeechRecognition(speechLauncher: androidx.activity.result.ActivityResultLauncher<Intent>) {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR")
@@ -70,7 +69,7 @@ fun SearchScreen(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            startSpeechRecognition(context, speechLauncher)
+            startSpeechRecognition(speechLauncher)
         }
     }
 
@@ -82,7 +81,7 @@ fun SearchScreen(
         ) {
             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
         } else {
-            startSpeechRecognition(context, speechLauncher)
+            startSpeechRecognition(speechLauncher)
         }
     }
 

@@ -22,7 +22,7 @@ class MapViewModel : ViewModel() {
     private var countdownJob: Job? = null
 
     fun getMap(context: Context, latitude: Double, longitude: Double) {
-        val mapApi = RestClient.createService(MapApi::class.java, context)
+        val mapApi = RestClient.createService(MapApi::class.java)
         val radius = 500
 
         viewModelScope.launch {

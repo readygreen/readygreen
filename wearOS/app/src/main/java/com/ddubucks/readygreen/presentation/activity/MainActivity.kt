@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
             ReadyGreenTheme {
                 val navController = rememberNavController()
                 val searchViewModel: SearchViewModel = viewModel()
-                val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
                 val locationService = remember { LocationService(this) }
                 val mapViewModel: MapViewModel = viewModel()
                 val navigationViewModel: NavigationViewModel = viewModel()
@@ -56,7 +55,6 @@ class MainActivity : ComponentActivity() {
                     composable("searchScreen") {
                         SearchScreen(
                             navController = navController,
-                            fusedLocationClient = fusedLocationClient,
                             searchViewModel = searchViewModel,
                             apiKey = BuildConfig.MAPS_API_KEY
                         )

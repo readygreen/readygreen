@@ -13,8 +13,7 @@ interface NavigationApi {
     fun startNavigation(@Body request: NavigationRequest): Call<NavigationResponse>
 
     @POST("map/guide")
-    fun finishNavigation()
-        // TODO 길안내 완료
+    fun finishNavigation(@Body request: NavigationfinishRequest): Call<Void>
 
     @DELETE("map/guide")
     fun stopNavigation(

@@ -12,6 +12,6 @@ data class NavigationRequest(
 
 data class NavigationfinishRequest(
     val distance: Double,
-    val startupTime: String,
+    val startTime: String,
     val watch: Boolean
 )

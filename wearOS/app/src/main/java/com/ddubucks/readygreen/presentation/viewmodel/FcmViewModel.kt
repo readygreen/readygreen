@@ -35,7 +35,7 @@ class FcmViewModel : ViewModel() {
                 .build()
 
             // RestClient에서 accessToken 처리 포함한 FcmApi 생성
-            val fcmApi = RestClient.createService(FcmApi::class.java, context)
+            val fcmApi = RestClient.createService(FcmApi::class.java)
 
             viewModelScope.launch {
                 try {
@@ -67,7 +67,7 @@ class FcmViewModel : ViewModel() {
         ).toString()
 
         // FCM API 호출을 위한 서비스 생성 (자동으로 토큰 처리)
-        val fcmApi = RestClient.createService(FcmApi::class.java, context)
+        val fcmApi = RestClient.createService(FcmApi::class.java)
         val body = fcmRequest.toRequestBody("application/json".toMediaTypeOrNull())
 
         viewModelScope.launch {

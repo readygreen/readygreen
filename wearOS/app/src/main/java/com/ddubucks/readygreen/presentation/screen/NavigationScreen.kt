@@ -38,7 +38,6 @@ fun NavigationScreen(
     navController: NavHostController,
     navigationViewModel: NavigationViewModel = viewModel()
 ) {
-    val context = LocalContext.current
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
 
@@ -75,12 +74,13 @@ fun NavigationScreen(
             title = "길 안내 중지",
             message = "길 안내를 중지하시겠습니까? 아니오를 누르면 백그라운드에서 길안내가 유지됩니다.",
             onConfirm = {
-                navigationViewModel.stopNavigation(context)
+                navigationViewModel.stopNavigation()
                 setShowExitDialog(false)
                 navController.popBackStack()
             },
             onCancel = {
                 setShowExitDialog(false)
+                navController.popBackStack()
             }
         )
     }
