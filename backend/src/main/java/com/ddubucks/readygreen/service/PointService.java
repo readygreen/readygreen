@@ -2,9 +2,11 @@ package com.ddubucks.readygreen.service;
 
 import com.ddubucks.readygreen.dto.PointRequestDTO;
 import com.ddubucks.readygreen.model.Point;
+import com.ddubucks.readygreen.model.Step;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import com.ddubucks.readygreen.repository.PointRepository;
+import com.ddubucks.readygreen.repository.StepRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,7 @@ public class PointService {
 
     private final PointRepository pointRepository;
     private final MemberRepository memberRepository;
+    private final StepRepository stepRepository;
 
     @Transactional
     public void addPoint(String email, PointRequestDTO pointRequestDTO) {
@@ -42,4 +45,10 @@ public class PointService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return pointRepository.findPointsByMember(member);
     }
+
+//    public List<Step> getStepsByMember(String email){
+//        Member member = memberRepository.findMemberByEmail(email)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//        return stepRepository.findByMember;
+//    }
 }

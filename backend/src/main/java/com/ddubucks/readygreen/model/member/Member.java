@@ -80,7 +80,7 @@ public class Member extends BaseEntity {
     // Steps 연결
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Steps> steps;
+    private List<Step> step;
 
     // Route_record 연결
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

@@ -2,9 +2,9 @@ package com.ddubucks.readygreen.controller;
 
 import com.ddubucks.readygreen.dto.*;
 import com.ddubucks.readygreen.model.member.Member;
-import com.ddubucks.readygreen.model.Steps;
+import com.ddubucks.readygreen.model.Step;
 import com.ddubucks.readygreen.repository.MemberRepository;
-import com.ddubucks.readygreen.repository.StepsRepository;
+import com.ddubucks.readygreen.repository.StepRepository;
 import com.ddubucks.readygreen.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -35,7 +35,7 @@ public class MapController {
     private final MemberService memberService;
     private final ObjectMapper objectMapper;
     private final PointService pointService;
-    private final StepsRepository stepsRepository;
+    private final StepRepository stepRepository;
     private final MemberRepository memberRepository;
 
     @PostMapping("start")
@@ -109,19 +109,19 @@ public class MapController {
         System.out.println("Calculated speed: " + speedKmPerHour + " km/h");
 
         LocalDate today = LocalDate.now();
-        Steps existingSteps = stepsRepository.findByMemberAndDate(member, today);
+        Step existingSteps = stepRepository.findByMemberAndDate(member, today);
         if (existingSteps != null) {
             // 이미 있는 기록에 걸음수 추가
             existingSteps.setSteps(existingSteps.getSteps() + steps);
-            stepsRepository.save(existingSteps);
+            stepRepository.save(existingSteps);
         } else {
             // 새로 걸음수 기록 추가
-            Steps newSteps = Steps.builder()
+            Step newSteps = Step.builder()
                     .member(member)
                     .date(today)
                     .steps(steps)
                     .build();
-            stepsRepository.save(newSteps);
+            stepRepository.save(newSteps);
         }
 
         member.setSpeed(speedKmPerHour);
