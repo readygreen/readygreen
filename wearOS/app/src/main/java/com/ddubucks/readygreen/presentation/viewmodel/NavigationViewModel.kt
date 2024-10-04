@@ -41,8 +41,6 @@ class NavigationViewModel : ViewModel() {
             }
         } else {
             Log.d("NavigationViewModel", "Location permission not granted")
-            // 권한 요청은 MainActivity에서 처리하므로 여기는 필요 없음
-            // 여기서는 권한 요청을 하지 않습니다.
         }
     }
 
@@ -210,13 +208,7 @@ class NavigationViewModel : ViewModel() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Log.d("NavigationViewModel", "길안내 완료 성공")
-
-                    _navigationState.value = _navigationState.value.copy(
-                        isNavigating = false,
-                        destinationName = null,
-                        currentDescription = null,
-                        nextDirection = null
-                    )
+                    clearState()
 
                     locationService?.stopLocationUpdates()
                 } else {
@@ -240,12 +232,7 @@ class NavigationViewModel : ViewModel() {
                     if (response.isSuccessful) {
                         Log.d("NavigationViewModel", "길안내 중단 성공")
 
-                        _navigationState.value = _navigationState.value.copy(
-                            isNavigating = false,
-                            destinationName = null,
-                            currentDescription = null,
-                            nextDirection = null
-                        )
+                        clearState()
                         locationService?.stopLocationUpdates()
 
                         Log.d("NavigationViewModel", "길안내 중단 상태반영 완료. 길안내 상태: ${_navigationState.value.isNavigating}")
@@ -332,5 +319,18 @@ class NavigationViewModel : ViewModel() {
     // 좌표 반올림
     private fun roundToSix(value: Double): Double {
         return String.format("%.6f", value).toDouble()
+    }
+
+    // 상태 초기화
+    fun clearState() {
+        _navigationState.value = _navigationState.value.copy(
+            isNavigating = false,
+            destinationName = null,
+            currentDescription = null,
+            nextDirection = null,
+            remainingDistance = null,
+            startTime = null,
+            totalDistance = null
+        )
     }
 }

@@ -9,4 +9,3 @@ data class NavigationState(
     val startTime: String? = null,
     val totalDistance: Double? = null
 )
-

@@ -24,7 +24,10 @@ import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Yellow
 import h1Style
 import android.widget.Toast
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ddubucks.readygreen.core.service.LocationService
+import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
+
 
 @Composable
 fun MainScreen(navController: NavHostController, locationService: LocationService) {
@@ -36,6 +39,7 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
         ButtonIconModel(R.drawable.unlink_icon, "워치 연결 해제")
     )
 
+    val navigationViewModel: NavigationViewModel = viewModel()
     var showModal by remember { mutableStateOf(false) }
     var locationPermissionGranted by remember { mutableStateOf(false) }
 
@@ -58,65 +62,61 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        ScalingLazyColumn {
-            item {
-                Text(
-                    text = "언제그린",
-                    color = Yellow,
-                    style = h1Style,
-                    modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
-                )
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Black),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            ScalingLazyColumn {
+                item {
+                    Text(
+                        text = "언제그린",
+                        color = Yellow,
+                        style = h1Style,
+                        modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
+                    )
+                }
 
-            items(buttonList) { item ->
-                ButtonIconItem(item = item, onClick = {
-                    if (locationPermissionGranted) {
-                        when (item.label) {
-                            "자주가는 목적지" -> {
-                                navController.navigate("bookmarkScreen")
+                items(buttonList) { item ->
+                    ButtonIconItem(item = item, onClick = {
+                        if (locationPermissionGranted) {
+                            when (item.label) {
+                                "자주가는 목적지" -> navController.navigate("bookmarkScreen")
+                                "음성검색" -> navController.navigate("searchScreen")
+                                "주변 신호등 보기" -> navController.navigate("mapScreen")
+                                "길안내" -> navController.navigate("navigationScreen")
+                                "워치 연결 해제" -> {
+                                    showModal = true
+                                    Log.d("MainScreen", "모달 표시 상태: $showModal")
+                                }
                             }
-                            "음성검색" -> {
-                                navController.navigate("searchScreen")
-                            }
-                            "주변 신호등 보기" -> {
-                                navController.navigate("mapScreen")
-                            }
-                            "길안내" -> {
-                                navController.navigate("navigationScreen")
-                            }
-                            "워치 연결 해제" -> {
-                                showModal = true // 모달 표시를 위한 상태 변경
-                                Log.d("MainScreen", "모달 표시 상태: $showModal")
-                            }
+                        } else {
+                            Toast.makeText(navController.context, "위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
                         }
-                    } else {
-                        Toast.makeText(navController.context, "위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
-                    }
-                })
+                    })
+                }
             }
         }
 
-        // 모달 표시 조건
         if (showModal) {
             ModalItem(
-                title = "연결 해제",
+                title = "워치 연결 해제",
                 message = "정말로 연결을 해제하시겠습니까?",
                 onConfirm = {
                     TokenManager.clearToken()
+                    navigationViewModel.clearState()
                     showModal = false
                     navController.navigate("linkEmailScreen") {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
                 onCancel = {
-                    showModal = false // 모달 닫기
+                    showModal = false
                 }
             )
         }
