@@ -37,6 +37,7 @@ class _MyPageState extends State<MyPage> {
       setState(() {
         profileData = data;
         isLoading = false; // 데이터 로딩 완료
+        // print('Profile Image URL: ${profileData?['profileImg']}');
       });
     }
   }
@@ -54,14 +55,16 @@ class _MyPageState extends State<MyPage> {
   }
 
   Future<void> _openBirthModal() async {
-    DateTime? selectedDate = await showDialog<DateTime>(
+    // 모달에서 생일이 성공적으로 업데이트된 경우 true를 반환받도록 처리
+    final result = await showDialog(
       context: context,
       builder: (BuildContext context) {
         return const BirthModal();
       },
     );
 
-    if (selectedDate != null) {
+    // 모달이 닫히고 나면 프로필 새로고침 (result가 true일 때)
+    if (result != null) {
       await _getProfile();
     }
   }
@@ -88,12 +91,15 @@ class _MyPageState extends State<MyPage> {
                           // 프로필 이미지
                           CircleAvatar(
                             radius: 35,
-                            backgroundImage: profileData?['profileImageUrl'] !=
-                                    null
-                                ? NetworkImage(profileData!['profileImageUrl'])
-                                : const AssetImage('assets/images/user.png')
-                                    as ImageProvider,
+                            backgroundImage: profileData?['profileImg'] != null
+                                ? NetworkImage(profileData!['profileImg'])
+                                    as ImageProvider
+                                : const AssetImage('assets/images/user.png'),
+                            onBackgroundImageError: (error, stackTrace) {
+                              print('Failed to load profile image: $error');
+                            },
                           ),
+
                           const SizedBox(width: 13),
                           // 프로필 텍스트 정보
                           _buildProfileSection(),
@@ -137,7 +143,7 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-// 프로필 텍스트 부분
+  // 프로필 텍스트 부분
   Widget _buildProfileSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +223,7 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-// 고객지원 섹션
+  // 고객지원 섹션
   Widget _buildSupportSection() {
     return CardboxMypage(
       title: Row(
@@ -275,7 +281,7 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
-// 계정 설정 섹션
+  // 계정 설정 섹션
   Widget _buildSettingsSection() {
     return CardboxMypage(
       title: Row(

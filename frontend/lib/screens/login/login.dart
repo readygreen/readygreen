@@ -88,8 +88,8 @@ class _LoginPageState extends State<LoginPage> {
     String password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      // 이메일이나 비밀번호가 비어있을 때 에러 메시지 처리
-      print('이메일과 비밀번호를 입력하세요.');
+      // 이메일이나 비밀번호가 비어있을 때 알림창 표시
+      _showErrorDialog('이메일과 비밀번호를 입력하세요.');
       return;
     }
 
@@ -110,11 +110,55 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (context) => const MainPage()),
         );
       } else {
-        print('로그인 실패');
+        // 로그인 실패 시 알림창 표시
+        _showErrorDialog('이메일 또는 비밀번호가 올바르지 않습니다.');
       }
     } catch (error) {
       print('일반 로그인 도중 에러 발생: $error');
+      // 에러 발생 시 알림창 표시
+      _showErrorDialog('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
     }
+  }
+
+  /// 에러 메시지를 보여주는 알림창 함수
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text(
+            '로그인 실패',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Text(
+            message,
+            style: const TextStyle(color: AppColors.black),
+          ),
+          actions: <Widget>[
+            GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  '확인',
+                  style: TextStyle(
+                    color: AppColors.black,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   /// 회원가입 페이지로 이동
@@ -139,14 +183,13 @@ class _LoginPageState extends State<LoginPage> {
           width: deviceWidth * 0.79,
           height: 50,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 251, 228, 16),
+            color: const Color.fromARGB(255, 255, 221, 0),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/kakao.png',
-                  height: 25), // Kakao 이미지로 변경 필요
+              Image.asset('assets/images/kakao.png', height: 25),
               const SizedBox(width: 10),
               const Text(
                 "카카오로 시작하기",
@@ -185,7 +228,11 @@ class _LoginPageState extends State<LoginPage> {
             children: const [
               Text(
                 "로그인",
-                style: TextStyle(color: Colors.white, fontSize: 17),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),

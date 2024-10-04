@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:readygreen/constants/baseurl.dart';
-import 'package:readygreen/api/main_api.dart';
+import 'package:intl/intl.dart';
 
 class NewUserApi {
   final storage = const FlutterSecureStorage();
@@ -21,7 +21,7 @@ class NewUserApi {
       'socialType': socialType.toUpperCase(), // 대문자로 변환
       'profileImg': profileImg,
     };
-
+    print('로그인requestBody $requestBody');
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
@@ -74,6 +74,7 @@ class NewUserApi {
         }
       } else {
         print('로그인 실패: ${response.statusCode}');
+        print('${response.body}');
         return null;
       }
     } catch (e) {
@@ -88,7 +89,6 @@ class NewUserApi {
     required String password,
     required String socialType,
     required String profileImg,
-    // required String smartphone,
   }) async {
     String? deviceToken = await storage.read(key: 'deviceToken');
     print("디바이스토큰");
@@ -99,7 +99,7 @@ class NewUserApi {
       'nickname': nickname,
       'socialId': password,
       'socialType': socialType.toUpperCase(), // 대문자로 변환
-      'profileImg': profileImg,
+      'profileImg': profileImg, // URL로 전달
       'smartphone': deviceToken ?? ''
     };
 
@@ -116,6 +116,7 @@ class NewUserApi {
 
       if (response.statusCode == 200) {
         print('회원가입 성공');
+        print('${response.body}');
         return true;
       } else {
         print('회원가입 실패: ${response.statusCode}');
@@ -162,9 +163,7 @@ class NewUserApi {
   }
 
   // 생일 등록
-  final NewMainApi mainApi = NewMainApi();
-
-  Future<void> updateBirth(String birthdate) async {
+  Future<DateTime?> updateBirth(String birthdate) async {
     String? accessToken = await storage.read(key: 'accessToken');
     final response = await http.put(
       Uri.parse('$baseUrl/auth/birth?birthdate=$birthdate'),
@@ -176,11 +175,13 @@ class NewUserApi {
 
     if (response.statusCode == 200) {
       print('생일 등록 완료');
-
-      getProfile();
+      await getProfile(); // 프로필 갱신
+      print('${response.body}');
+      // 성공 시 DateTime을 반환 (문자열에서 DateTime으로 변환)
+      return DateFormat('yyyy-MM-dd').parse(birthdate);
     } else {
       print('생일 등록 실패: ${response.statusCode}');
-      return null;
+      return null; // 실패 시 null 반환
     }
   }
 
