@@ -46,38 +46,10 @@ class MapStartAPI {
     print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } else {
       print('Error response body: ${response.body}');
       print('실패 코드: ${response.statusCode}');
-      return null;
-    }
-  }
-
-  // 길안내 정보 요청 (GET)
-  Future<Map<String, dynamic>?> fetchGuide() async {
-    String? accessToken = await storage.read(key: 'accessToken');
-
-    if (accessToken == null) {
-      print('엑세스 토큰이 없습니다.');
-      return null;
-    }
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/map/guide'),
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': '*/*',
-        'Authorization': 'Bearer $accessToken',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      print('길안내 정보 조회 성공');
-      return jsonDecode(response.body);
-    } else {
-      print('길안내 정보 조회 실패: ${response.statusCode}');
-      print('Response body: ${response.body}');
       return null;
     }
   }
@@ -93,7 +65,7 @@ class MapStartAPI {
 
     if (response.statusCode == 200) {
       print('즐겨찾기 목록 조회 성공');
-      return jsonDecode(response.body);
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } else {
       print('즐겨찾기 목록 조회 실패: ${response.statusCode}');
       return null;
@@ -223,7 +195,7 @@ class MapStartAPI {
 
     if (response.statusCode == 200) {
       print('길안내 정보 조회 성공');
-      return jsonDecode(response.body);
+      return jsonDecode(utf8.decode(response.bodyBytes));
     } else {
       print('길안내 정보 조회 실패: ${response.statusCode}');
       return null;
@@ -289,6 +261,41 @@ class MapStartAPI {
       // 기타 상태 코드일 경우 false 반환
       print('에러 코드: ${response.statusCode}');
       return false;
+    }
+  }
+
+  // 신호등 상태 정보 요청 (GET)
+  Future<List<dynamic>?> fetchBlinkerInfoByIds({
+    required List<int> blinkerIds,
+  }) async {
+    String? accessToken = await storage.read(key: 'accessToken');
+
+    if (accessToken == null) {
+      print('엑세스 토큰이 없습니다.');
+      return null;
+    }
+
+    // blinkerIDs를 쿼리 파라미터로 변환
+    String blinkerIdsQuery = blinkerIds.join(',');
+
+    final response = await http.get(
+      Uri.parse('$baseUrl/map/blinker?blinkerIDs=$blinkerIdsQuery'),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+    );
+
+    print('Response status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('신호등 상태 정보 조회 성공');
+      return jsonDecode(utf8.decode(response.bodyBytes))['blinkerDTOs'];
+    } else {
+      print('신호등 상태 정보 조회 실패: ${response.statusCode}');
+      return null;
     }
   }
 }
