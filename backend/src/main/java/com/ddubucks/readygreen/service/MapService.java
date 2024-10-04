@@ -238,7 +238,7 @@ public class MapService {
     }
 
     public BookmarkResponseDTO getBookmark(String email) {
-        List<Bookmark> bookmarks = bookmarkRepository.findAllByEmail(email);
+        List<Bookmark> bookmarks = bookmarkRepository.findAllByEmailOrderByType(email);
 
         List<BookmarkDTO> bookmarkDTOs = new ArrayList<>();
         for (Bookmark bookmark : bookmarks) {
