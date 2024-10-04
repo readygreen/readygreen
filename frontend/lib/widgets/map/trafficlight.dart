@@ -56,7 +56,7 @@ class TrafficLightService {
     required Set<Marker> markers,
     required Function(Set<Marker>) onMarkersUpdated,
   }) async {
-    const int radius = 500; // 반경 500미터
+    const int radius = 400; // 반경 400미터
 
     // 신호등 정보 요청
     final List<dynamic>? trafficLightData = await api.fetchBlinkerInfo(
