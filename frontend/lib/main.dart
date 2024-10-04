@@ -114,7 +114,7 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("메시지 수신!");
-      if(message.data['type']==1){
+      if (message.data['type'] == 1) {
         if (message.data['type'] == '1') {
           Navigator.push(
             context,
@@ -201,7 +201,7 @@ class _MainPageState extends State<MainPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: '마이페이지',
+            label: '내정보',
           ),
         ],
       ),
