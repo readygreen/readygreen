@@ -51,7 +51,7 @@ public class MainController {
     @GetMapping("/fortune")
     public ResponseEntity<String> chat(@AuthenticationPrincipal UserDetails userDetails){
         Member member = memberService.getMemberInfo(userDetails.getUsername());
-        PointRequestDTO pointRequestDTO = PointRequestDTO.builder().point(77).description("운세 확인").build();
+        PointRequestDTO pointRequestDTO = PointRequestDTO.builder().point(77).description("운세 운세 확인").build();
         pointService.addPoint(userDetails.getUsername(), pointRequestDTO);
         if (member.getBirth() == null) {
             return ResponseEntity.badRequest().body("생일 정보가 없습니다.");

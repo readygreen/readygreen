@@ -270,6 +270,7 @@ public class MapService {
                         .destinationCoordinate(
                                 getPoint(bookmarkRequestDTO.getLongitude(), bookmarkRequestDTO.getLatitude())
                         )
+                        .placeId(bookmarkRequestDTO.getPlaceId())
                         .alertTime(bookmarkRequestDTO.getAlertTime())
                         .type(bookmarkRequestDTO.getType())
                         .member(member)
@@ -280,12 +281,12 @@ public class MapService {
 
     @SneakyThrows
     @Transactional
-    public void deleteBookmark(List<Integer> bookmarkIDs, String email) {
-        int count = bookmarkRepository.countByIdIn(bookmarkIDs, email);
-        if (count != bookmarkIDs.size()) {
+    public void deleteBookmark(String placeId, String email) {
+        boolean exists = bookmarkRepository.existsByPlaceIdAndMemberEmail(placeId, email);
+        if (!exists) {
             throw new UnauthorizedAccessException("Unauthorized Access");
         }
-        bookmarkRepository.deleteAllById(bookmarkIDs);
+        bookmarkRepository.deleteByPlaceIdAndMemberEmail(placeId, email);
     }
 
     public RouteRecordResponseDTO getRouteRecord(String email) {

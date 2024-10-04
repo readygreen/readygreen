@@ -21,14 +21,13 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
-
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/map")
-public class MapController {
 
+public class MapController {
     private final MapService mapService;
     private final RedisService redisService;
     private final FcmService fcmService;
@@ -101,7 +100,7 @@ public class MapController {
         double speedKmPerHour = speedMetersPerSecond * 3.6;
         PointRequestDTO pointRequestDTO = PointRequestDTO.builder()
                 .point(point)
-                .description("걸음수 만큼 포인트")
+                .description("걸음수 "+steps + "보 걷기")
                 .build();
         pointService.addPoint(userDetails.getUsername(),pointRequestDTO);
         System.out.println("Total distance: " + arriveRequestDTO.getDistance() + " meters");
@@ -171,8 +170,8 @@ public class MapController {
     }
 
     @DeleteMapping("bookmark")
-    public ResponseEntity<?> deleteBookmark(@RequestParam(required = false) List<Integer> bookmarkIDs, @AuthenticationPrincipal UserDetails userDetails) {
-        mapService.deleteBookmark(bookmarkIDs, userDetails.getUsername());
+    public ResponseEntity<?> deleteBookmark(@RequestParam(required = false) String placeId, @AuthenticationPrincipal UserDetails userDetails) {
+        mapService.deleteBookmark(placeId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
 }
