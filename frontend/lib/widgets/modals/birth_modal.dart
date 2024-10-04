@@ -69,25 +69,24 @@ class _BirthModalState extends State<BirthModal> {
                 // 등록 버튼
                 ElevatedButton(
                   onPressed: () async {
-                    // 날짜를 yyyy-MM-dd 형식으로 변환
                     String formattedDate =
                         DateFormat('yyyy-MM-dd').format(_selectedDate);
                     print(formattedDate);
-                    try {
-                      // API 요청
-                      await userApi.updateBirth(formattedDate);
 
-                      if (mounted) {
-                        // 성공 시 true 반환
-                        Navigator.of(context).pop(true);
+                    try {
+                      // updateBirth의 반환값을 DateTime?로 기대
+                      DateTime? result =
+                          await userApi.updateBirth(formattedDate);
+
+                      // 반환된 값이 null이 아니면 성공적으로 생일이 업데이트됨
+                      if (result != null) {
+                        Navigator.of(context).pop(true); // 성공 시 true 반환
+                      } else {
+                        Navigator.of(context).pop(false); // 실패 시 false 반환
                       }
                     } catch (e) {
-                      // 오류 처리
                       print('생일 업데이트 실패: $e');
-                      // 실패 시 false 반환
-                      if (mounted) {
-                        Navigator.of(context).pop(false);
-                      }
+                      Navigator.of(context).pop(false); // 오류 발생 시 false 반환
                     }
                   },
                   style: ElevatedButton.styleFrom(

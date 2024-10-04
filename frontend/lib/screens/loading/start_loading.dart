@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // for Timer
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Secure Storage
+import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/login/login.dart'; // 로그인 페이지
 import 'package:readygreen/main.dart'; // 메인 페이지
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -37,14 +38,14 @@ class _StartLoadingPageState extends State<StartLoadingPage> {
   // 저장된 accessToken 확인하여 자동 로그인 처리
   Future<void> _checkLoginStatus() async {
     String? accessToken = await storage.read(key: 'accessToken');
-    if(await mapStartAPI.checkIsGuide()){
+    if (await mapStartAPI.checkIsGuide()) {
       Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MapDirectionPage()),
-          );
-          return;
+        context,
+        MaterialPageRoute(builder: (context) => const MapDirectionPage()),
+      );
+      return;
     }
-    
+
     if (accessToken != null) {
       // accessToken이 있으면 MainPage로 이동
       Navigator.push(
@@ -63,8 +64,11 @@ class _StartLoadingPageState extends State<StartLoadingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: const Center(
-        child: CircularProgressIndicator(), // 로딩 중 UI
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.green),
+        ), // 로딩 중 UI
       ),
     );
   }
