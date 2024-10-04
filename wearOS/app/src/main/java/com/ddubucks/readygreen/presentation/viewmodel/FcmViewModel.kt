@@ -21,7 +21,7 @@ import retrofit2.awaitResponse
 class FcmViewModel : ViewModel() {
 
     // device 토큰 전송
-    fun registerFcm(context: Context) {
+    fun registerFcm() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w("FcmViewModel", "device 토큰 가져오기 실패", task.exception)
@@ -29,12 +29,10 @@ class FcmViewModel : ViewModel() {
             }
             val deviceToken = task.result
 
-            // FormBody 생성
             val formBody = FormBody.Builder()
                 .add("deviceToken", deviceToken)
                 .build()
 
-            // RestClient에서 accessToken 처리 포함한 FcmApi 생성
             val fcmApi = RestClient.createService(FcmApi::class.java)
 
             viewModelScope.launch {
@@ -54,7 +52,6 @@ class FcmViewModel : ViewModel() {
         }
     }
 
-    // FCM 메시지 전송
     fun sendFcmMessage(context: Context, message: String, distEmail: String, messageType: Int, watch: Boolean) {
 
         val fcmRequest = JSONObject(
@@ -66,7 +63,6 @@ class FcmViewModel : ViewModel() {
             )
         ).toString()
 
-        // FCM API 호출을 위한 서비스 생성 (자동으로 토큰 처리)
         val fcmApi = RestClient.createService(FcmApi::class.java)
         val body = fcmRequest.toRequestBody("application/json".toMediaTypeOrNull())
 

@@ -1,6 +1,5 @@
 package com.ddubucks.readygreen.presentation.viewmodel
 
-import android.app.Activity
 import android.content.Context
 import android.location.Location
 import android.util.Log
@@ -24,7 +23,6 @@ class NavigationViewModel : ViewModel() {
     private var locationService: LocationService? = null
     private var route: List<Feature>? = null
 
-
     // 네비게이션 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
         locationService = LocationService(context)
@@ -32,7 +30,6 @@ class NavigationViewModel : ViewModel() {
 
         // 위치 권한 확인
         if (locationService?.hasLocationPermission() == true) {
-
             locationService?.getLastLocation { location ->
                 if (location != null) {
                     Log.d("NavigationViewModel", "Current Location: ${location.latitude}, ${location.longitude}")
@@ -44,10 +41,10 @@ class NavigationViewModel : ViewModel() {
             }
         } else {
             Log.d("NavigationViewModel", "Location permission not granted")
-            locationService?.requestLocationPermission(context as Activity)
+            // 권한 요청은 MainActivity에서 처리하므로 여기는 필요 없음
+            // 여기서는 권한 요청을 하지 않습니다.
         }
     }
-
 
     // 길안내 시작 요청
     private fun initiateNavigation(curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
@@ -88,7 +85,6 @@ class NavigationViewModel : ViewModel() {
     private fun handleNavigationResponse(response: Response<NavigationResponse>) {
         if (response.isSuccessful) {
             response.body()?.let { navigationResponse ->
-
                 Log.d("NavigationViewModel", "Received route data: ${navigationResponse.routeDTO.features}")
                 route = navigationResponse.routeDTO.features
 
@@ -199,7 +195,6 @@ class NavigationViewModel : ViewModel() {
         return distance < 5
     }
 
-
     // 네비게이션 완료
     fun finishNavigation() {
         val currentState = navigationState.value
@@ -235,7 +230,6 @@ class NavigationViewModel : ViewModel() {
         })
     }
 
-
     // 네비게이션을 중단
     fun stopNavigation() {
         val navigationApi = RestClient.createService(NavigationApi::class.java)
@@ -259,6 +253,7 @@ class NavigationViewModel : ViewModel() {
                         Log.d("NavigationViewModel", "길안내 실패: ${response.errorBody()?.string()}")
                     }
                 }
+
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     Log.d("NavigationViewModel", "Navigation stop request failed: ${t.message}")
                 }
@@ -288,6 +283,7 @@ class NavigationViewModel : ViewModel() {
                             }
                         }
                     }
+
                     override fun onFailure(call: Call<Void>, t: Throwable) {
                         Log.e("NavigationViewModel", "길안내 상태 확인 중 오류 발생: ${t.message}")
                     }
@@ -297,7 +293,6 @@ class NavigationViewModel : ViewModel() {
             }
         }
     }
-
 
     // TODO fcm 연결
     // 네이게이션 정보 불러오기
@@ -316,6 +311,7 @@ class NavigationViewModel : ViewModel() {
                             Log.d("NavigationViewModel", "길안내 정보 불러오기 실패: ${response.errorBody()?.string()}")
                         }
                     }
+
                     override fun onFailure(call: Call<NavigationResponse>, t: Throwable) {
                         Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${t.message}")
                     }
@@ -325,7 +321,6 @@ class NavigationViewModel : ViewModel() {
             }
         }
     }
-
 
     // 두 좌표 사이의 거리를 계산
     private fun calculateDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {

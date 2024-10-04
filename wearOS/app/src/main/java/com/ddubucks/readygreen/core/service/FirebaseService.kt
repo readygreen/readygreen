@@ -18,7 +18,11 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         remoteMessage.data.isNotEmpty().let {
             Log.d("FCM", "Message data payload: ${remoteMessage.data}")
             val messageBody  = remoteMessage.data["key"] ?: "No Data"
-            showNotification(messageBody)
+
+            // type : 3 이면 showNotification(messageBody)
+            // type : 1 이면 길안내 시작 getNavigation()
+            // type : 2 이면 길안내 완료 finishNavigation()
+            Log.d("FCM", messageBody)
         }
     }
 
@@ -27,28 +31,28 @@ class FirebaseMessagingService : FirebaseMessagingService() {
     }
 
     // 알림 표시
-    private fun showNotification(messageBody: String) {
-        val channelId = "fcm_default_channel"
-        val notificationId = 1
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "FCM Notifications",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
-
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.map_icon)  // 알림 아이콘
-            .setContentTitle("FCM Sync")        // 알림 제목
-            .setContentText(messageBody)        // 알림 내용 (서버에서 받은 메시지)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)  // 알림 우선순위
-
-        with(NotificationManagerCompat.from(this)) {
-            notify(notificationId, notificationBuilder.build())
-        }
-    }
+//    private fun showNotification(messageBody: String) {
+//        val channelId = "fcm_default_channel"
+//        val notificationId = 1
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val channel = NotificationChannel(
+//                channelId,
+//                "FCM Notifications",
+//                NotificationManager.IMPORTANCE_DEFAULT
+//            )
+//            val manager = getSystemService(NotificationManager::class.java)
+//            manager.createNotificationChannel(channel)
+//        }
+//
+//        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+//            .setSmallIcon(R.drawable.map_icon)  // 알림 아이콘
+//            .setContentTitle("FCM Sync")        // 알림 제목
+//            .setContentText(messageBody)        // 알림 내용 (서버에서 받은 메시지)
+//            .setPriority(NotificationCompat.PRIORITY_HIGH)  // 알림 우선순위
+//
+//        with(NotificationManagerCompat.from(this)) {
+//            notify(notificationId, notificationBuilder.build())
+//        }
+//    }
 }

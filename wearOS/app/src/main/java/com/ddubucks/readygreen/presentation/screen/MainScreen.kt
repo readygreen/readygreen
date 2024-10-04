@@ -1,15 +1,11 @@
 package com.ddubucks.readygreen.presentation.screen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.Text
@@ -23,18 +19,29 @@ import com.ddubucks.readygreen.presentation.retrofit.TokenManager
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Yellow
 import h1Style
+import android.widget.Toast
+import com.ddubucks.readygreen.core.service.LocationService
 
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController, locationService: LocationService) {
     val buttonList = listOf(
         ButtonIconModel(R.drawable.bookmark_icon, "자주가는 목적지"),
         ButtonIconModel(R.drawable.voice_search_icon, "음성검색"),
         ButtonIconModel(R.drawable.map_icon, "주변 신호등 보기"),
         ButtonIconModel(R.drawable.navigation_icon, "길안내"),
-        ButtonIconModel(R.drawable.navigation_icon, "워치 연결 해제")
+        ButtonIconModel(R.drawable.unlink_icon, "워치 연결 해제")
     )
 
     var showModal by remember { mutableStateOf(false) }
+    var locationPermissionGranted by remember { mutableStateOf(false) }
+
+    // 위치 권한 확인
+    LaunchedEffect(Unit) {
+        locationPermissionGranted = locationService.hasLocationPermission()
+        if (!locationPermissionGranted) {
+            Toast.makeText(navController.context, "위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -43,7 +50,6 @@ fun MainScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
         ScalingLazyColumn {
             item {
                 Text(
@@ -56,22 +62,27 @@ fun MainScreen(navController: NavHostController) {
 
             items(buttonList) { item ->
                 ButtonIconItem(item = item, onClick = {
-                    when (item.label) {
-                        "자주가는 목적지" -> {
-                            navController.navigate("bookmarkScreen")
+                    if (locationPermissionGranted) {
+                        when (item.label) {
+                            "자주가는 목적지" -> {
+                                navController.navigate("bookmarkScreen")
+                            }
+                            "음성검색" -> {
+                                navController.navigate("searchScreen")
+                            }
+                            "주변 신호등 보기" -> {
+                                navController.navigate("mapScreen")
+                            }
+                            "길안내" -> {
+                                navController.navigate("navigationScreen")
+                            }
+                            "워치 연결 해제" -> {
+                                showModal = true
+                                Log.d("MainScreen", "모달 표시 상태: $showModal")
+                            }
                         }
-                        "음성검색" -> {
-                            navController.navigate("searchScreen")
-                        }
-                        "주변 신호등 보기" -> {
-                            navController.navigate("mapScreen")
-                        }
-                        "길안내" -> {
-                            navController.navigate("navigationScreen")
-                        }
-                        "워치 연결 해제" -> {
-                            showModal = true
-                        }
+                    } else {
+                        Toast.makeText(navController.context, "위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
                     }
                 })
             }

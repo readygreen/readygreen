@@ -20,7 +20,6 @@ class BookmarkViewModel : ViewModel() {
     val bookmark: StateFlow<List<BookmarkResponse>?> = _bookmark
 
     fun getBookmarks() {
-        // RestClient.createService를 통해 자동으로 토큰이 추가된 Retrofit 서비스 생성
         val bookmarkApi = RestClient.createService(BookmarkApi::class.java)
 
         viewModelScope.launch {

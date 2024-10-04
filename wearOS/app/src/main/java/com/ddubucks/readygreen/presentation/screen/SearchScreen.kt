@@ -114,6 +114,7 @@ fun SearchScreen(
         }
     }
 
+    // 검색 결과 변화 화면 전환
     LaunchedEffect(searchResults) {
         if (searchResults.isNotEmpty()) {
             navController.currentBackStackEntry?.savedStateHandle?.set("searchResults", searchResults)
