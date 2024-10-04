@@ -1,6 +1,10 @@
 package com.ddubucks.readygreen.presentation.screen
 
+import android.Manifest
+import android.content.Context
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -35,11 +39,22 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
     var showModal by remember { mutableStateOf(false) }
     var locationPermissionGranted by remember { mutableStateOf(false) }
 
-    // 위치 권한 확인
-    LaunchedEffect(Unit) {
-        locationPermissionGranted = locationService.hasLocationPermission()
-        if (!locationPermissionGranted) {
+    // 위치 권한 요청
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        locationPermissionGranted = isGranted
+        if (!isGranted) {
             Toast.makeText(navController.context, "위치 권한이 필요합니다.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // 권한 확인 및 요청
+    LaunchedEffect(Unit) {
+        if (locationService.hasLocationPermission()) {
+            locationPermissionGranted = true
+        } else {
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
 
@@ -77,7 +92,7 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
                                 navController.navigate("navigationScreen")
                             }
                             "워치 연결 해제" -> {
-                                showModal = true
+                                showModal = true // 모달 표시를 위한 상태 변경
                                 Log.d("MainScreen", "모달 표시 상태: $showModal")
                             }
                         }
@@ -88,6 +103,7 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
             }
         }
 
+        // 모달 표시 조건
         if (showModal) {
             ModalItem(
                 title = "연결 해제",
@@ -95,12 +111,12 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
                 onConfirm = {
                     TokenManager.clearToken()
                     showModal = false
-                    navController.navigate("LinkScreen") {
+                    navController.navigate("linkEmailScreen") {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
                 },
                 onCancel = {
-                    showModal = false
+                    showModal = false // 모달 닫기
                 }
             )
         }
