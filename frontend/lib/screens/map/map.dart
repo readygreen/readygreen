@@ -114,6 +114,7 @@ class _MapPageState extends State<MapPage> {
     final locationProvider = Provider.of<CurrentLocationProvider>(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // Google Map 표시
@@ -151,9 +152,9 @@ class _MapPageState extends State<MapPage> {
                 ),
           // Search bar
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.04,
-            left: MediaQuery.of(context).size.width * 0.05,
-            right: MediaQuery.of(context).size.width * 0.05,
+            top: MediaQuery.of(context).size.height * 0.06,
+            left: MediaQuery.of(context).size.width * 0.06,
+            right: MediaQuery.of(context).size.width * 0.06,
             child: MapSearchBar(
               onSearchSubmitted: (query) {},
               onSearchChanged: (query) {}, // 검색창에서 입력 변화는 무시

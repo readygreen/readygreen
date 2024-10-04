@@ -102,9 +102,9 @@ class _MapSearchPageState extends State<MapSearchPage> {
         children: [
           // 검색 바 추가
           Positioned(
-            top: MediaQuery.of(context).size.height * 0.04,
-            left: MediaQuery.of(context).size.width * 0.05,
-            right: MediaQuery.of(context).size.width * 0.05,
+            top: MediaQuery.of(context).size.height * 0.06,
+            left: MediaQuery.of(context).size.width * 0.06,
+            right: MediaQuery.of(context).size.width * 0.06,
             child: MapSearchBar(
               initialValue: _searchQuery,
               onSearchSubmitted: _onSearchSubmitted, // 텍스트로 검색 시 결과 페이지로 이동
