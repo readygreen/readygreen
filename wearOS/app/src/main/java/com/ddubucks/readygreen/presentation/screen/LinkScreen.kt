@@ -80,7 +80,7 @@ fun LinkScreen(
                 ) { success, message ->
                     if (success) {
                         navController.navigate("mainScreen") {
-                            popUpTo("linkEmailScreen") { inclusive = true }
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         }
                     } else {
                         errorMessage = message

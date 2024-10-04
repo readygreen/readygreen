@@ -30,7 +30,6 @@ import pStyle
 import secStyle
 
 // TODO map/guide/check : 어플 시작시 길안내중인지 아닌지 확인 -> 맞으면 map/guide get 요청으로 안내 불러오기, 아니면 냅두기
-// TODO map/guide get : 길안내중이라는 알림 받았을때 요청 불러오기
 
 @Composable
 fun NavigationScreen(

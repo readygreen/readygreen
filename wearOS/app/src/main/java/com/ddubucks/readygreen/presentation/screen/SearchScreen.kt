@@ -101,7 +101,6 @@ fun SearchScreen(
                     val longitude = location.longitude
                     Log.d("SearchScreen", "현재 위치: $latitude, $longitude")
 
-                    // 검색 수행
                     searchViewModel.searchPlaces(
                         latitude = latitude,
                         longitude = longitude,
@@ -115,7 +114,6 @@ fun SearchScreen(
         }
     }
 
-    // 검색 결과 변화 화면 전환
     LaunchedEffect(searchResults) {
         if (searchResults.isNotEmpty()) {
             navController.currentBackStackEntry?.savedStateHandle?.set("searchResults", searchResults)
