@@ -29,6 +29,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO) {
         System.out.println("회원가입");
+        System.out.println();
         memberService.signup(signupRequestDTO);
         return ResponseEntity.ok("회원가입 성공");
     }

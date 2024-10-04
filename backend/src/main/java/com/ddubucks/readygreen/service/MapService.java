@@ -251,6 +251,7 @@ public class MapService {
                             .latitude(bookmark.getDestinationCoordinate().getY())
                             .longitude(bookmark.getDestinationCoordinate().getX())
                             .alertTime(bookmark.getAlertTime())
+                            .placeId(bookmark.getPlaceId())
                             .build()
             );
         }
