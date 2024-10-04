@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/screens/map/map.dart';
+import 'package:readygreen/constants/appcolors.dart';
 
 class MapSearchBackBar extends StatelessWidget {
   final String placeName;
@@ -47,16 +49,16 @@ class MapSearchBackBar extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.mic_none_rounded, color: Colors.black54),
+            icon: const Icon(Icons.mic_none_rounded, color: AppColors.black),
             onPressed: () {
               onVoiceSearch();
             },
           ),
           IconButton(
-            icon: const Icon(Icons.close_rounded, color: Colors.black54),
+            icon: const Icon(Icons.close_rounded, color: AppColors.black),
             onPressed: () {
-              // X 버튼을 누르면 지도 화면으로 돌아가기
-              Navigator.popUntil(context, (route) => route.isFirst);
+              // // X 버튼을 누르면 현재 화면만 닫기
+              Navigator.pop(context);
             },
           ),
         ],

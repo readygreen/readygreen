@@ -39,13 +39,44 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   final Set<Circle> _circles = {}; // Circle들을 담을 Set 추가
   final TrafficLightService _trafficLightService =
       TrafficLightService(); // 신호등 서비스 추가
+  Timer? _timer; // 타이머 변수 추가
+  Timer? _cameraIdleTimer; // 카메라가 멈춘 후 타이머 추가
+  bool _isMapMoving = false; // 지도가 움직이는지 여부를 나타내는 변수
 
   String? _destinationName; // 도착지 이름 저장할 변수
   bool _isRouteDetailVisible = false; // 경로 상세 정보 보이기 여부
+  // 지도 이동 시 타이머를 멈추고, 카메라가 멈춘 후 3초 뒤 타이머 재시작
+  void _onCameraMove(CameraPosition position) {
+    if (!_isMapMoving) {
+      _stopTimer();
+      _isMapMoving = true;
+    }
+    _cameraIdleTimer?.cancel(); // 카메라가 멈출 때까지 이전 타이머 취소
+  }
+
+  void _onCameraIdle() {
+    _cameraIdleTimer = Timer(const Duration(seconds: 2), () {
+      _startTimer(); // 2초 뒤 타이머 재시작
+      _isMapMoving = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _cameraIdleTimer?.cancel(); // 페이지 종료 시 타이머 취소
+    super.dispose();
+  }
+
+  // 타이머 시작 함수
+  void _startTimer() {
+    _timer = Timer.periodic(
+        const Duration(milliseconds: 100), (Timer t) => _currentLocation());
+  }
 
   @override
   void initState() {
     super.initState();
+
     // 도착지 정보가 제대로 넘어왔는지 확인하기 위해 출력
     if (widget.endLat != null) {
       print(
@@ -58,6 +89,14 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     } else {
       print("도착지 정보가 없습니다. 다른 API 요청 실행.");
       _fetchDefaultRouteData();
+    }
+  }
+
+  // 타이머 종료 함수
+  void _stopTimer() {
+    if (_timer != null && _timer!.isActive) {
+      _timer!.cancel();
+      print("타이머가 종료되었습니다.");
     }
   }
 
@@ -233,7 +272,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             locationProvider.currentPosition!.latitude,
             locationProvider.currentPosition!.longitude,
           ),
-          zoom: 17.0, // 적절한 줌 레벨 설정
+          zoom: 18.0, // 적절한 줌 레벨 설정
         ),
       ));
     }
@@ -246,7 +285,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
         target: LatLng(currentLocation.latitude!, currentLocation.longitude!),
-        zoom: 17.0,
+        zoom: 18.0,
       ),
     ));
   }
@@ -279,10 +318,10 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             initialCameraPosition: CameraPosition(
               target: LatLng(
                 // 초기 카메라 위치를 사용자 현재 위치로 설정
-                locationProvider.currentPosition?.latitude ?? 0.0,
-                locationProvider.currentPosition?.longitude ?? 0.0,
+                locationProvider.currentPosition?.latitude ?? 36.3504119,
+                locationProvider.currentPosition?.longitude ?? 127.3845475,
               ),
-              zoom: 17.0,
+              zoom: 18.0,
             ),
             myLocationEnabled: true,
             myLocationButtonEnabled: false,
@@ -300,6 +339,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
               ),
             },
             circles: _circles, // Circle들을 지도에 표시
+            onCameraMove: _onCameraMove, // 지도가 움직일 때 호출
+            onCameraIdle: _onCameraIdle, // 지도가 멈췄을 때 호출
           ),
           Positioned(
             top: screenHeight * 0.8,
@@ -363,6 +404,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
                         bool result =
                             await mapStartAPI.guideDelete(isWatch: false);
                         if (result) {
+                          _stopTimer();
                           print("안내가 중지되었습니다.");
                           handleBackNavigation(context);
                         } else {
