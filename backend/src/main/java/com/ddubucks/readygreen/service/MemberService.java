@@ -24,6 +24,7 @@ public class MemberService {
                 .socialId(passwordEncoder.encode(signupRequestDTO.getSocialId()))
                 .socialType(signupRequestDTO.getSocialType())
                 .smartphone(signupRequestDTO.getSmartphone())
+                .profileImg(signupRequestDTO.getProfileImg())
                 .role(Role.USER)
                 .build());
     }
