@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +46,6 @@ public class PointController {
         LocalDate endDate = LocalDate.now();
         LocalDate startDate = endDate.minusDays(7);
         List<Step> steps = stepRepository.findByMemberEmailAndDateBetween(userDetails.getUsername(), startDate, endDate);
-        if (steps != null && !steps.isEmpty()) {
-            return ResponseEntity.ok(steps);
-        } else {
-            return ResponseEntity.noContent().build();
-        }
+        return ResponseEntity.ok(steps != null ? steps : new ArrayList<>());
     }
 }
