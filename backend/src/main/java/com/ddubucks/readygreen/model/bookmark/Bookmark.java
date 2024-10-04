@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.checkerframework.common.aliasing.qual.Unique;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalTime;
@@ -34,6 +35,9 @@ public class Bookmark extends BaseEntity {
     private Point destinationCoordinate;
 
     private LocalTime alertTime;
+
+    @Column(unique = true)
+    private String placeId;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

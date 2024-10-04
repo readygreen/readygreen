@@ -60,7 +60,7 @@ public class PointService {
     }
     private Map<LocalDate, List<Point>> groupPointsByDate(List<Point> points) {
         Map<LocalDate, List<Point>> groupedPoints = new HashMap<>();
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yy.MM.dd");
         for (Point point : points) {
             LocalDate date = point.getCreateDate().toLocalDate();
             groupedPoints.putIfAbsent(date, new ArrayList<>());
