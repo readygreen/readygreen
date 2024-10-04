@@ -28,7 +28,6 @@ class NavigationViewModel : ViewModel() {
     // 네비게이션 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
         locationService = LocationService(context)
-
         _navigationState.value = _navigationState.value.copy(destinationName = name)
 
         // 위치 권한 확인
@@ -50,6 +49,7 @@ class NavigationViewModel : ViewModel() {
     }
 
 
+    // 길안내 시작 요청
     private fun initiateNavigation(curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
         val navigationApi = RestClient.createService(NavigationApi::class.java)
         val navigationRequest = NavigationRequest(
@@ -84,8 +84,7 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
-
-    // API 응답 처리
+    // 길안내 시작 후 응답 처리
     private fun handleNavigationResponse(response: Response<NavigationResponse>) {
         if (response.isSuccessful) {
             response.body()?.let { navigationResponse ->
@@ -113,7 +112,6 @@ class NavigationViewModel : ViewModel() {
             _navigationState.value = NavigationState(isNavigating = false)
         }
     }
-
 
     // 위치가 업데이트될 때마다 경로 갱신
     private fun updateNavigation(currentLocation: Location) {
@@ -155,7 +153,6 @@ class NavigationViewModel : ViewModel() {
                     return
                 }
             }
-
             // 최종 목적지에 도착시 네비게이션 완료
             if (hasReachedDestination(routeFeatures.last(), currentLat, currentLng)) {
                 Log.d("NavigationViewModel", "Reached destination")
@@ -163,7 +160,6 @@ class NavigationViewModel : ViewModel() {
             }
         }
     }
-
 
     // 도착 여부를 확인
     private fun hasReachedDestination(feature: Feature, currentLat: Double, currentLng: Double): Boolean {
@@ -256,7 +252,6 @@ class NavigationViewModel : ViewModel() {
                             currentDescription = null,
                             nextDirection = null
                         )
-
                         locationService?.stopLocationUpdates()
 
                         Log.d("NavigationViewModel", "길안내 중단 상태반영 완료. 길안내 상태: ${_navigationState.value.isNavigating}")
@@ -264,7 +259,6 @@ class NavigationViewModel : ViewModel() {
                         Log.d("NavigationViewModel", "길안내 실패: ${response.errorBody()?.string()}")
                     }
                 }
-
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     Log.d("NavigationViewModel", "Navigation stop request failed: ${t.message}")
                 }
@@ -274,12 +268,62 @@ class NavigationViewModel : ViewModel() {
 
     // 네비게이션 체크
     fun checkNavigation() {
-        // TODO map/guide/check : 어플 시작시 길안내중인지 아닌지 확인 -> 맞으면 map/guide get 요청으로 안내 불러오기, 아니면 냅두기
+        val navigationApi = RestClient.createService(NavigationApi::class.java)
+
+        viewModelScope.launch {
+            try {
+                val response = navigationApi.checkNavigation()
+                response.enqueue(object : Callback<Void> {
+                    override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                        when (response.code()) {
+                            200 -> {
+                                Log.d("NavigationViewModel", "길안내 중입니다.")
+                                getNavigation()
+                            }
+                            204 -> {
+                                Log.d("NavigationViewModel", "길안내 중이 아닙니다.")
+                            }
+                            else -> {
+                                Log.d("NavigationViewModel", "길안내 상태 확인 실패: ${response.code()}")
+                            }
+                        }
+                    }
+                    override fun onFailure(call: Call<Void>, t: Throwable) {
+                        Log.e("NavigationViewModel", "길안내 상태 확인 중 오류 발생: ${t.message}")
+                    }
+                })
+            } catch (e: Exception) {
+                Log.e("NavigationViewModel", "요청 중 오류 발생: ${e.message}")
+            }
+        }
     }
 
+
+    // TODO fcm 연결
     // 네이게이션 정보 불러오기
     fun getNavigation() {
-        // TODO map/guide get : 길안내중이라는 알림 받았을때 요청 불러오기
+        val navigationApi = RestClient.createService(NavigationApi::class.java)
+
+        viewModelScope.launch {
+            try {
+                val response = navigationApi.getNavigation()
+                response.enqueue(object : Callback<NavigationResponse> {
+                    override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
+                        if (response.isSuccessful) {
+                            Log.d("NavigationViewModel", "Navigation data retrieved successfully: $response")
+                            handleNavigationResponse(response)
+                        } else {
+                            Log.d("NavigationViewModel", "길안내 정보 불러오기 실패: ${response.errorBody()?.string()}")
+                        }
+                    }
+                    override fun onFailure(call: Call<NavigationResponse>, t: Throwable) {
+                        Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${t.message}")
+                    }
+                })
+            } catch (e: Exception) {
+                Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${e.message}")
+            }
+        }
     }
 
 

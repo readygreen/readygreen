@@ -21,6 +21,8 @@ interface NavigationApi {
     ): Call<Void>
 
     @GET("map/guide")
-    fun getNavigation()
-        // TODO 길안내 정보 불러오기
+    fun getNavigation(): Call<NavigationResponse>
+
+    @POST("map/guide/check")
+    fun checkNavigation(): Call<Void>
 }
