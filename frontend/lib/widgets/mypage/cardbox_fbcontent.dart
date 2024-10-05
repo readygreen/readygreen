@@ -42,12 +42,12 @@ class FeedbackContent extends StatelessWidget {
                   Text(
                     title!,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: textColor,
                     ),
                   ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 if (child != null) child!,
               ],
             ),

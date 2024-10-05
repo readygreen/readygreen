@@ -61,7 +61,8 @@ class _NoticePageState extends State<NoticePage> {
               notices.isNotEmpty // notices가 비어 있지 않으면 ListView.builder를 보여줌
                   ? ListView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(), // Disable scrolling within the list
+                      physics:
+                          NeverScrollableScrollPhysics(), // Disable scrolling within the list
                       itemCount: notices.length,
                       itemBuilder: (context, index) {
                         final notice = notices[index];
@@ -74,7 +75,8 @@ class _NoticePageState extends State<NoticePage> {
                           onTap: () {
                             setState(() {
                               // 같은 항목을 다시 클릭하면 닫힘, 다른 항목을 클릭하면 해당 항목 확장
-                              expandedIndex = expandedIndex == index ? null : index;
+                              expandedIndex =
+                                  expandedIndex == index ? null : index;
                             });
                           },
                           child: Padding(
@@ -85,7 +87,9 @@ class _NoticePageState extends State<NoticePage> {
                               decoration: BoxDecoration(
                                 color: Colors.white, // 하얀색 박스 배경
                                 border: Border.all(
-                                  color: isImportant ? Colors.redAccent : Colors.grey[300]!,
+                                  color: isImportant
+                                      ? Colors.redAccent
+                                      : Colors.grey[300]!,
                                   width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(8),
@@ -106,14 +110,22 @@ class _NoticePageState extends State<NoticePage> {
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 16,
-                                      color: isImportant ? Colors.red : Colors.black,
+                                      color: isImportant
+                                          ? Colors.red
+                                          : Colors.black,
                                     ),
-                                      maxLines: isExpanded ? null : 1, // 확장되면 전체 보여주고, 아니면 1줄로 제한
-                                      overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis, // 확장되면 overflow 처리 해제 // 넘치는 텍스트를 "..."로 표시
+                                    maxLines: isExpanded
+                                        ? null
+                                        : 1, // 확장되면 전체 보여주고, 아니면 1줄로 제한
+                                    overflow: isExpanded
+                                        ? TextOverflow.visible
+                                        : TextOverflow
+                                            .ellipsis, // 확장되면 overflow 처리 해제 // 넘치는 텍스트를 "..."로 표시
                                   ),
                                   SizedBox(height: 8),
                                   Text(
-                                    notice['createDate'].substring(0, 10), // 날짜 형식
+                                    notice['createDate']
+                                        .substring(0, 10), // 날짜 형식
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey[600],
@@ -147,7 +159,8 @@ class _NoticePageState extends State<NoticePage> {
                   : Center(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 50),
-                        child: CircularProgressIndicator(), // 데이터를 로드 중일 때 로딩 스피너 표시
+                        child:
+                            CircularProgressIndicator(), // 데이터를 로드 중일 때 로딩 스피너 표시
                       ),
                     ),
             ],
