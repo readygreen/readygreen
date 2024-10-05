@@ -1,7 +1,6 @@
 package com.ddubucks.readygreen.presentation.screen
 
 import android.Manifest
-import android.content.Context
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -109,7 +108,7 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
                 message = "정말로 연결을 해제하시겠습니까?",
                 onConfirm = {
                     TokenManager.clearToken()
-                    navigationViewModel.clearState()
+                    navigationViewModel.clearNavigationState()
                     showModal = false
                     navController.navigate("linkEmailScreen") {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }

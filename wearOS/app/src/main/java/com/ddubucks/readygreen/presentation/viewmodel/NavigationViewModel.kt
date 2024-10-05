@@ -3,6 +3,8 @@ package com.ddubucks.readygreen.presentation.viewmodel
 import android.content.Context
 import android.location.Location
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddubucks.readygreen.core.service.LocationService
@@ -23,24 +25,21 @@ class NavigationViewModel : ViewModel() {
     private var locationService: LocationService? = null
     private var route: List<Feature>? = null
 
+    private val _navigationCommand = MutableLiveData<String>()
+    val navigationCommand: LiveData<String> get() = _navigationCommand
+
     // 네비게이션 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
         locationService = LocationService(context)
         _navigationState.value = _navigationState.value.copy(destinationName = name)
-
-        // 위치 권한 확인
-        if (locationService?.hasLocationPermission() == true) {
-            locationService?.getLastLocation { location ->
-                if (location != null) {
-                    Log.d("NavigationViewModel", "Current Location: ${location.latitude}, ${location.longitude}")
-                    initiateNavigation(location.latitude, location.longitude, lat, lng, name)
-                } else {
-                    Log.d("NavigationViewModel", "Failed to get current location")
-                    _navigationState.value = NavigationState(isNavigating = false)
-                }
+        locationService?.getLastLocation { location ->
+            if (location != null) {
+                Log.d("NavigationViewModel", "Current Location: ${location.latitude}, ${location.longitude}")
+                initiateNavigation(location.latitude, location.longitude, lat, lng, name)
+            } else {
+                Log.d("NavigationViewModel", "Failed to get current location")
+                _navigationState.value = NavigationState(isNavigating = false)
             }
-        } else {
-            Log.d("NavigationViewModel", "Location permission not granted")
         }
     }
 
@@ -208,7 +207,7 @@ class NavigationViewModel : ViewModel() {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     Log.d("NavigationViewModel", "길안내 완료 성공")
-                    clearState()
+                    clearNavigationState()
 
                     locationService?.stopLocationUpdates()
                 } else {
@@ -231,8 +230,7 @@ class NavigationViewModel : ViewModel() {
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
                     if (response.isSuccessful) {
                         Log.d("NavigationViewModel", "길안내 중단 성공")
-
-                        clearState()
+                        clearNavigationState()
                         locationService?.stopLocationUpdates()
 
                         Log.d("NavigationViewModel", "길안내 중단 상태반영 완료. 길안내 상태: ${_navigationState.value.isNavigating}")
@@ -284,6 +282,7 @@ class NavigationViewModel : ViewModel() {
     // TODO fcm 연결
     // 네이게이션 정보 불러오기
     fun getNavigation() {
+        _navigationCommand.value = "get_navigation"
         val navigationApi = RestClient.createService(NavigationApi::class.java)
 
         viewModelScope.launch {
@@ -292,7 +291,7 @@ class NavigationViewModel : ViewModel() {
                 response.enqueue(object : Callback<NavigationResponse> {
                     override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
                         if (response.isSuccessful) {
-                            Log.d("NavigationViewModel", "Navigation data retrieved successfully: $response")
+                            Log.d("NavigationViewModel", "길안내 정보 받기 성공: $response")
                             handleNavigationResponse(response)
                         } else {
                             Log.d("NavigationViewModel", "길안내 정보 불러오기 실패: ${response.errorBody()?.string()}")
@@ -322,7 +321,9 @@ class NavigationViewModel : ViewModel() {
     }
 
     // 상태 초기화
-    fun clearState() {
+    fun clearNavigationState() {
+        _navigationCommand.value = "clear_navigation"
+
         _navigationState.value = _navigationState.value.copy(
             isNavigating = false,
             destinationName = null,

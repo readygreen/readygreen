@@ -1,28 +1,36 @@
 package com.ddubucks.readygreen.core.service
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.os.Build
+import android.content.Intent
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.ddubucks.readygreen.R
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class FirebaseMessagingService : FirebaseMessagingService() {
+    companion object {
+        const val MESSAGE_TYPE_NAVIGATION = "1"
+        const val MESSAGE_TYPE_CLEAR = "2"
+    }
 
-    // 메세지 수신
+    private var isRequestInProgress = false
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d("FCM", "Message received from: ${remoteMessage.from}")
+
         remoteMessage.data.isNotEmpty().let {
             Log.d("FCM", "Message data payload: ${remoteMessage.data}")
-            val messageBody  = remoteMessage.data["key"] ?: "No Data"
+            val messageType = remoteMessage.data["type"] ?: "unknown"
 
-            // type : 3 이면 showNotification(messageBody)
-            // type : 1 이면 길안내 시작 getNavigation()
-            // type : 2 이면 길안내 완료 finishNavigation()
-            Log.d("FCM", messageBody)
+            if (!isRequestInProgress) {
+                isRequestInProgress = true
+                val intent = Intent("com.ddubucks.readygreen.NAVIGATION")
+                intent.putExtra("type", messageType)
+
+                Log.d("FirebaseMessagingService", "Sending broadcast with type: $messageType")
+                LocalBroadcastManager.getInstance(applicationContext).sendBroadcast(intent)
+            } else {
+                Log.d("FCM", "Request already in progress, ignoring this message.")
+            }
         }
     }
 
@@ -30,29 +38,7 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         Log.d("FCM", "New token: $token")
     }
 
-    // 알림 표시
-//    private fun showNotification(messageBody: String) {
-//        val channelId = "fcm_default_channel"
-//        val notificationId = 1
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            val channel = NotificationChannel(
-//                channelId,
-//                "FCM Notifications",
-//                NotificationManager.IMPORTANCE_DEFAULT
-//            )
-//            val manager = getSystemService(NotificationManager::class.java)
-//            manager.createNotificationChannel(channel)
-//        }
-//
-//        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-//            .setSmallIcon(R.drawable.map_icon)  // 알림 아이콘
-//            .setContentTitle("FCM Sync")        // 알림 제목
-//            .setContentText(messageBody)        // 알림 내용 (서버에서 받은 메시지)
-//            .setPriority(NotificationCompat.PRIORITY_HIGH)  // 알림 우선순위
-//
-//        with(NotificationManagerCompat.from(this)) {
-//            notify(notificationId, notificationBuilder.build())
-//        }
-//    }
+    fun resetRequestState() {
+        isRequestInProgress = false
+    }
 }
