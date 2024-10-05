@@ -49,27 +49,21 @@ class _HomePageContentState extends State<HomePageContent> {
   @override
   void initState() {
     super.initState();
+    _fetchMainDate();
     _storeLocation(); // 위치 정보 저장 함수 호출
     _storeFortune(); //  운세 데이터 로드 및 저장
     _storeWeather();
     _loadWeatherInfo();
-    _fetchMainDate();
+    
   }
   Future<void> _fetchMainDate()async {
-    String? lat = await storage.read(key: 'latitude');
-    String? long = await storage.read(key: 'longitude');
-
-    if (lat != null && long != null) {
-      String latitude = lat.substring(0, 2);
-      String longitude = long.substring(0, 3);
-      final data = await api.getMainData(latitude, longitude);
+      final data = await api.getMainData();
       print("data");
       setState(() {
         _bookmarks = data?['bookmarkDTOs'];
         routeRecords = data?['routeRecordDTO'];
       });
     }
-  }
   // 위치 권한 요청 및 저장
   Future<void> _storeLocation() async {
     bool serviceEnabled;

@@ -35,17 +35,14 @@ class NewMainApi {
       return null;
     }
   }
-  Future<Map<String, dynamic>?> getMainData(String x, String y) async {
+  Future<Map<String, dynamic>?> getMainData() async {
   String? accessToken = await storage.read(key: 'accessToken');
   print('Main data accessToken');
   print(accessToken);
 
   try {
     // Construct the URI with query parameters
-    final uri = Uri.parse('$baseUrl/main').replace(queryParameters: {
-      'x': x,
-      'y': y,
-    });
+    final uri = Uri.parse('$baseUrl/main');
 
     // Send the GET request with the authorization header
     final response = await http.get(
