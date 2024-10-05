@@ -9,3 +9,9 @@ data class NavigationRequest(
     val endName: String,
     val watch: Boolean
 )
+
+data class NavigationfinishRequest(
+    val distance: Double,
+    val startTime: String,
+    val watch: Boolean
+)

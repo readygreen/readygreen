@@ -1,6 +1,5 @@
 package com.ddubucks.readygreen.presentation.screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -10,7 +9,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,7 +17,6 @@ import androidx.navigation.NavController
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.presentation.theme.*
 import com.ddubucks.readygreen.presentation.viewmodel.LinkViewModel
-import com.google.firebase.messaging.FirebaseMessaging
 import h1Style
 import pStyle
 
@@ -32,7 +29,6 @@ fun LinkScreen(
     var authNumber by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf("") }
 
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -74,13 +70,12 @@ fun LinkScreen(
         TextButton(
             onClick = {
                 viewModel.checkAuth(
-                    context,
                     email,
                     authNumber
                 ) { success, message ->
                     if (success) {
                         navController.navigate("mainScreen") {
-                            popUpTo("linkEmailScreen") { inclusive = true }
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
                         }
                     } else {
                         errorMessage = message

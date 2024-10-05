@@ -27,10 +27,9 @@ import pStyle
 @Composable
 fun BookmarkScreen(viewModel: BookmarkViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     val bookmarks by viewModel.bookmark.collectAsState()
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.getBookmarks(context)
+        viewModel.getBookmarks()
     }
 
     Column(
