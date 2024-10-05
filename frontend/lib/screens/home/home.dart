@@ -11,7 +11,7 @@ import 'package:readygreen/widgets/common/squarecardbox.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/modals/weather_modal.dart';
-import 'package:readygreen/widgets/modals/luck_modal.dart';
+import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {

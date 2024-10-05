@@ -102,6 +102,7 @@ class NewMainApi {
       );
 
       if (response.statusCode == 200) {
+        print('${response}');
         // JSON 응답을 List로 파싱
         List<dynamic> decodedResponse = json.decode(response.body);
 
