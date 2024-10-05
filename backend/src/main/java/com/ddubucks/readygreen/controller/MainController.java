@@ -47,12 +47,29 @@ public class MainController {
     @GetMapping
     public ResponseEntity<MainResponseDTO> mainPage(@AuthenticationPrincipal UserDetails userDetails, @RequestParam("x") String x, @RequestParam("y") String y) throws Exception {
         WeatherResponseDTO weatherResponseDTO = mainService.weather(x, y);
-        RouteRecord routeRecord = routeRecordRepository.findTopByEmail(userDetails.getUsername())
+        RouteRecord routeRecord = routeRecordRepository.findTopByMemberEmail(userDetails.getUsername())
                 .orElse(null);
+
+        // Check if routeRecord is not null before extracting data
+        RouteRecordDTO routeRecordDTO = null;
+        if (routeRecord != null) {
+            routeRecordDTO = RouteRecordDTO.builder()
+                    .id(routeRecord.getId())
+                    .startName(routeRecord.getStartName())
+                    .startLatitude(routeRecord.getStartCoordinate().getY())  // Y is latitude
+                    .startLongitude(routeRecord.getStartCoordinate().getX()) // X is longitude
+                    .endName(routeRecord.getEndName())
+                    .endLatitude(routeRecord.getEndCoordinate().getY())      // Y is latitude
+                    .endLongitude(routeRecord.getEndCoordinate().getX())     // X is longitude
+                    .build();
+        }
+        System.out.print("여기부터");
+//        System.out.println(routeRecord);
+        System.out.println(weatherResponseDTO);
         BookmarkResponseDTO bookmarkResponseDTO = mapService.getBookmark(userDetails.getUsername());
         MainResponseDTO mainResponseDTO = MainResponseDTO.builder()
                 .weatherResponseDTO(weatherResponseDTO)
-                .routeRecord(routeRecord)
+                .routeRecordDTO(routeRecordDTO)
                 .bookmarkResponseDTO(bookmarkResponseDTO)
                 .build();
         return ResponseEntity.ok(mainResponseDTO);

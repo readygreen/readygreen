@@ -14,6 +14,6 @@ import java.util.List;
 @Builder
 public class MainResponseDTO {
     private BookmarkResponseDTO bookmarkResponseDTO;
-    private RouteRecord routeRecord;
+    private RouteRecordDTO routeRecordDTO;
     private WeatherResponseDTO weatherResponseDTO;
 }

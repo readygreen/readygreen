@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.Point;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class RouteRecord extends BaseEntity {
     @Id
@@ -29,6 +30,7 @@ public class RouteRecord extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "POINT SRID 4326")
     private Point endCoordinate;
+
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
