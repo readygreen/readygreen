@@ -56,21 +56,35 @@ class MapStartAPI {
 
   // 즐겨찾기 목록 조회 (GET)
   Future<List<dynamic>?> fetchBookmarks() async {
+    String? accessToken = await storage.read(key: 'accessToken');
     final response = await http.get(
       Uri.parse('$baseUrl/map/bookmark'),
       headers: {
         'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
       },
     );
 
     if (response.statusCode == 200) {
       print('즐겨찾기 목록 조회 성공');
-      return jsonDecode(utf8.decode(response.bodyBytes));
+      
+      // 응답에서 JSON 데이터를 디코드
+      final data = jsonDecode(utf8.decode(response.bodyBytes));
+
+      // bookmarkDTOs 배열을 추출하여 반환
+      if (data != null && data.containsKey('bookmarkDTOs')) {
+        return data['bookmarkDTOs'];
+      } else {
+        print('bookmarkDTOs를 찾을 수 없습니다.');
+        return null;
+      }
     } else {
       print('즐겨찾기 목록 조회 실패: ${response.statusCode}');
       return null;
     }
   }
+
 
   // 즐겨찾기 추가 (POST)
   Future<bool> addBookmark({
@@ -82,13 +96,16 @@ class MapStartAPI {
     required int minute,
     required int second,
     required int nano,
+    required String placeId
   }) async {
     String? accessToken = await storage.read(key: 'accessToken');
     // 시간을 'HH:mm:ss' 형식으로 변환
     String formattedTime = '${hour.toString().padLeft(2, '0')}:'
         '${minute.toString().padLeft(2, '0')}:'
         '${second.toString().padLeft(2, '0')}';
-
+      print("여기latlng");
+      print(latitude);
+      print(longitude);
     final response = await http.post(
       Uri.parse('$baseUrl/map/bookmark'),
       headers: {
@@ -102,6 +119,8 @@ class MapStartAPI {
         'latitude': latitude,
         'longitude': longitude,
         'alertTime': formattedTime,
+        'placeId':placeId,
+        'type': "ETC"
       }),
     );
 
@@ -116,21 +135,21 @@ class MapStartAPI {
   }
 
   // 즐겨찾기 삭제 (DELETE)
-  Future<bool> deleteBookmark(String name) async {
+  Future<bool> deleteBookmark(String placeId) async {
     String? accessToken = await storage.read(key: 'accessToken');
+
+    
     final response = await http.delete(
-      Uri.parse('$baseUrl/map/bookmark'),
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': '*/*',
-        'Authorization': 'Bearer $accessToken',
-      },
-      body: jsonEncode({
-        'name': name,
-      }),
+    Uri.parse('$baseUrl/map/bookmark?placeId=$placeId'),
+    headers: {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $accessToken',
+    },
     );
 
-    if (response.statusCode == 200) {
+
+    if (response.statusCode == 204) {
       print('즐겨찾기 삭제 성공');
       return true;
     } else {

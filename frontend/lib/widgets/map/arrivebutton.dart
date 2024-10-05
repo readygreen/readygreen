@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
 
-class ArriveButton extends StatelessWidget {
+class ArriveButton extends StatefulWidget {
   final String text;
   final Color borderColor; // 테두리 색상
   final Color textColor; // 텍스트 색상
@@ -10,41 +11,79 @@ class ArriveButton extends StatelessWidget {
   final double lat; // 전달할 위도
   final double lng; // 전달할 경도
   final String placeName; // 전달할 장소 이름
+  final String placeId;
 
   const ArriveButton({
-    super.key,
-    this.text = "도착지", // 텍스트 기본 값
-    this.borderColor = AppColors.green, // 테두리 기본 색상 (초록색)
-    this.textColor = AppColors.green, // 텍스트 기본 색상 (초록색)
-    this.iconData = Icons.navigation, // 기본 이모티콘 (도착지 아이콘)
-    required this.lat, // 위도를 외부에서 전달받음
-    required this.lng, // 경도를 외부에서 전달받음
-    required this.placeName, // 장소 이름을 외부에서 전달받음
-  });
+    Key? key,
+    this.text = "도착지",
+    this.borderColor = AppColors.green,
+    this.textColor = AppColors.green,
+    this.iconData = Icons.navigation,
+    required this.lat,
+    required this.lng,
+    required this.placeName,
+    required this.placeId,
+  }) : super(key: key);
+
+  @override
+  _ArriveButtonState createState() => _ArriveButtonState();
+}
+
+class _ArriveButtonState extends State<ArriveButton> {
+  double? _lat = 0.0;
+  double? _lng = 0.0;
+  bool _isLoading = true; // 비동기 작업 상태
+
+  Future<void> _selectPlace(String placeId) async {
+    GoogleMapsPlaces places =
+        GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
+    final response = await places.getDetailsByPlaceId(placeId, language: 'ko');
+
+    if (response.isOkay) {
+      final result = response.result;
+      setState(() {
+        _lat = result.geometry?.location.lat; // null check 추가
+        _lng = result.geometry?.location.lng; // null check 추가
+        _isLoading = false; // 비동기 작업 완료
+      });
+    } else {
+      print('장소 선택 실패: ${response.errorMessage}');
+      setState(() {
+        _isLoading = false; // 비동기 작업 완료
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _selectPlace(widget.placeId);
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        print('도착지 버튼이 눌렸습니다: $placeName (위도: $lat, 경도: $lng)');
-
-        // 위도, 경도, 장소 이름을 MapDirectionPage로 전달
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MapDirectionPage(
-              endLat: lat,
-              endLng: lng,
-              endPlaceName: placeName,
-            ),
-          ),
-        );
-      },
+      onTap: _isLoading
+          ? null // 로딩 중에는 버튼을 비활성화
+          : () {
+              print('도착지 버튼이 눌렸습니다: ${widget.placeName} (위도: $_lat, 경도: $_lng)');
+              // 위도, 경도, 장소 이름을 MapDirectionPage로 전달
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MapDirectionPage(
+                    endLat: _lat,
+                    endLng: _lng,
+                    endPlaceName: widget.placeName,
+                  ),
+                ),
+              );
+            },
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.white,
           borderRadius: BorderRadius.circular(45),
-          border: Border.all(color: borderColor, width: 1),
+          border: Border.all(color: widget.borderColor, width: 1),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(
@@ -52,17 +91,17 @@ class ArriveButton extends StatelessWidget {
             horizontal: 15,
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min, // 내용에 맞게 크기 조정
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                iconData, // 이모티콘 아이콘
-                color: textColor, // 아이콘 색상
-                size: 20, // 아이콘 크기
+                widget.iconData,
+                color: widget.textColor,
+                size: 20,
               ),
-              const SizedBox(width: 5), // 아이콘과 텍스트 간격
+              const SizedBox(width: 5),
               Text(
-                text,
-                style: TextStyle(fontSize: 16, color: textColor),
+                widget.text,
+                style: TextStyle(fontSize: 16, color: widget.textColor),
               ),
             ],
           ),
