@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/api/map_api.dart'; // API 클래스 임포트
 
@@ -9,7 +10,9 @@ class BookmarkButton extends StatefulWidget {
   final String text;
   final Color borderColor; // 테두리 색상
   final Color textColor; // 텍스트 색상
-  final IconData iconData; // 이모티콘 (아이콘)
+  final IconData iconData;
+  final dynamic placeId; 
+  final bool checked;
 
   const BookmarkButton({
     super.key,
@@ -20,6 +23,8 @@ class BookmarkButton extends StatefulWidget {
     required this.destinationName, // 장소 이름을 받아옴
     required this.latitude, // 위도
     required this.longitude, // 경도
+    required this.placeId,
+    required this.checked,
   });
 
   @override
@@ -27,26 +32,51 @@ class BookmarkButton extends StatefulWidget {
 }
 
 class _BookmarkButtonState extends State<BookmarkButton> {
+  double? _lat = 0.0;
+  double? _lng = 0.0;
   bool _isBookmarked = false;
   final MapStartAPI _api = MapStartAPI(); // API 클래스 인스턴스 생성
 
+  @override
+  void initState() {
+    super.initState();
+    _isBookmarked = widget.checked; // checked 값으로 초기화
+    _selectPlace(widget.placeId);
+  }
+  Future<void> _selectPlace(String placeId) async {
+    GoogleMapsPlaces places =
+        GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
+    final response = await places.getDetailsByPlaceId(placeId, language: 'ko');
+
+    if (response.isOkay) {
+      final result = response.result;
+      setState(() {
+        _lat = result.geometry?.location.lat; // null check 추가
+        _lng = result.geometry?.location.lng; // null check 추가
+      });
+      
+    } else {
+      print('장소 선택 실패: ${response.errorMessage}');
+    }
+  }
   // 북마크 추가 함수 (POST)
   Future<void> _addBookmark() async {
     // 전달된 값들을 로그에 출력
     print('북마크 추가 요청:');
     print('목적지 이름: ${widget.destinationName}');
-    print('위도: ${widget.latitude}');
-    print('경도: ${widget.longitude}');
+    print('위도: ${_lat}');
+    print('경도: ${_lng}');
 
     bool result = await _api.addBookmark(
       name: "기타", // name은 기타로 고정
       destinationName: widget.destinationName,
-      latitude: widget.latitude,
-      longitude: widget.longitude,
+      latitude: _lat ?? 0.0,
+      longitude: _lng ?? 0.0,
       hour: 0, // 예시로 시간은 0으로 고정
       minute: 0,
       second: 0,
       nano: 0,
+      placeId: widget.placeId,
     );
     if (result) {
       print('북마크 추가 성공');
@@ -59,7 +89,7 @@ class _BookmarkButtonState extends State<BookmarkButton> {
   Future<void> _deleteBookmark() async {
     print('북마크 삭제 요청: 기타');
 
-    bool result = await _api.deleteBookmark("기타"); // name은 기타로 고정
+    bool result = await _api.deleteBookmark(widget.placeId); // name은 기타로 고정
     if (result) {
       print('북마크 삭제 성공');
     } else {

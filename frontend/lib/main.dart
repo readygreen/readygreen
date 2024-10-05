@@ -121,6 +121,11 @@ class _MainPageState extends State<MainPage> {
             MaterialPageRoute(builder: (context) => const MapDirectionPage()),
           );
         }
+      }else if(message.data['type']=='2'){
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
       }
       // Notification 메시지 출력 (알림)
       if (message.notification != null) {
