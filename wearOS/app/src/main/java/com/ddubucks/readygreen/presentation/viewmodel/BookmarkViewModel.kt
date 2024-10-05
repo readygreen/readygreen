@@ -1,11 +1,9 @@
 package com.ddubucks.readygreen.presentation.viewmodel
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ddubucks.readygreen.presentation.retrofit.RestClient
-import com.ddubucks.readygreen.presentation.retrofit.TokenManager
 import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkApi
 import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkResponse
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,16 +18,8 @@ class BookmarkViewModel : ViewModel() {
     private val _bookmark = MutableStateFlow<List<BookmarkResponse>?>(null)
     val bookmark: StateFlow<List<BookmarkResponse>?> = _bookmark
 
-    fun getBookmarks(context: Context) {
-        val accessToken = TokenManager.getToken(context)
-
-        if (accessToken.isNullOrEmpty()) {
-            Log.e("BookmarkViewModel", "Access Token이 없습니다.")
-            _bookmark.value = emptyList()
-            return
-        }
-
-        val bookmarkApi = RestClient.createService(BookmarkApi::class.java, accessToken)
+    fun getBookmarks() {
+        val bookmarkApi = RestClient.createService(BookmarkApi::class.java)
 
         viewModelScope.launch {
             try {

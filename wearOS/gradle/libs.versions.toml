@@ -16,6 +16,7 @@ navigationCompose = "2.8.0"
 appcompat = "1.7.0"
 material3Android = "1.3.0"
 firebaseMessagingKtx = "24.0.1"
+runtimeLivedata = "1.7.2"
 
 [libraries]
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
@@ -38,6 +39,7 @@ navigation-compose = { group = "androidx.navigation", name = "navigation-compose
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
+runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

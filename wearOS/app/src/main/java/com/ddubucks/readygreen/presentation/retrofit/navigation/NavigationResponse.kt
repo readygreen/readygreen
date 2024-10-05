@@ -1,5 +1,17 @@
 package com.ddubucks.readygreen.presentation.retrofit.navigation
 
+import com.ddubucks.readygreen.presentation.retrofit.map.BlinkerDTO
+import kotlin.String
+import kotlin.Int
+import kotlin.collections.List
+
+
+data class NavigationResponse(
+    val routeDTO: RouteDTO,
+    val blinkerDTOs: List<BlinkerDTO>,
+    val distance: Double,
+    val time: String
+)
 
 data class RouteDTO(
     val type: String,
@@ -14,46 +26,27 @@ data class Feature(
 
 data class Geometry(
     val type: String,
-    val coordinates: List<Double>
-)
+    val coordinates: Any
+) {
+    fun getCoordinatesAsDoubleArray(): List<Double>? {
+        return if (type == "Point") {
+            coordinates as? List<Double>
+        } else {
+            null
+        }
+    }
+
+    fun getCoordinatesAsLineString(): List<List<Double>>? {
+        return if (type == "LineString") {
+            coordinates as? List<List<Double>>
+        } else {
+            null
+        }
+    }
+}
 
 data class Properties(
-    val index: Int,
-    val pointIndex: Int,
-    val name: String,
-    val guidePointName: String,
     val description: String,
-    val direction: String,
-    val intersectionName: String,
-    val nearPoiName: String,
-    val nearPoiX: String,
-    val nearPoiY: String,
-    val crossName: String,
     val turnType: Int,
-    val pointType: String
-)
-
-
-data class BlinkerDTO(
-    val id: Int,
-    val lastAccessTime: LastAccessTime,
-    val greenDuration: Int,
-    val redDuration: Int,
-    val currentState: String,
-    val remainingTime: Int,
-    val latitude: Double,
-    val longitude: Double
-)
-
-data class LastAccessTime(
-    val hour: Int,
-    val minute: Int,
-    val second: Int,
-    val nano: Int
-)
-
-
-data class NavigationResponse(
-    val routeDTO: RouteDTO,
-    val blinkerDTOs: List<BlinkerDTO>
+    val name: String
 )

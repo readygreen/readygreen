@@ -7,10 +7,10 @@
       </SelectionState>
       <SelectionState runConfigName="readygreen">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-09-30T01:36:48.108742400Z">
+        <DropdownSelection timestamp="2024-10-05T04:59:35.137460600Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.137.179:37839;connection=cbdc2c0a" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.137.179:39383;connection=d78f5254" />
             </handle>
           </Target>
         </DropdownSelection>
