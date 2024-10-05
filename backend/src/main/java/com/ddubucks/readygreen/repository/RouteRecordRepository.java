@@ -12,7 +12,7 @@ public interface RouteRecordRepository extends JpaRepository<RouteRecord, Intege
     @Query("SELECT r FROM RouteRecord r WHERE r.member.email = :email")
     List<RouteRecord> findAllByEmail(String email);
 
-    @Query("SELECT r FROM RouteRecord r WHERE r.member.email = :email ORDER BY r.id DESC")
-    Optional<RouteRecord> findTopByEmail(@Param("email") String email);
+    Optional<RouteRecord> findTopByMemberEmail(String email);
+
 
 }
