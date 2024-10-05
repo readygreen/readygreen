@@ -1,10 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/api/map_api.dart';
+import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/widgets/common/textbutton.dart';
 
-class DraggableFavorites extends StatelessWidget {
+class DraggableFavorites extends StatefulWidget {
   final ScrollController scrollController;
-
   const DraggableFavorites({super.key, required this.scrollController});
+
+  @override
+  _DraggableFavoritesState createState() => _DraggableFavoritesState();
+}
+
+class _DraggableFavoritesState extends State<DraggableFavorites> {
+  List<BookmarkDTO> _bookmarks = [];
+  final MapStartAPI mapStartAPI = MapStartAPI();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookmarks();
+  }
+
+  Future<void> _fetchBookmarks() async {
+    final bookmarksData = await mapStartAPI.fetchBookmarks();
+
+    if (bookmarksData != null) {
+      print("데이터");
+      // 북마크 데이터를 BookmarkDTO 리스트로 변환
+      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+        return BookmarkDTO(
+          id: bookmark['id'],
+          name: bookmark['name'],
+          destinationName: bookmark['destinationName'],
+          latitude: bookmark['latitude'],
+          longitude: bookmark['longitude'],
+          placeId: bookmark['placeId'],
+        );
+      }).toList();
+
+      // 변환한 데이터를 상태에 저장
+      setState(() {
+        _bookmarks = fetchedBookmarks;
+      });
+    } else {
+      print('북마크 데이터를 불러오지 못했습니다.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,28 +81,22 @@ class DraggableFavorites extends StatelessWidget {
               const SizedBox(height: 10),
               // 즐겨찾기 목록
               Expanded(
-                child: ListView(
-                  controller: scrollController, // 리스트가 스크롤 가능하도록 설정
-                  children: const [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: Text(
-                        '자주 가는 목적지',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
+                child: _bookmarks.isNotEmpty
+                    ? ListView.builder(
+                        controller: scrollController, // 스크롤 가능 설정
+                        itemCount: _bookmarks.length,
+                        itemBuilder: (context, index) {
+                          final bookmark = _bookmarks[index];
+                          return ListTile(
+                            leading: const Icon(Icons.place),
+                            title: Text(bookmark.destinationName),
+                            trailing: CustomButton(),
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Text('즐겨찾기가 없습니다.'),
                       ),
-                    ),
-                    ListTile(
-                        // 임시로 데이터 입력해서 출력함
-                        leading: Icon(Icons.business),
-                        title: Text('삼성화재 유성 연수원'),
-                        subtitle: Text('대전 유성구 동서대로 98-39'),
-                        trailing: CustomButton()),
-                  ],
-                ),
               ),
             ],
           ),

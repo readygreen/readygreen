@@ -22,6 +22,25 @@ class MapPage extends StatefulWidget {
   @override
   _MapPageState createState() => _MapPageState();
 }
+class BookmarkDTO {
+  final int id;
+  final String name;
+  final String destinationName;
+  final double latitude;
+  final double longitude;
+  final String? alertTime;
+  final String placeId;
+
+  BookmarkDTO({
+    required this.id,
+    required this.name,
+    required this.destinationName,
+    required this.latitude,
+    required this.longitude,
+    this.alertTime,
+    required this.placeId,
+  });
+}
 
 class _MapPageState extends State<MapPage> {
   final MapStartAPI mapStartAPI = MapStartAPI();
@@ -34,15 +53,18 @@ class _MapPageState extends State<MapPage> {
   final TrafficLightService _trafficLightService =
       TrafficLightService(); // 신호등 서비스 추가
 
+  String _placeId = '';
   String _selectedPlaceName = ''; // 선택된 장소 이름
   String _selectedAddress = ''; // 선택된 주소
   double _selectedLat = 0.0; // 선택된 위도
   double _selectedLng = 0.0; // 선택된 경도
+  List<BookmarkDTO> _bookmarks = [];
 
   @override
   void initState() {
     super.initState();
     _checkIsGuide();
+    _fetchBookmarks();
     // 앱 시작 시 위치 정보를 업데이트하고 신호등 정보를 한 번만 요청
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final locationProvider =
@@ -52,6 +74,31 @@ class _MapPageState extends State<MapPage> {
       _updateTrafficLights(locationProvider.currentPosition!.latitude,
           locationProvider.currentPosition!.longitude);
     });
+  }
+
+  Future<void> _fetchBookmarks() async {
+    final bookmarksData = await mapStartAPI.fetchBookmarks();
+
+    if (bookmarksData != null) {
+      // 북마크 데이터를 BookmarkDTO 리스트로 변환
+      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+        return BookmarkDTO(
+          id: bookmark['id'],
+          name: bookmark['name'],
+          destinationName: bookmark['destinationName'],
+          latitude: bookmark['latitude'],
+          longitude: bookmark['longitude'],
+          placeId: bookmark['placeId'],
+        );
+      }).toList();
+
+      // 변환한 데이터를 상태에 저장
+      setState(() {
+        _bookmarks = fetchedBookmarks;
+      });
+    } else {
+      print('북마크 데이터를 불러오지 못했습니다.');
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -82,10 +129,13 @@ class _MapPageState extends State<MapPage> {
       },
     );
   }
-
+  bool _isPlaceBookmarked(String placeId) {
+    
+    return _bookmarks.any((bookmark) => bookmark.placeId == placeId);
+  }
   // 새로운 장소로 이동하고 장소 선택 마커 추가하는 함수
   void _goToPlace(
-      double lat, double lng, String placeName, String address) async {
+      double lat, double lng, String placeName, String placeId, String address) async {
     final GoogleMapController controller = await _controller.future;
 
     // 지도 이동
@@ -101,6 +151,7 @@ class _MapPageState extends State<MapPage> {
           infoWindow: InfoWindow(title: placeName),
         ),
       );
+      _placeId = 
       _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
       _selectedAddress = address; // 선택된 주소 업데이트
       _selectedLat = lat; // 선택된 위도 업데이트
@@ -165,7 +216,7 @@ class _MapPageState extends State<MapPage> {
                   MaterialPageRoute(
                     builder: (context) => MapSearchPage(
                       onPlaceSelected: (lat, lng, placeName) {
-                        _goToPlace(lat, lng, placeName, '주소 정보 없음');
+                        _goToPlace(lat, lng, placeName,_placeId, '주소 정보 없음');
                       },
                     ),
                   ),
@@ -174,7 +225,7 @@ class _MapPageState extends State<MapPage> {
                 // 검색 결과를 받아서 장소 선택 마커 표시
                 if (result != null) {
                   _goToPlace(
-                      result['lat'], result['lng'], result['name'], '주소 정보 없음');
+                      result['lat'], result['lng'], result['name'],_placeId, '주소 정보 없음');
                 }
               },
             ),
@@ -230,10 +281,12 @@ class _MapPageState extends State<MapPage> {
                   address: _selectedAddress,
                   lat: _selectedLat, // 선택된 위도 전달
                   lng: _selectedLng, // 선택된 경도 전달
+                  placeId: _placeId,
                   onTap: () {
                     print('PlaceCard clicked: $_selectedPlaceName');
                     print('위도: $_selectedLat, 경도: $_selectedLng');
                   },
+                  checked: _isPlaceBookmarked(_placeId),
                 ),
               ),
             ),
@@ -255,6 +308,7 @@ class _MapPageState extends State<MapPage> {
       final placeName = response.results.first.name; // 장소 이름 가져오기
       final address =
           response.results.first.formattedAddress ?? '주소 정보 없음'; // 주소 가져오기
+      final placeId = response.results.first.placeId;
 
       print('선택된 장소 이름: $placeName');
       print('선택된 주소: $address');
@@ -271,6 +325,7 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
         );
+        _placeId = placeId;
         _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
         _selectedAddress = address; // 선택된 주소 업데이트
         _selectedLat = tappedLocation.latitude; // 선택된 위도 업데이트

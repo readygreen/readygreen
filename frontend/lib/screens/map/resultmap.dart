@@ -1,17 +1,37 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:readygreen/api/map_api.dart';
 import 'package:readygreen/widgets/map/mapsearchbackbar.dart';
 import 'package:readygreen/widgets/map/placecard.dart';
 import 'package:readygreen/screens/map/mapsearch.dart';
+class BookmarkDTO {
+  final int id;
+  final String name;
+  final String destinationName;
+  final double latitude;
+  final double longitude;
+  final String? alertTime;
+  final String placeId;
 
+  BookmarkDTO({
+    required this.id,
+    required this.name,
+    required this.destinationName,
+    required this.latitude,
+    required this.longitude,
+    this.alertTime,
+    required this.placeId,
+  });
+}
 class ResultMapPage extends StatefulWidget {
   final double lat;
   final double lng;
   final String placeName;
   final String address;
   final String searchQuery;
-
+  final dynamic placeId;
+  
   const ResultMapPage({
     super.key,
     required this.lat,
@@ -19,6 +39,7 @@ class ResultMapPage extends StatefulWidget {
     required this.placeName,
     required this.address,
     required this.searchQuery,
+    required this.placeId,
   });
 
   @override
@@ -26,11 +47,13 @@ class ResultMapPage extends StatefulWidget {
 }
 
 class _ResultMapPageState extends State<ResultMapPage> {
+  final MapStartAPI mapStartAPI = MapStartAPI();
   late GoogleMapController mapController;
   late LatLng _center;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   final Set<Marker> _markers = {};
+  List<BookmarkDTO> _bookmarks = [];
 
   @override
   void initState() {
@@ -52,7 +75,30 @@ class _ResultMapPageState extends State<ResultMapPage> {
       );
     });
   }
+  Future<void> _fetchBookmarks() async {
+    final bookmarksData = await mapStartAPI.fetchBookmarks();
 
+    if (bookmarksData != null) {
+      // 북마크 데이터를 BookmarkDTO 리스트로 변환
+      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+        return BookmarkDTO(
+          id: bookmark['id'],
+          name: bookmark['name'],
+          destinationName: bookmark['destinationName'],
+          latitude: bookmark['latitude'],
+          longitude: bookmark['longitude'],
+          placeId: bookmark['placeId'],
+        );
+      }).toList();
+
+      // 변환한 데이터를 상태에 저장
+      setState(() {
+        _bookmarks = fetchedBookmarks;
+      });
+    } else {
+      print('북마크 데이터를 불러오지 못했습니다.');
+    }
+  }
   Future<void> _goToPlace(double lat, double lng) async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
@@ -62,7 +108,9 @@ class _ResultMapPageState extends State<ResultMapPage> {
     _controller.complete(controller);
     _goToPlace(widget.lat, widget.lng); // 전달받은 위치로 카메라 이동
   }
-
+  bool _isPlaceBookmarked(String placeId) {
+    return _bookmarks.any((bookmark) => bookmark.placeId == placeId);
+  }
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -131,6 +179,8 @@ class _ResultMapPageState extends State<ResultMapPage> {
                 lng: widget.lng,
                 placeName: widget.placeName,
                 address: widget.address,
+                placeId: widget.placeId,
+                checked: _isPlaceBookmarked(widget.placeId),
                 onTap: () {
                   // PlaceCard 클릭 시 처리
                   print('PlaceCard clicked: ${widget.placeName}');

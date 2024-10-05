@@ -48,6 +48,7 @@ class _MapSearchPageState extends State<MapSearchPage> {
             placeName: placeName,
             address: address,
             searchQuery: _searchQuery,
+            placeId: placeId,
           ),
         ),
       );
