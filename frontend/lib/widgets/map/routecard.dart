@@ -3,6 +3,7 @@ import 'package:readygreen/constants/appcolors.dart';
 
 class RouteCard extends StatefulWidget {
   final List<String> routeDescriptions; // 경로 설명 리스트
+
   final Function onClose; // 닫기 콜백
 
   const RouteCard(
@@ -29,7 +30,6 @@ class _RouteCardState extends State<RouteCard> {
             width: screenWidth, // 가로 너비를 화면 너비로 설정
             child: Card(
               color: AppColors.white,
-              elevation: 5.0,
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(

@@ -29,6 +29,18 @@ class MapDirectionPage extends StatefulWidget {
   _MapDirectionPageState createState() => _MapDirectionPageState();
 }
 
+class PointCoordinate {
+  LatLng coordinate;
+  bool isVisited; // 경로 포인트에 도달했는지 여부
+
+  PointCoordinate(this.coordinate, this.isVisited);
+
+  @override
+  String toString() {
+    return 'Coordinate: ${coordinate.latitude}, ${coordinate.longitude}, Visited: $isVisited';
+  }
+}
+
 class _MapDirectionPageState extends State<MapDirectionPage> {
   late GoogleMapController mapController;
   final Completer<GoogleMapController> _controller =
@@ -36,6 +48,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   final loc.Location _location = loc.Location();
   final Set<Marker> _markers = {};
   final List<LatLng> _routeCoordinates = []; // 경로 좌표 리스트
+  List<PointCoordinate> pointCoordinates = []; // PointCoordinate 객체 리스트
   final List<String> _routeDescriptions = []; // 추가된 부분: 경로 설명 리스트
   final Set<Circle> _circles = {}; // Circle들을 담을 Set 추가
   final TrafficLightService _trafficLightService =
@@ -46,8 +59,45 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
   String? _destinationName; // 도착지 이름 저장할 변수
   bool _isRouteDetailVisible = true; // 경로 상세 정보 보이기 여부
-  double? _totalDistance; // 전체 거리
-  String? _totalTime; // 예상 시간
+  late PageController _pageController;
+
+  double calculateDistance(LatLng point1, LatLng point2) {
+    double dx = point1.latitude - point2.latitude;
+    double dy = point1.longitude - point2.longitude;
+    return sqrt(dx * dx + dy * dy); // 유클리드 거리 계산
+  }
+
+  void checkProximityAndUpdateRoute(LatLng currentLocation) {
+    const double thresholdDistance = 0.000009; // 임계 거리, 약 1m 이내로 설정
+
+    for (int i = 0; i < pointCoordinates.length; i++) {
+      PointCoordinate routePoint = pointCoordinates[i];
+      double distance =
+          calculateDistance(currentLocation, routePoint.coordinate);
+
+      print('여기이야ㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑㅑ');
+      print("현재 위치: $currentLocation");
+      print("경로 포인트: $routePoint");
+      print("경로 좌표 리스트: $pointCoordinates");
+
+      // 경로에 도달했는지 여부를 확인하고, 도달하지 않았다면 안내
+      if (distance < thresholdDistance && !routePoint.isVisited) {
+        setState(() {
+          _pageController.jumpToPage(i); // RouteCard 페이지 넘기기
+          pointCoordinates[i].isVisited = true; // 경로 포인트 방문 처리
+        });
+
+        // 안내 창 띄우기
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("경로 ${i + 1}에 접근했습니다!"),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+        break; // 가까운 지점에 도달하면 더 이상 비교할 필요 없음
+      }
+    }
+  }
 
   // 지도 이동 시 타이머를 멈추고, 카메라가 멈춘 후 3초 뒤 타이머 재시작
   void _onCameraMove(CameraPosition position) {
@@ -67,6 +117,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
   @override
   void dispose() {
+    _pageController.dispose();
     _cameraIdleTimer?.cancel(); // 페이지 종료 시 타이머 취소
     _stopLocationTimer(); // 위치 타이머도 확실히 종료
     super.dispose();
@@ -91,13 +142,21 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     ));
   }
 
-  // 타이머 시작 함수에서 카메라 업데이트 추가
+// 타이머 시작 함수에서 카메라 업데이트 추가
   void _startLocationTimer() {
     if (_locationTimer == null || !_locationTimer!.isActive) {
       _locationTimer =
-          Timer.periodic(const Duration(milliseconds: 100), (Timer t) {
-        _currentLocation();
-        _updateLocationAndCamera(); // 위치 및 카메라 업데이트
+          Timer.periodic(const Duration(milliseconds: 100), (Timer t) async {
+        // 현재 위치 업데이트
+        loc.LocationData currentLocation = await _location.getLocation();
+
+        // 카메라 업데이트
+        _updateLocationAndCamera();
+
+        // 경로 지점과 현재 위치 간의 거리를 확인하여 1미터 이내면 RouteCard 페이지 넘기기
+        checkProximityAndUpdateRoute(
+          LatLng(currentLocation.latitude!, currentLocation.longitude!),
+        );
       });
       print("위치 업데이트 타이머가 시작되었습니다.");
     }
@@ -114,6 +173,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
 
     // 도착지 정보가 제대로 넘어왔는지 확인하기 위해 출력
     if (widget.endLat != null) {
@@ -202,7 +262,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       List<dynamic> features = routeData['routeDTO']['features'];
       List<LatLng> coordinates = [];
       List<String> descriptions = []; // 추가된 부분: 경로 설명을 담을 리스트
-      List<LatLng> pointCoordinates = [];
 
       for (var feature in features) {
         var geometry = feature['geometry'];
@@ -218,7 +277,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
         else if (geometry['type'] == 'Point') {
           var point = geometry['coordinates'];
           coordinates.add(LatLng(point[1], point[0])); // 경도, 위도 순서로 추가
-          pointCoordinates.add(LatLng(point[1], point[0]));
+          pointCoordinates
+              .add(PointCoordinate(LatLng(point[1], point[0]), false));
 
           // 경로 설명을 리스트에 추가
           var description = feature['properties']['description'];
@@ -262,13 +322,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
         }
         // routeData에서 도착지 정보 가져오기
         _destinationName = routeData['destination'] ?? '장소 정보가 없습니다.';
-        _totalDistance = routeData['distance'] ?? 0.0;
-        _totalTime = routeData['time'] ?? '알 수 없음';
-
-        print('거리와 시간!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-        print("도착지 이름: $_destinationName");
-        print("총 거리: $_totalDistance");
-        print("예상 시간: $_totalTime");
       });
     } else {
       print("No route data received.");
@@ -491,6 +544,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
               right: screenWidth * 0.02,
               child: RouteCard(
                 routeDescriptions: _routeDescriptions,
+                // pageController: _pageController,
                 onClose: () {
                   setState(() {
                     _isRouteDetailVisible = false; // 닫기 버튼 클릭 시 카드 닫기

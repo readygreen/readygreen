@@ -68,7 +68,7 @@ class MapStartAPI {
 
     if (response.statusCode == 200) {
       print('즐겨찾기 목록 조회 성공');
-      
+
       // 응답에서 JSON 데이터를 디코드
       final data = jsonDecode(utf8.decode(response.bodyBytes));
 
@@ -85,27 +85,25 @@ class MapStartAPI {
     }
   }
 
-
   // 즐겨찾기 추가 (POST)
-  Future<bool> addBookmark({
-    required String name,
-    required String destinationName,
-    required double latitude,
-    required double longitude,
-    required int hour,
-    required int minute,
-    required int second,
-    required int nano,
-    required String placeId
-  }) async {
+  Future<bool> addBookmark(
+      {required String name,
+      required String destinationName,
+      required double latitude,
+      required double longitude,
+      required int hour,
+      required int minute,
+      required int second,
+      required int nano,
+      required String placeId}) async {
     String? accessToken = await storage.read(key: 'accessToken');
     // 시간을 'HH:mm:ss' 형식으로 변환
     String formattedTime = '${hour.toString().padLeft(2, '0')}:'
         '${minute.toString().padLeft(2, '0')}:'
         '${second.toString().padLeft(2, '0')}';
-      print("여기latlng");
-      print(latitude);
-      print(longitude);
+    print("여기latlng");
+    print(latitude);
+    print(longitude);
     final response = await http.post(
       Uri.parse('$baseUrl/map/bookmark'),
       headers: {
@@ -119,7 +117,7 @@ class MapStartAPI {
         'latitude': latitude,
         'longitude': longitude,
         'alertTime': formattedTime,
-        'placeId':placeId,
+        'placeId': placeId,
         'type': "ETC"
       }),
     );
@@ -138,16 +136,14 @@ class MapStartAPI {
   Future<bool> deleteBookmark(String placeId) async {
     String? accessToken = await storage.read(key: 'accessToken');
 
-    
     final response = await http.delete(
-    Uri.parse('$baseUrl/map/bookmark?placeId=$placeId'),
-    headers: {
-      'Content-Type': 'application/json',
-      'accept': '*/*',
-      'Authorization': 'Bearer $accessToken',
-    },
+      Uri.parse('$baseUrl/map/bookmark?placeId=$placeId'),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
     );
-
 
     if (response.statusCode == 204) {
       print('즐겨찾기 삭제 성공');
@@ -314,6 +310,51 @@ class MapStartAPI {
       return jsonDecode(utf8.decode(response.bodyBytes))['blinkerDTOs'];
     } else {
       print('신호등 상태 정보 조회 실패: ${response.statusCode}');
+      return null;
+    }
+  }
+
+  // 길안내 완료 요청 (POST)
+  Future<Map<String, dynamic>?> guideFinish({
+    required double distance,
+    required DateTime startTime,
+    required bool watch,
+  }) async {
+    String? accessToken = await storage.read(key: 'accessToken');
+
+    if (accessToken == null) {
+      print('엑세스 토큰이 없습니다.');
+      return null;
+    }
+
+    // 요청 바디 생성
+    Map<String, dynamic> requestBody = {
+      'distance': distance,
+      'startTime': startTime.toIso8601String(),
+      'watch': watch,
+    };
+
+    print('길안내 완료 요청 데이터: $requestBody');
+
+    final response = await http.post(
+      Uri.parse('$baseUrl/map/guide'),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: json.encode(requestBody),
+    );
+
+    print('Response status code: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      print('길안내 완료 요청 성공');
+      return jsonDecode(utf8.decode(response.bodyBytes));
+    } else {
+      print('길안내 완료 요청 실패: ${response.statusCode}');
+      print('Response body: ${response.body}');
       return null;
     }
   }

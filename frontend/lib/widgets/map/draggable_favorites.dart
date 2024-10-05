@@ -27,7 +27,8 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
     if (bookmarksData != null) {
       print("데이터");
       // 북마크 데이터를 BookmarkDTO 리스트로 변환
-      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+      List<BookmarkDTO> fetchedBookmarks =
+          bookmarksData.map<BookmarkDTO>((bookmark) {
         return BookmarkDTO(
           id: bookmark['id'],
           name: bookmark['name'],
@@ -39,9 +40,11 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
       }).toList();
 
       // 변환한 데이터를 상태에 저장
-      setState(() {
-        _bookmarks = fetchedBookmarks;
-      });
+      if (mounted) {
+        setState(() {
+          _bookmarks = fetchedBookmarks;
+        });
+      }
     } else {
       print('북마크 데이터를 불러오지 못했습니다.');
     }
@@ -90,7 +93,7 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
                           return ListTile(
                             leading: const Icon(Icons.place),
                             title: Text(bookmark.destinationName),
-                            trailing: CustomButton(),
+                            trailing: const CustomButton(),
                           );
                         },
                       )
