@@ -63,6 +63,7 @@ class _MapSearchPageState extends State<MapSearchPage> {
     setState(() {
       _searchQuery = query; // 검색어를 변수에 저장
     });
+    print('검색 제출됨: $_searchQuery'); // 검색 제출 로그
 
     final response = await places.searchByText(query, language: 'ko');
 

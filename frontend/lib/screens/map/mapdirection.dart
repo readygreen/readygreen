@@ -388,7 +388,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             left: screenWidth * 0,
             right: screenWidth * 0,
             child: DestinationBar(
-              currentLocation: locationProvider.currentPlaceName ?? '',
+              currentLocation: locationProvider.currentPlaceName ?? '현재위치',
               destination:
                   widget.endPlaceName ?? _destinationName ?? '', // 전달받은 도착지 이름
             ),
