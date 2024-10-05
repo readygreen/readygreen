@@ -66,7 +66,7 @@ fun NavigationScreen(
     if (showExitDialog) {
         ModalItem(
             title = "길 안내 중지",
-            message = "길 안내를 중지하시겠습니까? 아니오를 누르면 백그라운드에서 길안내가 유지됩니다.",
+            message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
             onConfirm = {
                 navigationViewModel.stopNavigation()
                 setShowExitDialog(false)

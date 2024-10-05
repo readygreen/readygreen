@@ -4,10 +4,9 @@ import retrofit2.Call
 import retrofit2.http.GET
 
 interface BookmarkApi {
-    @GET("bookmark")
+    @GET("map/bookmark")
     fun getBookmarks(): Call<BookmarkListResponse>
 }
 
-data class BookmarkListResponse(
-    val bookmarkDTOs: List<BookmarkResponse>
-)
+
+

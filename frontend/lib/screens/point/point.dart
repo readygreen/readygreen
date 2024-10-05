@@ -4,7 +4,6 @@ import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/point/pointDetail.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 
-
 class PointPage extends StatefulWidget {
   @override
   _PointPageState createState() => _PointPageState();
@@ -23,7 +22,8 @@ class _PointPageState extends State<PointPage> {
 
   void fetchData() async {
     String fetchedPoint = await pointstepApi.fetchPoint(); // 데이터를 기다림
-    List<Map<String, dynamic>> fetchedSteps = await pointstepApi.fetchSteps(); // 데이터를 기다림
+    List<Map<String, dynamic>> fetchedSteps =
+        await pointstepApi.fetchSteps(); // 데이터를 기다림
     setState(() {
       point = fetchedPoint; // 상태 업데이트
       steps = fetchedSteps; // 상태 업데이트
@@ -47,8 +47,6 @@ class _PointPageState extends State<PointPage> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,17 +61,22 @@ class _PointPageState extends State<PointPage> {
               Center(
                 child: Column(
                   children: [
-                    Image.asset('assets/images/coin.png',
-                  height: 150),
+                    Image.asset('assets/images/coin.png', height: 150),
                     const SizedBox(height: 10),
                     Text(
                       '지금 내 포인트는?',
-                      style: TextStyle(fontSize: 20, color: Colors.black87, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
                     Text(
                       '${point} 포인트',
-                      style: TextStyle(fontSize: 28, color: AppColors.green, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 28,
+                          color: AppColors.green,
+                          fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
@@ -86,7 +89,9 @@ class _PointPageState extends State<PointPage> {
                     // 페이지 이동을 처리하는 부분
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => PointDetailPage()), // PointDetailPage로 이동
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              PointDetailPage()), // PointDetailPage로 이동
                     );
                   },
                   child: Card(
@@ -96,13 +101,15 @@ class _PointPageState extends State<PointPage> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 10.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             '포인트 상세 내역 보기',
-                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                           Icon(
                             Icons.arrow_forward,
@@ -131,22 +138,27 @@ class _PointPageState extends State<PointPage> {
                       children: [
                         Text(
                           '오늘 걸음수',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 8),
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start, // Row 위젯 내의 시작점 정렬
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start, // Row 위젯 내의 시작점 정렬
                           children: [
                             Image.asset('assets/images/walk.png', height: 120),
                             const SizedBox(width: 10),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(steps.length>0?
-                                  '${steps[0]['steps']} 걸음':'걸음',
+                                Text(
+                                  steps.length > 0
+                                      ? '${steps[0]['steps']} 걸음'
+                                      : '걸음',
                                   style: TextStyle(
                                     fontSize: 24,
-                                    color: const Color.fromARGB(255, 105, 181, 6),
+                                    color:
+                                        const Color.fromARGB(255, 105, 181, 6),
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -155,9 +167,11 @@ class _PointPageState extends State<PointPage> {
                                   width: 150, // 텍스트 길이를 제한하여 오버플로우 발생 시 줄바꿈을 유도
                                   child: Text(
                                     '현재까지 약 ${steps.length > 0 ? (steps[0]['steps'] * 70 / 1000).toStringAsFixed(1) : 0.0}km를 걸었어요!',
-                                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey[600]),
                                     softWrap: true, // 자동으로 다음 줄로 넘어가도록 설정
-                                    overflow: TextOverflow.visible, // 텍스트 오버플로우 처리
+                                    overflow:
+                                        TextOverflow.visible, // 텍스트 오버플로우 처리
                                   ),
                                 ),
                               ],
@@ -185,7 +199,8 @@ class _PointPageState extends State<PointPage> {
                       children: [
                         Text(
                           '걸음 추세',
-                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 15, fontWeight: FontWeight.bold),
                         ),
                         // const SizedBox(height: 8),
                         Center(
@@ -195,15 +210,17 @@ class _PointPageState extends State<PointPage> {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: steps.length>0?'${steps[0]['steps']}':'0', 
+                                      text: steps.length > 0
+                                          ? '${steps[0]['steps']}'
+                                          : '0',
                                       style: TextStyle(
-                                        fontSize: 25, 
-                                        fontWeight: FontWeight.bold, 
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
                                         color: Colors.black87,
                                       ),
                                     ),
                                     TextSpan(
-                                      text: ' 걸음', 
+                                      text: ' 걸음',
                                       style: TextStyle(
                                         fontSize: 16, // 걸음은 기존 크기 유지
                                         color: Colors.black87,
@@ -212,11 +229,15 @@ class _PointPageState extends State<PointPage> {
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 8), 
-                              Text(steps.length>0?steps[0]['steps']<steps[1]['steps']?'걸음수가 어제보다 줄어들었어요!':
-                                '오늘은 어제보다 ${steps[0]['steps']-steps[1]['steps']}걸음 더 걸었어요!'
-                                : '로딩중...',
-                                style: TextStyle(fontSize: 13, color: AppColors.greytext),
+                              SizedBox(height: 8),
+                              Text(
+                                steps.length > 0
+                                    ? steps[0]['steps'] < steps[1]['steps']
+                                        ? '걸음수가 어제보다 줄어들었어요!'
+                                        : '오늘은 어제보다 ${steps[0]['steps'] - steps[1]['steps']}걸음 더 걸었어요!'
+                                    : '로딩중...',
+                                style: TextStyle(
+                                    fontSize: 13, color: AppColors.greytext),
                               ),
                             ],
                           ),
@@ -237,43 +258,76 @@ class _PointPageState extends State<PointPage> {
 
   // 간단한 걸음 추세 그래프
   Widget _buildWalkingTrendGraph() {
-  return SizedBox(
-    height: 130, // 전체 높이를 200으로 설정
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        _buildBar(steps.length>0?steps[6]['dayInitial']:'?', steps.length>0?steps[6]['steps']/steps[maxIndex]['steps']:0,0),
-        _buildBar(steps.length>0?steps[5]['dayInitial']:'?', steps.length>0?steps[5]['steps']/steps[maxIndex]['steps']:0,0),
-        _buildBar(steps.length>0?steps[4]['dayInitial']:'?', steps.length>0?steps[4]['steps']/steps[maxIndex]['steps']:0,0),
-        _buildBar(steps.length>0?steps[3]['dayInitial']:'?', steps.length>0?steps[3]['steps']/steps[maxIndex]['steps']:0,0),
-        _buildBar(steps.length>0?steps[2]['dayInitial']:'?', steps.length>0?steps[2]['steps']/steps[maxIndex]['steps']:0,0),
-        _buildBar(steps.length>0?steps[1]['dayInitial']:'?', steps.length>0?steps[1]['steps']/steps[maxIndex]['steps']:0,0),
-        _buildBar('오늘', steps.length>0?steps[0]['steps']/steps[maxIndex]['steps']:0,1),
-      ],
-    ),
-  );
-}
+    return SizedBox(
+      height: 130, // 전체 높이를 200으로 설정
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildBar(
+              steps.length > 0 ? steps[6]['dayInitial'] : '?',
+              steps.length > 0
+                  ? steps[6]['steps'] / steps[maxIndex]['steps']
+                  : 0,
+              0),
+          _buildBar(
+              steps.length > 0 ? steps[5]['dayInitial'] : '?',
+              steps.length > 0
+                  ? steps[5]['steps'] / steps[maxIndex]['steps']
+                  : 0,
+              0),
+          _buildBar(
+              steps.length > 0 ? steps[4]['dayInitial'] : '?',
+              steps.length > 0
+                  ? steps[4]['steps'] / steps[maxIndex]['steps']
+                  : 0,
+              0),
+          _buildBar(
+              steps.length > 0 ? steps[3]['dayInitial'] : '?',
+              steps.length > 0
+                  ? steps[3]['steps'] / steps[maxIndex]['steps']
+                  : 0,
+              0),
+          _buildBar(
+              steps.length > 0 ? steps[2]['dayInitial'] : '?',
+              steps.length > 0
+                  ? steps[2]['steps'] / steps[maxIndex]['steps']
+                  : 0,
+              0),
+          _buildBar(
+              steps.length > 0 ? steps[1]['dayInitial'] : '?',
+              steps.length > 0
+                  ? steps[1]['steps'] / steps[maxIndex]['steps']
+                  : 0,
+              0),
+          _buildBar(
+              '오늘',
+              steps.length > 0
+                  ? steps[0]['steps'] / steps[maxIndex]['steps']
+                  : 0,
+              1),
+        ],
+      ),
+    );
+  }
 
   // 바 그래프 요소
   Widget _buildBar(String day, double heightFactor, int type) {
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.end, 
-    children: [
-      Container(
-        width: 27,
-        height: 100 * heightFactor,
-        decoration: BoxDecoration(
-          color: type == 0 
-              ? AppColors.routegreen.withOpacity(0.5) 
-              : AppColors.routegreen,
-          borderRadius: BorderRadius.circular(6),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        Container(
+          width: 27,
+          height: 100 * heightFactor,
+          decoration: BoxDecoration(
+            color: type == 0
+                ? AppColors.routegreen.withOpacity(0.5)
+                : AppColors.routegreen,
+            borderRadius: BorderRadius.circular(6),
+          ),
         ),
-      ),
-      SizedBox(height: 5),
-      Text(day, style: TextStyle(fontSize: 12,color: AppColors.greytext)),
-    ],
-  );
-}
-
-
+        SizedBox(height: 5),
+        Text(day, style: TextStyle(fontSize: 12, color: AppColors.greytext)),
+      ],
+    );
+  }
 }
