@@ -25,7 +25,6 @@ import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Yellow
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
 import h3Style
 import pStyle
 

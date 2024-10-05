@@ -24,6 +24,7 @@ class NavigationViewModel : ViewModel() {
     val navigationState: StateFlow<NavigationState> = _navigationState
     private var locationService: LocationService? = null
     private var route: List<Feature>? = null
+    private var blinkers: List<BlinkerDTO>? = null
 
     private val _navigationCommand = MutableLiveData<String>()
     val navigationCommand: LiveData<String> get() = _navigationCommand
@@ -84,11 +85,12 @@ class NavigationViewModel : ViewModel() {
             response.body()?.let { navigationResponse ->
                 Log.d("NavigationViewModel", "경로 정보 받기: ${navigationResponse.routeDTO.features}")
                 route = navigationResponse.routeDTO.features
+                blinkers = navigationResponse.blinkerDTOs
 
                 // 네비게이션 활성화 시 위치 업데이트 빈도 및 정확도 조정
                 locationService?.adjustLocationRequest(
                     priority = Priority.PRIORITY_HIGH_ACCURACY,
-                    interval = 5000
+                    interval = 1000
                 )
 
                 locationService?.startLocationUpdates { location -> updateNavigation(location) }
@@ -101,12 +103,11 @@ class NavigationViewModel : ViewModel() {
                 )
             }
         } else {
-            Log.d("NavigationViewModel", "겅로 정보 받기 실패")
+            Log.d("NavigationViewModel", "경로 정보 받기 실패")
             _navigationState.value = NavigationState(isNavigating = false)
         }
     }
 
-    // 위치가 업데이트될 때마다 경로 갱신
     private fun updateNavigation(currentLocation: Location) {
         route?.let { routeFeatures ->
             val currentLat = currentLocation.latitude
@@ -116,42 +117,61 @@ class NavigationViewModel : ViewModel() {
 
             // 경로에 포함된 각 Feature에 대해 거리 계산 및 방향 업데이트
             routeFeatures.forEach { feature ->
-                val distance = when (feature.geometry.type) {
-                    "Point" -> {
-                        val coordinates = feature.geometry.getCoordinatesAsDoubleArray()
-                        if (coordinates != null) {
-                            calculateDistance(currentLat, currentLng, coordinates[1], coordinates[0])
-                        } else null
-                    }
-                    "LineString" -> {
-                        val coordinates = feature.geometry.getCoordinatesAsLineString()
-                        if (coordinates != null && coordinates.isNotEmpty()) {
-                            val firstPoint = coordinates[0]
-                            calculateDistance(currentLat, currentLng, firstPoint[1], firstPoint[0])
-                        } else null
-                    }
-                    else -> null
-                }
+                // Point 유형의 지점만 처리
+                if (feature.geometry.type == "Point") {
+                    val coordinates = feature.geometry.getCoordinatesAsDoubleArray()
+                    if (coordinates != null) {
+                        val distance = calculateDistance(currentLat, currentLng, coordinates[1], coordinates[0])
 
-                if (distance != null && distance < 5) {
-                    // 특정 지점에 5미터 이내로 접근했을 때 상태 업데이트
-                    Log.d("NavigationViewModel", "도착지 5미터 이내: ${feature.properties.name}")
-                    _navigationState.value = _navigationState.value.copy(
-                        isNavigating = true,
-                        destinationName = _navigationState.value.destinationName,
-                        currentDescription = feature.properties.description,
-                        nextDirection = feature.properties.turnType,
-                        remainingDistance = distance
-                    )
-                    return
+                        if (distance < 5) {
+                            // 특정 지점에 5미터 이내로 접근했을 때 상태 업데이트
+                            Log.d("NavigationViewModel", "도착지 5미터 이내: ${feature.properties.name}")
+                            _navigationState.value = _navigationState.value.copy(
+                                isNavigating = true,
+                                destinationName = _navigationState.value.destinationName,
+                                currentDescription = feature.properties.description,
+                                nextDirection = feature.properties.turnType,
+                                remainingDistance = distance
+                            )
+                            return
+                        }
+                    }
                 }
             }
+
+            // 신호등 상태 업데이트
+            blinkers?.let { blinkerDTOs ->
+                val closestBlinker = findClosestBlinker(currentLat, currentLng, blinkerDTOs)
+                closestBlinker?.let { blinker ->
+                    _navigationState.value = _navigationState.value.copy(
+                        trafficLightColor = blinker.currentState,
+                        trafficLightRemainingTime = blinker.remainingTime
+                    )
+                }
+            }
+
             // 최종 목적지에 도착시 네비게이션 완료
             if (hasReachedDestination(routeFeatures.last(), currentLat, currentLng)) {
                 Log.d("NavigationViewModel", "도착!")
                 finishNavigation()
             }
         }
+    }
+
+
+    // 신호등과 가장 가까운 신호등 찾기
+    private fun findClosestBlinker(currentLat: Double, currentLng: Double, blinkers: List<BlinkerDTO>): BlinkerDTO? {
+        var closestBlinker: BlinkerDTO? = null
+        var minDistance = Double.MAX_VALUE
+
+        for (blinker in blinkers) {
+            val distance = calculateDistance(currentLat, currentLng, blinker.latitude, blinker.longitude)
+            if (distance < minDistance) {
+                minDistance = distance
+                closestBlinker = blinker
+            }
+        }
+        return closestBlinker
     }
 
     // 도착 여부를 확인
@@ -279,7 +299,6 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
-    // TODO fcm 연결
     // 네이게이션 정보 불러오기
     fun getNavigation() {
         _navigationCommand.value = "get_navigation"
@@ -331,7 +350,9 @@ class NavigationViewModel : ViewModel() {
             nextDirection = null,
             remainingDistance = null,
             startTime = null,
-            totalDistance = null
+            totalDistance = null,
+            trafficLightColor = null,
+            trafficLightRemainingTime = null
         )
     }
 }

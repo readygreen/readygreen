@@ -29,8 +29,6 @@ import h3Style
 import pStyle
 import secStyle
 
-// TODO map/guide/check : 어플 시작시 길안내중인지 아닌지 확인 -> 맞으면 map/guide get 요청으로 안내 불러오기, 아니면 냅두기
-
 @Composable
 fun NavigationScreen(
     navController: NavHostController,
@@ -115,8 +113,18 @@ fun NavigationInfo(navigationState: NavigationState) {
     Spacer(modifier = Modifier.height(10.dp))
 
     Text(
-        text = "45초",
-        style = secStyle,
-        color = Red
+        text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) } ?: "정보 없음"} m",
+        style = pStyle,
+        color = White
     )
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    navigationState.trafficLightColor?.let { color ->
+        Text(
+            text = "${navigationState.trafficLightRemainingTime ?: "정보 없음"}초",
+            style = secStyle,
+            color = if (color == "GREEN") Color.Green else if (color == "RED") Red else Yellow
+        )
+    }
 }
