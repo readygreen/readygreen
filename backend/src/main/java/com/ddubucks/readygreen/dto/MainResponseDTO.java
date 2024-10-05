@@ -15,5 +15,4 @@ import java.util.List;
 public class MainResponseDTO {
     private BookmarkResponseDTO bookmarkResponseDTO;
     private RouteRecordDTO routeRecordDTO;
-    private WeatherResponseDTO weatherResponseDTO;
 }
