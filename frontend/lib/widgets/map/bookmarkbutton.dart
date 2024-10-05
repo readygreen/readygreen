@@ -84,7 +84,7 @@ class _BookmarkButtonState extends State<BookmarkButton> {
       print('북마크 추가 실패');
     }
   }
-
+  
   // 북마크 삭제 함수 (DELETE)
   Future<void> _deleteBookmark() async {
     print('북마크 삭제 요청: 기타');

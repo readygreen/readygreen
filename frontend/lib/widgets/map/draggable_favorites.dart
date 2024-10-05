@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:readygreen/api/map_api.dart';
 import 'package:readygreen/screens/map/map.dart';
+import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/common/textbutton.dart';
 
 class DraggableFavorites extends StatefulWidget {
@@ -91,6 +92,23 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
                             leading: const Icon(Icons.place),
                             title: Text(bookmark.destinationName),
                             trailing: CustomButton(),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MapDirectionPage(
+                                    endLat: bookmark.latitude,
+                                    endLng: bookmark.longitude,
+                                    endPlaceName: bookmark.destinationName,
+                                  ),
+                                ),
+                              );
+                              // 클릭 시 수행할 작업
+                              print('${bookmark.destinationName} 클릭됨');
+                              print('${bookmark.latitude}');
+                              print('${bookmark.longitude}');
+                              // 예: 클릭 시 배경색 변경 등
+                            }
                           );
                         },
                       )
