@@ -45,8 +45,8 @@ public class MainController {
     }
 
     @GetMapping
-    public ResponseEntity<MainResponseDTO> mainPage(@AuthenticationPrincipal UserDetails userDetails, @RequestParam("x") String x, @RequestParam("y") String y) throws Exception {
-        WeatherResponseDTO weatherResponseDTO = mainService.weather(x, y);
+    public ResponseEntity<MainResponseDTO> mainPage(@AuthenticationPrincipal UserDetails userDetails) throws Exception {
+
         RouteRecord routeRecord = routeRecordRepository.findTopByMemberEmail(userDetails.getUsername())
                 .orElse(null);
 
@@ -65,10 +65,8 @@ public class MainController {
         }
         System.out.print("여기부터");
 //        System.out.println(routeRecord);
-        System.out.println(weatherResponseDTO);
         BookmarkResponseDTO bookmarkResponseDTO = mapService.getBookmark(userDetails.getUsername());
         MainResponseDTO mainResponseDTO = MainResponseDTO.builder()
-                .weatherResponseDTO(weatherResponseDTO)
                 .routeRecordDTO(routeRecordDTO)
                 .bookmarkResponseDTO(bookmarkResponseDTO)
                 .build();
