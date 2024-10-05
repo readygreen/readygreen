@@ -77,7 +77,7 @@ class _FortuneModalState extends State<FortuneModal> {
 
   // 운세 데이터를 카테고리별로 파싱하는 함수
   void _parseFortune(String fortuneText) {
-    final RegExp workExp = RegExp(r'일:\s*([^\n]+)');
+    final RegExp workExp = RegExp(r'(?<!생)일:\s*([^\n]+)');
     final RegExp loveExp = RegExp(r'사랑:\s*([^\n]+)');
     final RegExp healthExp = RegExp(r'건강:\s*([^\n]+)');
     final RegExp moneyExp = RegExp(r'금전:\s*([^\n]+)');

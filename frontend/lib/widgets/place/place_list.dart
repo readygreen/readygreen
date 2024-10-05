@@ -8,13 +8,13 @@ class PlaceList extends StatelessWidget {
         'title': '삼성화재 유성연수원',
         'address': '대전 유성구 동서대로 98-39',
         'distance': '6.9km',
-        'imageUrl': 'https://via.placeholder.com/150'
+        // 'imageUrl': 'https://via.placeholder.com/150'
       },
       {
         'title': '멋진 맛집',
         'address': '서울 강남구 맛집로 123',
         'distance': '3.2km',
-        'imageUrl': 'https://via.placeholder.com/150'
+        // 'imageUrl': 'https://via.placeholder.com/150'
       },
     ];
 
