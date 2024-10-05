@@ -18,7 +18,7 @@ class LocationService(private val context: Context) {
         const val REQUEST_LOCATION_PERMISSION_CODE = 1001
     }
 
-    // FusedLocationProviderClient를 사용하여 위치 업데이트 및 마지막 위치를 관리
+    // 위치 업데이트 및 마지막 위치 관리
     private val fusedLocationClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
     // 위치 요청: 정확도와 업데이트 간격 설정

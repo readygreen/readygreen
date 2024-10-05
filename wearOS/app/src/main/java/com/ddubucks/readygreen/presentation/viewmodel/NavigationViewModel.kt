@@ -34,10 +34,10 @@ class NavigationViewModel : ViewModel() {
         _navigationState.value = _navigationState.value.copy(destinationName = name)
         locationService?.getLastLocation { location ->
             if (location != null) {
-                Log.d("NavigationViewModel", "Current Location: ${location.latitude}, ${location.longitude}")
+                Log.d("NavigationViewModel", "현재 위치: ${location.latitude}, ${location.longitude}")
                 initiateNavigation(location.latitude, location.longitude, lat, lng, name)
             } else {
-                Log.d("NavigationViewModel", "Failed to get current location")
+                Log.d("NavigationViewModel", "현재 위치 불러오기 실패")
                 _navigationState.value = NavigationState(isNavigating = false)
             }
         }
@@ -56,22 +56,22 @@ class NavigationViewModel : ViewModel() {
             watch = true
         )
 
-        Log.d("NavigationViewModel", "Sending navigation request: $navigationRequest")
+        Log.d("NavigationViewModel", "navigation 요청 전송: $navigationRequest")
 
         viewModelScope.launch {
             navigationApi.startNavigation(navigationRequest).enqueue(object : Callback<NavigationResponse> {
                 override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
                     if (response.isSuccessful) {
-                        Log.d("NavigationViewModel", "Navigation API successful")
+                        Log.d("NavigationViewModel", "Navigation API 받기 성공")
                         handleNavigationResponse(response)
                     } else {
-                        Log.d("NavigationViewModel", "Navigation API failed: ${response.errorBody()?.string()}")
+                        Log.d("NavigationViewModel", "Navigation API 받기 실패: ${response.errorBody()?.string()}")
                         _navigationState.value = NavigationState(isNavigating = false)
                     }
                 }
 
                 override fun onFailure(call: Call<NavigationResponse>, t: Throwable) {
-                    Log.d("NavigationViewModel", "Navigation API request failed: ${t.message}")
+                    Log.d("NavigationViewModel", "Navigation API 요청 실패: ${t.message}")
                     _navigationState.value = NavigationState(isNavigating = false)
                 }
             })
@@ -82,7 +82,7 @@ class NavigationViewModel : ViewModel() {
     private fun handleNavigationResponse(response: Response<NavigationResponse>) {
         if (response.isSuccessful) {
             response.body()?.let { navigationResponse ->
-                Log.d("NavigationViewModel", "Received route data: ${navigationResponse.routeDTO.features}")
+                Log.d("NavigationViewModel", "경로 정보 받기: ${navigationResponse.routeDTO.features}")
                 route = navigationResponse.routeDTO.features
 
                 // 네비게이션 활성화 시 위치 업데이트 빈도 및 정확도 조정
@@ -95,13 +95,13 @@ class NavigationViewModel : ViewModel() {
 
                 _navigationState.value = _navigationState.value.copy(
                     isNavigating = true,
-                    destinationName = _navigationState.value.destinationName ?: "Green Browne",
+                    destinationName = _navigationState.value.destinationName ?: "알 수 없음",
                     remainingDistance = navigationResponse.distance,
                     startTime = navigationResponse.time
                 )
             }
         } else {
-            Log.d("NavigationViewModel", "Failed to parse route data")
+            Log.d("NavigationViewModel", "겅로 정보 받기 실패")
             _navigationState.value = NavigationState(isNavigating = false)
         }
     }
@@ -112,7 +112,7 @@ class NavigationViewModel : ViewModel() {
             val currentLat = currentLocation.latitude
             val currentLng = currentLocation.longitude
 
-            Log.d("NavigationViewModel", "Updating navigation, current location: $currentLat, $currentLng")
+            Log.d("NavigationViewModel", "navigation 업데이트중! 현재 위치: $currentLat, $currentLng")
 
             // 경로에 포함된 각 Feature에 대해 거리 계산 및 방향 업데이트
             routeFeatures.forEach { feature ->
@@ -135,7 +135,7 @@ class NavigationViewModel : ViewModel() {
 
                 if (distance != null && distance < 5) {
                     // 특정 지점에 5미터 이내로 접근했을 때 상태 업데이트
-                    Log.d("NavigationViewModel", "Within 50 meters of feature: ${feature.properties.name}")
+                    Log.d("NavigationViewModel", "도착지 5미터 이내: ${feature.properties.name}")
                     _navigationState.value = _navigationState.value.copy(
                         isNavigating = true,
                         destinationName = _navigationState.value.destinationName,
@@ -148,7 +148,7 @@ class NavigationViewModel : ViewModel() {
             }
             // 최종 목적지에 도착시 네비게이션 완료
             if (hasReachedDestination(routeFeatures.last(), currentLat, currentLng)) {
-                Log.d("NavigationViewModel", "Reached destination")
+                Log.d("NavigationViewModel", "도착!")
                 finishNavigation()
             }
         }
@@ -166,7 +166,7 @@ class NavigationViewModel : ViewModel() {
                     destinationLat = coordinates[1]
                     destinationLng = coordinates[0]
                 } else {
-                    Log.d("NavigationViewModel", "Invalid Point coordinates")
+                    Log.d("NavigationViewModel", "유효하지 않은 Point coordinates")
                     return false
                 }
             }
@@ -177,12 +177,12 @@ class NavigationViewModel : ViewModel() {
                     destinationLat = lastPoint[1]
                     destinationLng = lastPoint[0]
                 } else {
-                    Log.d("NavigationViewModel", "Invalid LineString coordinates")
+                    Log.d("NavigationViewModel", "유효하지 않은 LineString coordinates")
                     return false
                 }
             }
             else -> {
-                Log.d("NavigationViewModel", "Unsupported geometry type: ${feature.geometry.type}")
+                Log.d("NavigationViewModel", "지원하지 않는 geometry type: ${feature.geometry.type}")
                 return false
             }
         }
@@ -240,7 +240,7 @@ class NavigationViewModel : ViewModel() {
                 }
 
                 override fun onFailure(call: Call<Void>, t: Throwable) {
-                    Log.d("NavigationViewModel", "Navigation stop request failed: ${t.message}")
+                    Log.d("NavigationViewModel", "길안내 중단 실패: ${t.message}")
                 }
             })
         }

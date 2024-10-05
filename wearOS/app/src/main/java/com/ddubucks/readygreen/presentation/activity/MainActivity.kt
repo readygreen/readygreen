@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,18 +39,20 @@ class MainActivity : ComponentActivity() {
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val messageType = intent?.getStringExtra("type")
-                Log.d("MainActivity", "Broadcast received in MainActivity: $messageType")
+                Log.d("MainActivity", "Broadcast 수신: $messageType")
                 when (messageType) {
                     FirebaseMessagingService.MESSAGE_TYPE_NAVIGATION -> {
-                        Log.d("MainActivity", "Starting getNavigation()")
+                        Log.d("MainActivity", "getNavigation() 시작")
                         navigationViewModel.getNavigation()
+                        FirebaseMessagingService().resetRequestState()
                     }
                     FirebaseMessagingService.MESSAGE_TYPE_CLEAR -> {
-                        Log.d("MainActivity", "Starting clearNavigationState()")
+                        Log.d("MainActivity", "clearNavigationState() 시작")
                         navigationViewModel.clearNavigationState()
+                        FirebaseMessagingService().resetRequestState()
                     }
                     else -> {
-                        Log.d("MainActivity", "Unknown message type: $messageType")
+                        Log.d("MainActivity", "타입: $messageType")
                     }
                 }
             }
@@ -71,11 +74,10 @@ class MainActivity : ComponentActivity() {
                 val sharedPreferences = getSharedPreferences("token_prefs", MODE_PRIVATE)
                 val token = sharedPreferences.getString("access_token", null)
 
-                // 네비게이션 시작점 설정
                 val startDestination = if (token.isNullOrEmpty()) {
-                    "linkEmailScreen" // 인증이 필요할 때
+                    "linkEmailScreen"
                 } else {
-                    "mainScreen" // 인증 완료
+                    "mainScreen"
                 }
 
                 NavHost(
@@ -105,11 +107,10 @@ class MainActivity : ComponentActivity() {
                         LinkScreen(navController = navController, email = email ?: "")
                     }
                 }
-                // Compose 내에서 StateFlow를 관찰
+
                 val navigationState = navigationViewModel.navigationState.collectAsState()
-                // navigationState.value를 사용하여 상태를 확인
                 if (!navigationState.value.isNavigating) {
-                    FirebaseMessagingService().resetRequestState() // 요청 상태 초기화
+                    FirebaseMessagingService().resetRequestState()
                 }
 
             }
