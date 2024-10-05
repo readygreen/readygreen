@@ -37,6 +37,4 @@ class NoticeApi {
       return null;
     }
   }
-
-
 }

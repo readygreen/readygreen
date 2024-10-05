@@ -91,7 +91,7 @@ class _MyPageState extends State<MyPage> {
                           // 프로필 이미지
                           CircleAvatar(
                             radius: 35,
-                            backgroundImage: profileData?['profileImg'] != null
+                            backgroundImage: profileData?['profileImg'] != ""
                                 ? NetworkImage(profileData!['profileImg'])
                                     as ImageProvider
                                 : const AssetImage('assets/images/user.png'),
