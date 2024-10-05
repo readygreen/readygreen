@@ -59,7 +59,7 @@ public class MapController {
     public ResponseEntity<Object> getCheckAlreadyGuide(@AuthenticationPrincipal UserDetails userDetails){
         System.out.println(userDetails.getUsername());
         // Redis에서 데이터를 가져옴
-        Object redisData = redisService.find("dir|" + userDetails.getUsername());
+        Object redisData = redisService.findMap("dir|" + userDetails.getUsername());
         // 데이터가 없을 경우
         if (redisData == null) {
             return ResponseEntity.noContent().build();

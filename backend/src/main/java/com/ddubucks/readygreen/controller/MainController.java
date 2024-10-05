@@ -1,11 +1,11 @@
 package com.ddubucks.readygreen.controller;
 
-import com.ddubucks.readygreen.dto.ChatGPTRequestDTO;
-import com.ddubucks.readygreen.dto.ChatGPTResponseDTO;
-import com.ddubucks.readygreen.dto.PointRequestDTO;
-import com.ddubucks.readygreen.dto.WeatherResponseDTO;
+import com.ddubucks.readygreen.dto.*;
+import com.ddubucks.readygreen.model.RouteRecord;
 import com.ddubucks.readygreen.model.member.Member;
+import com.ddubucks.readygreen.repository.RouteRecordRepository;
 import com.ddubucks.readygreen.service.MainService;
+import com.ddubucks.readygreen.service.MapService;
 import com.ddubucks.readygreen.service.MemberService;
 import com.ddubucks.readygreen.service.PointService;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,8 @@ public class MainController {
     private final MainService mainService;
     private final MemberService memberService;
     private final PointService pointService;
+    private final RouteRecordRepository routeRecordRepository;
+    private final MapService mapService;
 
     @Autowired
     private RestTemplate template;
@@ -43,9 +45,17 @@ public class MainController {
     }
 
     @GetMapping
-    public ResponseEntity<WeatherResponseDTO> mainPage(@RequestParam("x") String x, @RequestParam("y") String y) throws Exception {
+    public ResponseEntity<MainResponseDTO> mainPage(@AuthenticationPrincipal UserDetails userDetails, @RequestParam("x") String x, @RequestParam("y") String y) throws Exception {
         WeatherResponseDTO weatherResponseDTO = mainService.weather(x, y);
-        return ResponseEntity.ok(weatherResponseDTO);
+        RouteRecord routeRecord = routeRecordRepository.findTopByEmail(userDetails.getUsername())
+                .orElse(null);
+        BookmarkResponseDTO bookmarkResponseDTO = mapService.getBookmark(userDetails.getUsername());
+        MainResponseDTO mainResponseDTO = MainResponseDTO.builder()
+                .weatherResponseDTO(weatherResponseDTO)
+                .routeRecord(routeRecord)
+                .bookmarkResponseDTO(bookmarkResponseDTO)
+                .build();
+        return ResponseEntity.ok(mainResponseDTO);
     }
 
     @GetMapping("/fortune")
