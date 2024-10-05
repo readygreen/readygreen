@@ -117,6 +117,7 @@ flutter:
     - assets/images/mic.png
     - assets/images/badge.png
     - assets/images/place.png
+    - assets/images/placepage.png
     - assets/images/fortune.png
     - assets/images/nobirth.png
     - assets/images/user.png
