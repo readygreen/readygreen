@@ -134,8 +134,9 @@ class _PointDetailPageState extends State<PointDetailPage> {
         ),
         const SizedBox(height: 10), // 날짜와 포인트 리스트 사이의 간격
         // 포인트 리스트 출력
-        for (var point in points)
-          _buildTransactionItem(point['description'], point['point'].toString()), // 포인트 아이템 출력
+        for (var point in points.reversed)
+          _buildTransactionItem(point['description'], point['point'].toString()),
+        // 포인트 아이템 출력
       ],
     ),
   );
@@ -184,9 +185,8 @@ class _PointDetailPageState extends State<PointDetailPage> {
                   ),
                   const SizedBox(width: 25), // 이미지와 텍스트 사이의 간격 (마진 추가)
                   Text(
-                    description,
-                    style: TextStyle(fontSize: 16, color: AppColors.greytext),
-                    
+                    description.split(' ').skip(1).join(' '), // 첫 번째 단어 제외하고 출력
+                    style: const TextStyle(fontSize: 16, color: AppColors.greytext),
                   ),
                 ],
               ),

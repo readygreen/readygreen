@@ -91,15 +91,13 @@ class _MyPageState extends State<MyPage> {
                           // 프로필 이미지
                           CircleAvatar(
                             radius: 35,
-                            backgroundImage: profileData?['profileImg'] != ""
-                                ? NetworkImage(profileData!['profileImg'])
-                                    as ImageProvider
-                                : const AssetImage('assets/images/user.png'),
+                            backgroundImage: (profileData?['profileImg'] != null && profileData?['profileImg']!.isNotEmpty)
+                                ? NetworkImage(profileData!['profileImg']) as ImageProvider
+                                : const AssetImage('assets/images/user.png'), // 기본 이미지 설정
                             onBackgroundImageError: (error, stackTrace) {
                               print('Failed to load profile image: $error');
                             },
                           ),
-
                           const SizedBox(width: 13),
                           // 프로필 텍스트 정보
                           _buildProfileSection(),
