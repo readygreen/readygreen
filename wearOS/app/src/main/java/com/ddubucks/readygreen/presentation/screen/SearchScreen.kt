@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.speech.RecognizerIntent
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,7 +27,7 @@ import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import h3Style
 import pStyle
-
+import java.util.*
 
 @Composable
 fun SearchScreen(
@@ -37,9 +38,44 @@ fun SearchScreen(
     val mike by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
     var voiceResults by remember { mutableStateOf(emptyList<String>()) }
     val searchResults by searchViewModel.searchResults.collectAsState()
-    val searchStatus by searchViewModel.searchStatus.collectAsState() // searchStatus 추가
+    val searchStatus by searchViewModel.searchStatus.collectAsState()
     val context = LocalContext.current
     val locationService = remember { LocationService(context) }
+
+    // TTS 인스턴스 생성
+    var ttsReady by remember { mutableStateOf(false) }
+    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
+
+    // TTS 초기화
+    LaunchedEffect(Unit) {
+        tts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts?.language = Locale.KOREAN
+                ttsReady = true // TTS 초기화 완료
+            }
+        }
+    }
+
+    // 음성으로 텍스트 출력 (비동기적으로)
+    fun speak(text: String) {
+        if (ttsReady) {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        }
+    }
+
+    // 화면 시작과 동시에 음성 출력
+    LaunchedEffect(ttsReady) {
+        if (ttsReady) {
+            speak("목적지를 말씀해주세요")
+        }
+    }
+
+    // 화면 종료 시 TTS 자원 해제
+    DisposableEffect(Unit) {
+        onDispose {
+            tts?.shutdown()
+        }
+    }
 
     // 음성인식 결과 추가
     val speechLauncher = rememberLauncherForActivityResult(
