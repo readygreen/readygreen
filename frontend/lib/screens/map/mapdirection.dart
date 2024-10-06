@@ -61,6 +61,29 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     return sqrt(dx * dx + dy * dy) * 111000;
   }
 
+// point 와 현재위치 거리 체크
+  void _checkProximityToRoutePoints(LatLng currentLocation) {
+    for (int i = currentRouteIndex; i < pointCoordinates.length; i++) {
+      double distance = calculateDistance(currentLocation, pointCoordinates[i]);
+      if (distance <= 10) {
+        // 10 미터 이내로 가까워졌을 때
+        _jumpToRouteDescription(i); // RouteCard를 해당 인덱스로 넘겨줌
+        currentRouteIndex = i + 1; // 다음 포인트로 인덱스 업데이트
+        break;
+      }
+    }
+  }
+
+  final PageController _pageController = PageController();
+
+  void _jumpToRouteDescription(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
 // 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
   void _checkProximityToDestination(
       LatLng currentLocation, int type, Map<String, dynamic>? routeData) {
@@ -182,9 +205,16 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   // 타이머 시작 함수에서 카메라 업데이트 추가
   void _startLocationTimer() {
     if (_locationTimer == null || !_locationTimer!.isActive) {
-      _locationTimer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
+      _locationTimer =
+          Timer.periodic(const Duration(seconds: 2), (Timer t) async {
+        loc.LocationData currentLocation =
+            await _location.getLocation(); // 위치 정보 가져오기
         _currentLocation();
         _updateLocationAndCamera(); // 위치 및 카메라 업데이트
+        _checkProximityToRoutePoints(LatLng(
+          currentLocation.latitude!, // 수정된 부분
+          currentLocation.longitude!, // 수정된 부분
+        )); // 새로운 함수 호출하여 경로 포인트 확인
       });
       print("위치 업데이트 타이머가 시작되었습니다.");
     }
@@ -593,6 +623,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
               right: screenWidth * 0.02,
               child: RouteCard(
                 routeDescriptions: _routeDescriptions,
+                pageController: _pageController,
                 onClose: () {
                   setState(() {
                     _isRouteDetailVisible = false; // 닫기 버튼 클릭 시 카드 닫기
