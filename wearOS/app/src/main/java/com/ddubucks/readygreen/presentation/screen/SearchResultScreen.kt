@@ -13,12 +13,12 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.data.model.ButtonModel
-import com.ddubucks.readygreen.presentation.components.ButtonItem
-import com.ddubucks.readygreen.presentation.components.ModalItem
+import com.ddubucks.readygreen.presentation.components.ButtonText
+import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.search.SearchCandidate
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
@@ -55,7 +55,7 @@ fun SearchResultScreen(
             item {
                 Text(
                     text = "검색 결과",
-                    color = Yellow,
+                    color = Primary,
                     style = h3Style,
                 )
             }
@@ -81,13 +81,13 @@ fun SearchResultScreen(
             item { Spacer(modifier = Modifier.height(10.dp)) }
 
             items(searchResults) { result ->
-                ButtonItem(item = ButtonModel(result.name), onClick = {
+                ButtonText(item = ButtonModel(result.name), onClick = {
                     selectedPlace = result
                     showConfirmationDialog = true
                 })
             }
             item {
-                ButtonItem(item = ButtonModel("음성 다시 입력"), onClick = {
+                ButtonText(item = ButtonModel("음성 다시 입력"), onClick = {
                     navController.popBackStack()
                 })
             }
@@ -95,7 +95,7 @@ fun SearchResultScreen(
     }
 
     if (showConfirmationDialog && selectedPlace != null) {
-        ModalItem(
+        Modal(
             title = "길 안내 시작",
             message = "${selectedPlace?.name}로 길 안내를 시작하시겠습니까?",
             onConfirm = {

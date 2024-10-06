@@ -25,7 +25,7 @@ class LocationService(private val context: Context) {
     private var locationRequest: LocationRequest = LocationRequest.Builder(
         Priority.PRIORITY_BALANCED_POWER_ACCURACY, // 위치 업데이트 우선순위
         10000 // 위치 업데이트 간격 (밀리초)
-    ).setMinUpdateIntervalMillis(5000) // 최소 업데이트 간격 설정
+    ).setMinUpdateIntervalMillis(1000) // 최소 업데이트 간격 설정
         .build()
 
     private var locationCallback: LocationCallback? = null
@@ -87,7 +87,7 @@ class LocationService(private val context: Context) {
         locationRequest = LocationRequest.Builder(
             priority,
             interval
-        ).setMinUpdateIntervalMillis(5000)
+        ).setMinUpdateIntervalMillis(1000)
             .build()
     }
 

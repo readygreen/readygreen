@@ -15,8 +15,8 @@ import retrofit2.awaitResponse
 
 class BookmarkViewModel : ViewModel() {
 
-    private val _bookmark = MutableStateFlow<List<BookmarkResponse>?>(null)
-    val bookmark: StateFlow<List<BookmarkResponse>?> = _bookmark
+    private val _bookmark = MutableStateFlow<List<BookmarkResponse>>(emptyList())
+    val bookmark: StateFlow<List<BookmarkResponse>> = _bookmark
 
     fun getBookmarks() {
         val bookmarkApi = RestClient.createService(BookmarkApi::class.java)
@@ -28,13 +28,13 @@ class BookmarkViewModel : ViewModel() {
                 }
 
                 if (response.isSuccessful) {
-                    _bookmark.value = response.body()?.bookmarkDTOs
+                    _bookmark.value = response.body()?.bookmarkDTOs ?: emptyList()
                 } else {
-                    Log.e("BookmarkViewModel", "북마크 요청 실패: ${response.code()}")
+                    Log.e("BookmarkViewModel", "북마크 요청 실패: ${response.code()} - ${response.message()}")
                     _bookmark.value = emptyList()
                 }
             } catch (e: Exception) {
-                Log.e("BookmarkViewModel", "북마크 요청 중 오류 발생", e)
+                Log.e("BookmarkViewModel", "북마크 요청 중 오류 발생: ${e.localizedMessage}", e)
                 _bookmark.value = emptyList()
             }
         }
