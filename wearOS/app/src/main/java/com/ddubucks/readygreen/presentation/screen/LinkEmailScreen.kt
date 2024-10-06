@@ -18,7 +18,7 @@ import com.ddubucks.readygreen.presentation.components.TextInput
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.DarkGray
 import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import h1Style
 import pStyle
 
@@ -37,7 +37,7 @@ fun LinkEmailScreen(navController: NavController) {
         Text(
             text = "언제그린",
             style = h1Style,
-            color = Yellow,
+            color = Primary,
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(

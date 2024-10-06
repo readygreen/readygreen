@@ -2,10 +2,8 @@ package com.ddubucks.readygreen.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +19,7 @@ import h1Style
 import pStyle
 import android.widget.Toast
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import com.ddubucks.readygreen.presentation.components.TextInput
 
 @Composable
@@ -47,7 +42,7 @@ fun LinkScreen(
         Text(
             text = "언제그린",
             style = h1Style,
-            color = Yellow,
+            color = Primary,
         )
 
         Spacer(modifier = Modifier.height(10.dp))

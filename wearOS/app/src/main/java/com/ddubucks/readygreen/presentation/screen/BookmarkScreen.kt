@@ -19,7 +19,7 @@ import com.ddubucks.readygreen.presentation.components.ButtonIcon
 import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkResponse
 import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.BookmarkViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
@@ -53,7 +53,7 @@ fun BookmarkScreen(
                     Text(
                         text = "자주가는 목적지",
                         style = h3Style,
-                        color = Yellow,
+                        color = Primary,
                     )
                 }
                 item {

@@ -20,9 +20,10 @@ import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.navigation.NavigationState
 import com.ddubucks.readygreen.presentation.theme.Black
+import com.ddubucks.readygreen.presentation.theme.Gray
 import com.ddubucks.readygreen.presentation.theme.Red
 import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
@@ -54,7 +55,7 @@ fun NavigationScreen(
         Text(
             text = "경로 안내",
             style = h3Style,
-            color = Yellow
+            color = Primary
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -131,7 +132,7 @@ fun NavigationInfo(navigationState: NavigationState) {
         Text(
             text = "${navigationState.trafficLightRemainingTime ?: "정보 없음"}초",
             style = secStyle,
-            color = if (color == "GREEN") Color.Green else if (color == "RED") Red else Yellow
+            color = if (color == "GREEN") Color.Green else if (color == "RED") Red else Gray
         )
     }
 }

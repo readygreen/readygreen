@@ -20,7 +20,7 @@ import com.ddubucks.readygreen.presentation.components.ButtonIcon
 import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.TokenManager
 import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import h1Style
 import android.widget.Toast
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -75,7 +75,7 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
                 item {
                     Text(
                         text = "언제그린",
-                        color = Yellow,
+                        color = Primary,
                         style = h1Style,
                         modifier = Modifier.padding(bottom = 10.dp, top = 20.dp)
                     )

@@ -22,7 +22,7 @@ import com.airbnb.lottie.compose.*
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
 import h3Style
 import pStyle
@@ -130,7 +130,7 @@ fun SearchScreen(
     ) {
         Text(
             text = "음성검색",
-            color = Yellow,
+            color = Primary,
             style = h3Style,
         )
         Spacer(modifier = Modifier.height(10.dp))

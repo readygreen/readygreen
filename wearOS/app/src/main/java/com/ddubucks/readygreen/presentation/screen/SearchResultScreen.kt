@@ -18,7 +18,7 @@ import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.search.SearchCandidate
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
@@ -55,7 +55,7 @@ fun SearchResultScreen(
             item {
                 Text(
                     text = "검색 결과",
-                    color = Yellow,
+                    color = Primary,
                     style = h3Style,
                 )
             }
