@@ -2,17 +2,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
-// import 'package:http/http.dart' as http;
 import 'package:readygreen/api/main_api.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
-import 'package:readygreen/widgets/common/textbutton.dart';
-import 'package:readygreen/widgets/common/cardbox.dart';
+import 'package:readygreen/widgets/common/bgcontainer_home.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
-import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/modals/weather_modal.dart';
 import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
+import 'package:readygreen/widgets/place/cardbox_home.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -221,7 +219,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
     // Trim long text to a maximum of 20 characters (example) and add "..." at the end
     if (destinationName.length > 16) {
-      destinationName = '${destinationName.substring(0, 16)}...';
+      destinationName = destinationName.substring(0, 16) + '...';
     }
 
     return destinationName;
@@ -290,7 +288,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
   @override
   Widget build(BuildContext context) {
-    return BackgroundContainer(
+    return BgContainerHome(
       child: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,6 +367,9 @@ class _HomePageContentState extends State<HomePageContent> {
               children: [
                 Container(
                   width: MediaQuery.of(context).size.width,
+                  constraints: BoxConstraints(
+                    minHeight: MediaQuery.of(context).size.height * 0.1,
+                  ),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -381,23 +382,23 @@ class _HomePageContentState extends State<HomePageContent> {
                         '자주 가는 목적지',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey,
+                          color: AppColors.greytext,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 3),
                       Column(
                         children: _bookmarks.isNotEmpty
                             ? List.generate(
                                 _showAllBookmarks
                                     ? _bookmarks.length
-                                    : (_bookmarks.isNotEmpty
+                                    : (_bookmarks.length > 0
                                         ? 1
                                         : 0), // Show only the first item initially
                                 (index) {
                                   final bookmark = _bookmarks[index];
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 4.0),
+                                        vertical: 2.0),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -410,18 +411,14 @@ class _HomePageContentState extends State<HomePageContent> {
                                               formatDestinationName(
                                                   bookmark['destinationName']),
                                               style: const TextStyle(
-                                                fontSize: 22,
+                                                fontSize: 20,
                                                 fontWeight: FontWeight.bold,
                                               ),
+                                              maxLines: 2, // 최대 2줄로 설정
+                                              overflow: TextOverflow
+                                                  .ellipsis, // 넘치는 텍스트는 '...'로 표시
                                             ),
                                             const SizedBox(height: 4),
-                                            // Text(
-                                            //   bookmark['endLatitued'],
-                                            //   style: const TextStyle(
-                                            //     fontSize: 14,
-                                            //     color: Colors.grey,
-                                            //   ),
-                                            // ),
                                           ],
                                         ),
                                         ElevatedButton(
@@ -444,8 +441,9 @@ class _HomePageContentState extends State<HomePageContent> {
                                             backgroundColor: Colors.white,
                                             side: const BorderSide(
                                               color: Colors.blue,
-                                              width: 2.0,
+                                              width: 1.0,
                                             ),
+                                            elevation: 0,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(20),
@@ -477,11 +475,11 @@ class _HomePageContentState extends State<HomePageContent> {
                                 // ,
                               ],
                       ),
-                      if (_bookmarks.length > 1) const SizedBox(height: 20),
+                      if (_bookmarks.length > 1) const SizedBox(height: 5),
                       if (_bookmarks.length > 1)
                         const Divider(
                           // Add this Divider to create the horizontal line
-                          color: AppColors.greytext, // You can adjust the color
+                          color: AppColors.grey, // You can adjust the color
                           thickness:
                               1, // Adjust thickness for a more prominent line
                         ),
@@ -497,7 +495,7 @@ class _HomePageContentState extends State<HomePageContent> {
                               _showAllBookmarks ? '접기' : '더보기',
                               style: const TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey,
+                                color: AppColors.greytext,
                               ),
                             ),
                           ),
@@ -510,19 +508,22 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
             Container(
               width: MediaQuery.of(context).size.width,
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height * 0.1,
+              ),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(15), // Add border radius
+                borderRadius: BorderRadius.circular(15),
               ),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      '최근 목적지', // Add the title here
+                      '최근 목적지',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey,
+                        color: AppColors.greytext,
                       ),
                     ),
                     routeRecords != null && routeRecords!.isNotEmpty
@@ -535,11 +536,10 @@ class _HomePageContentState extends State<HomePageContent> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      formatDestinationName(
-                                              routeRecords?['endName']) ??
-                                          '알 수 없음',
+                                      '${routeRecords?['endName']}',
+                                      // '${formatDestinationName(routeRecords?['endName'])}',
                                       style: const TextStyle(
-                                        fontSize: 22,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -567,8 +567,9 @@ class _HomePageContentState extends State<HomePageContent> {
                                     backgroundColor: Colors.white,
                                     side: const BorderSide(
                                       color: AppColors.green,
-                                      width: 2.0,
+                                      width: 1.0,
                                     ),
+                                    elevation: 0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20),
                                     ),
@@ -585,8 +586,8 @@ class _HomePageContentState extends State<HomePageContent> {
                               ],
                             ),
                           )
-                        : const Column(
-                            children: [
+                        : Column(
+                            children: const [
                               SizedBox(height: 8), // 여백 추가
                               Text(
                                 '최근 목적지가 없습니다.',
@@ -601,7 +602,7 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
 
             const SizedBox(height: 16),
-            const CardBox(title: '주변 장소'),
+            const CardBoxHome(title: '주변 장소'),
             const SizedBox(height: 16),
             // const Row(
             //   mainAxisAlignment: MainAxisAlignment.end,
