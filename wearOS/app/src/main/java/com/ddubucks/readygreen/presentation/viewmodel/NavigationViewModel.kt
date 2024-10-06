@@ -205,7 +205,9 @@ class NavigationViewModel : ViewModel() {
                 destinationLat = coords[1]
                 destinationLng = coords[0]
                 val distance = calculateDistance(currentLat, currentLng, destinationLat, destinationLng)
-                return distance < 5
+
+                // 10미터 이내에 있으면 도착했다고 간주
+                return distance < 10
             }
         }
         return false
@@ -242,10 +244,8 @@ class NavigationViewModel : ViewModel() {
         val b = Location("").apply { latitude = endLat; longitude = endLng }
         val p = Location("").apply { latitude = lat; longitude = lng }
 
-        // Float 값을 Double로 변환
         return (p.distanceTo(a).toDouble() + p.distanceTo(b).toDouble() - a.distanceTo(b).toDouble())
     }
-
 
     // 네비게이션 완료
     fun finishNavigation() {
