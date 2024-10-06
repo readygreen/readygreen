@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.presentation.screen
 
+import android.speech.tts.TextToSpeech
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -22,6 +23,7 @@ import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
+import java.util.*
 
 @Composable
 fun SearchResultScreen(
@@ -36,6 +38,27 @@ fun SearchResultScreen(
     val searchResults = navController.previousBackStackEntry
         ?.savedStateHandle
         ?.get<List<SearchCandidate>>("searchResults") ?: emptyList()
+
+    // TTS 인스턴스 생성
+    var ttsReady by remember { mutableStateOf(false) }
+    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
+
+    // TTS 초기화
+    LaunchedEffect(Unit) {
+        tts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts?.language = Locale.KOREAN
+                ttsReady = true
+            }
+        }
+    }
+
+    // TTS 자원 해제
+    DisposableEffect(Unit) {
+        onDispose {
+            tts?.shutdown()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -84,6 +107,11 @@ fun SearchResultScreen(
                 ButtonText(item = ButtonModel(result.name), onClick = {
                     selectedPlace = result
                     showConfirmationDialog = true
+
+                    // 선택된 목적지 이름을 TTS로 읽기
+                    if (ttsReady && result.name != null) {
+                        tts?.speak("${result.name}로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, null)
+                    }
                 })
             }
             item {

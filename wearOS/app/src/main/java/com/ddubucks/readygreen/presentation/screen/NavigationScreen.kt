@@ -1,15 +1,14 @@
 package com.ddubucks.readygreen.presentation.screen
 
+import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -28,6 +27,7 @@ import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
 import secStyle
+import java.util.*
 
 @Composable
 fun NavigationScreen(
@@ -36,6 +36,35 @@ fun NavigationScreen(
 ) {
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
+
+    // TTS 인스턴스 생성
+    val context = LocalContext.current
+    var ttsReady by remember { mutableStateOf(false) }
+    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
+
+    // TTS 초기화
+    LaunchedEffect(Unit) {
+        tts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts?.language = Locale.KOREAN
+                ttsReady = true
+            }
+        }
+    }
+
+    // TTS 자원 해제
+    DisposableEffect(Unit) {
+        onDispose {
+            tts?.shutdown()
+        }
+    }
+
+    // currentDescription이 바뀔 때마다 음성 출력
+    LaunchedEffect(navigationState.currentDescription) {
+        if (ttsReady && navigationState.currentDescription != null) {
+            tts?.speak(navigationState.currentDescription, TextToSpeech.QUEUE_FLUSH, null, null)
+        }
+    }
 
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
