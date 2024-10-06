@@ -53,11 +53,38 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   String? _totalTime; // 예상 시간
   List<LatLng> pointCoordinates = [];
 
+  // 추가: 현재 경로 포인트 관리
+  int _currentPointIndex = 0;
+  final PageController _pageController = PageController(); // PageController 추가
+  final List<bool> _reachedPoints = []; // 도착한 포인트 관리
+
 // 유클리드 거리 계산
   double calculateDistance(LatLng currentPosition, LatLng point) {
     double dx = currentPosition.longitude - point.longitude;
     double dy = currentPosition.latitude - point.latitude;
     return sqrt(dx * dx + dy * dy) * 111000;
+  }
+
+  // 경로 업데이트 함수: 포인트에 가까워지면 페이지 업데이트
+  void _updateRouteCard(LatLng currentLocation) {
+    for (int i = _currentPointIndex; i < pointCoordinates.length; i++) {
+      double distance = calculateDistance(currentLocation, pointCoordinates[i]);
+
+      if (distance < 10 && !_reachedPoints[i]) {
+        print('포인트 ${i + 1}에 도착: ${_routeDescriptions[i]}');
+
+        // 페이지 업데이트
+        _pageController.animateToPage(i,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
+
+        setState(() {
+          _currentPointIndex = i + 1; // 다음 포인트로 넘어가도록 업데이트
+          _reachedPoints[i] = true; // 도착한 포인트 표시
+        });
+        break;
+      }
+    }
   }
 
 // 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
@@ -140,8 +167,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   }
 
   void _onCameraIdle() {
-    _cameraIdleTimer = Timer(const Duration(seconds: 1), () {
-      _startLocationTimer(); // 1초 뒤 타이머 재시작
+    _cameraIdleTimer = Timer(const Duration(seconds: 2), () {
+      _startLocationTimer(); // 2초 뒤 타이머 재시작
       _isMapMoving = false;
     });
   }
@@ -178,7 +205,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   // 타이머 시작 함수에서 카메라 업데이트 추가
   void _startLocationTimer() {
     if (_locationTimer == null || !_locationTimer!.isActive) {
-      _locationTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      _locationTimer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
         _currentLocation();
         _updateLocationAndCamera(); // 위치 및 카메라 업데이트
       });
@@ -333,6 +360,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       setState(() {
         _routeCoordinates.addAll(coordinates);
         _routeDescriptions.addAll(descriptions); // 추가된 부분: 경로 설명 리스트 추가
+        _reachedPoints
+            .addAll(List.filled(pointCoordinates.length, false)); // 도착 여부 초기화
         // 도착지에 마커 추가
         if (type == 2) {
           _markers.add(
@@ -466,6 +495,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             myLocationButtonEnabled: false,
             compassEnabled: true,
             zoomControlsEnabled: false,
+            trafficEnabled: false, // 교통 정보 비활성화.
             markers: _markers,
             polylines: {
               Polyline(
@@ -587,6 +617,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
               right: screenWidth * 0.02,
               child: RouteCard(
                 routeDescriptions: _routeDescriptions,
+                pageController: _pageController, // PageController 전달
                 onClose: () {
                   setState(() {
                     _isRouteDetailVisible = false; // 닫기 버튼 클릭 시 카드 닫기

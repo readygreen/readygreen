@@ -544,7 +544,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
               right: screenWidth * 0.02,
               child: RouteCard(
                 routeDescriptions: _routeDescriptions,
-                // pageController: _pageController,
+                pageController: _pageController,
                 onClose: () {
                   setState(() {
                     _isRouteDetailVisible = false; // 닫기 버튼 클릭 시 카드 닫기
