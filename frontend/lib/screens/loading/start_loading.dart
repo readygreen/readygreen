@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async'; // for Timer
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Secure Storage
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:readygreen/api/user_api.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/login/login.dart'; // 로그인 페이지
 import 'package:readygreen/main.dart'; // 메인 페이지
@@ -20,6 +22,7 @@ class StartLoadingPage extends StatefulWidget {
 class _StartLoadingPageState extends State<StartLoadingPage> {
   final FlutterSecureStorage storage = FlutterSecureStorage();
   final MapStartAPI mapStartAPI = MapStartAPI();
+  final NewUserApi newUserApi = NewUserApi();
 
   @override
   void initState() {
@@ -45,8 +48,9 @@ class _StartLoadingPageState extends State<StartLoadingPage> {
       );
       return;
     }
-
-    if (accessToken != null) {
+    // if()
+    final profile = await newUserApi.getProfile();
+    if (profile!=null) {
       // accessToken이 있으면 MainPage로 이동
       Navigator.push(
         context,
