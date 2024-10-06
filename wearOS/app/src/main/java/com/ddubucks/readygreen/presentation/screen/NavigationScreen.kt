@@ -4,7 +4,6 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,10 +26,6 @@ import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import pStyle
 import secStyle
 
@@ -90,16 +85,6 @@ fun NavigationScreen(
                 navController.popBackStack()
             }
         )
-    }
-
-    // 1초마다 신호등 상태 업데이트
-    LaunchedEffect(Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            while (navigationState.isNavigating) {
-                navigationViewModel.updateTrafficLightState()
-                delay(1000L)  // 1초마다 갱신
-            }
-        }
     }
 }
 

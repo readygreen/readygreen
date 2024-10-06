@@ -181,17 +181,6 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
-    // 신호등 상태 업데이트 메서드
-    fun updateTrafficLightState() {
-        currentLocation?.let { location ->
-            blinkers?.let { blinkersList ->
-                // 현재 위치를 기반으로 신호등 상태 갱신
-                updateTrafficLight(location.latitude, location.longitude, blinkersList)
-            }
-        }
-    }
-
-    // 기존 updateTrafficLight 메서드
     private fun updateTrafficLight(currentLat: Double, currentLng: Double, blinkers: List<BlinkerDTO>) {
         val nextTrafficLight = findNextTrafficLightOnRoute(currentLat, currentLng, blinkers)
 
