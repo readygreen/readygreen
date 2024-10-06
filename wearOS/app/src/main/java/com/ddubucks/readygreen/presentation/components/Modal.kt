@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Gray
 import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import h3Style
 import pStyle
 
@@ -41,7 +41,7 @@ fun Modal(
             Text(
                 text = title,
                 style = h3Style,
-                color = Yellow,
+                color = Primary,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -60,7 +60,7 @@ fun Modal(
                 Button(
                     onClick = onConfirm,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Yellow,
+                        containerColor = Primary,
                         contentColor = Black
                     )
                 ) {

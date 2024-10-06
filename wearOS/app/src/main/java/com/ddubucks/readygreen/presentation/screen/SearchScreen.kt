@@ -37,6 +37,7 @@ fun SearchScreen(
     val mike by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
     var voiceResults by remember { mutableStateOf(emptyList<String>()) }
     val searchResults by searchViewModel.searchResults.collectAsState()
+    val searchStatus by searchViewModel.searchStatus.collectAsState() // searchStatus 추가
     val context = LocalContext.current
     val locationService = remember { LocationService(context) }
 
@@ -112,9 +113,9 @@ fun SearchScreen(
         }
     }
 
-    // 검색 결과 변화 화면 전환
-    LaunchedEffect(searchResults) {
-        if (searchResults.isNotEmpty()) {
+    // 검색 상태 변화에 따른 화면 전환
+    LaunchedEffect(searchStatus) {
+        if (searchStatus == "ZERO_RESULTS" || searchResults.isNotEmpty()) {
             navController.currentBackStackEntry?.savedStateHandle?.set("searchResults", searchResults)
             Log.d("SearchScreen", "검색 결과 화면으로 이동")
             navController.navigate("searchResultScreen")

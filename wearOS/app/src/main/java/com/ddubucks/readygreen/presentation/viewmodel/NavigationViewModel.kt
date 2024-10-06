@@ -17,6 +17,8 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class NavigationViewModel : ViewModel() {
 
@@ -29,6 +31,9 @@ class NavigationViewModel : ViewModel() {
     private val _navigationCommand = MutableLiveData<String>()
     val navigationCommand: LiveData<String> get() = _navigationCommand
 
+    // 현재 위치를 저장할 변수 추가
+    private var currentLocation: Location? = null
+
     // 네비게이션 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
         locationService = LocationService(context)
@@ -37,6 +42,8 @@ class NavigationViewModel : ViewModel() {
         locationService?.getLastLocation { location ->
             if (location != null) {
                 Log.d("NavigationViewModel", "현재 위치: ${location.latitude}, ${location.longitude}")
+                // 현재 위치를 저장
+                currentLocation = location
                 initiateNavigation(location.latitude, location.longitude, lat, lng, name)
             } else {
                 Log.d("NavigationViewModel", "현재 위치 불러오기 실패")
@@ -116,6 +123,8 @@ class NavigationViewModel : ViewModel() {
 
     // 현재 위치를 기반으로 네비게이션 업데이트
     private fun updateNavigation(currentLocation: Location) {
+        this.currentLocation = currentLocation // 위치 업데이트 시 저장
+
         val currentLat = currentLocation.latitude
         val currentLng = currentLocation.longitude
         var closestFeature: Feature? = null
@@ -172,21 +181,86 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
-    // 신호등 상태 업데이트
+    // 신호등 상태 업데이트 메서드
+    fun updateTrafficLightState() {
+        currentLocation?.let { location ->
+            blinkers?.let { blinkersList ->
+                // 현재 위치를 기반으로 신호등 상태 갱신
+                updateTrafficLight(location.latitude, location.longitude, blinkersList)
+            }
+        }
+    }
+
+    // 기존 updateTrafficLight 메서드
     private fun updateTrafficLight(currentLat: Double, currentLng: Double, blinkers: List<BlinkerDTO>) {
-        findClosestBlinker(currentLat, currentLng, blinkers)?.let { blinker ->
+        val nextTrafficLight = findNextTrafficLightOnRoute(currentLat, currentLng, blinkers)
+
+        nextTrafficLight?.let { blinker ->
+            val currentTimeInSeconds = System.currentTimeMillis() / 1000
+            val lastAccessTimeInSeconds = convertTimeToSeconds(blinker.lastAccessTime)
+            val elapsedTimeInSeconds = currentTimeInSeconds - lastAccessTimeInSeconds
+            val cycleDuration = blinker.greenDuration + blinker.redDuration
+            val timeInCurrentCycle = elapsedTimeInSeconds % cycleDuration
+
+            val currentState: String
+            val remainingTime: Int
+
+            if (timeInCurrentCycle < blinker.greenDuration) {
+                currentState = "GREEN"
+                remainingTime = blinker.greenDuration - timeInCurrentCycle.toInt()
+            } else {
+                currentState = "RED"
+                remainingTime = blinker.redDuration - (timeInCurrentCycle - blinker.greenDuration).toInt()
+            }
+
             _navigationState.value = _navigationState.value.copy(
-                trafficLightColor = blinker.currentState,
-                trafficLightRemainingTime = blinker.remainingTime
+                trafficLightColor = currentState,
+                trafficLightRemainingTime = remainingTime
             )
         }
     }
 
-    // 신호등과 가장 가까운 신호등 찾기
-    private fun findClosestBlinker(currentLat: Double, currentLng: Double, blinkers: List<BlinkerDTO>): BlinkerDTO? {
-        return blinkers.minByOrNull {
-            calculateDistance(currentLat, currentLng, it.latitude, it.longitude)
+    // 시간을 초 단위로 변환하는 함수
+    private fun convertTimeToSeconds(timeString: String): Long {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        return try {
+            val date = dateFormat.parse(timeString)
+            date?.time?.div(1000) ?: 0L // 밀리초를 초로 변환
+        } catch (e: Exception) {
+            Log.e("NavigationViewModel", "시간 변환 오류: ${e.message}")
+            0L
         }
+    }
+
+
+    // 경로 상에서 다음 신호등을 찾는 함수
+    private fun findNextTrafficLightOnRoute(currentLat: Double, currentLng: Double, blinkers: List<BlinkerDTO>): BlinkerDTO? {
+        var nextTrafficLight: BlinkerDTO? = null
+        var minDistance = Double.MAX_VALUE
+
+        route?.forEach { feature ->
+            when (feature.geometry.type) {
+                "LineString" -> {
+                    val lineCoords = feature.geometry.getCoordinatesAsLineString()
+                    lineCoords?.forEach { coord ->
+                        val segmentLat = coord[1]
+                        val segmentLng = coord[0]
+
+                        blinkers.forEach { blinker ->
+                            val distanceToBlinker = calculateDistance(segmentLat, segmentLng, blinker.latitude, blinker.longitude)
+                            if (distanceToBlinker < 10) { // 신호등이 경로 좌표와 가까운지 확인 (10미터 이내)
+                                val currentDistance = calculateDistance(currentLat, currentLng, blinker.latitude, blinker.longitude)
+                                if (currentDistance > 0 && currentDistance < minDistance) {
+                                    minDistance = currentDistance
+                                    nextTrafficLight = blinker
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return nextTrafficLight
     }
 
     // 목적지 도착 여부 확인
@@ -215,7 +289,6 @@ class NavigationViewModel : ViewModel() {
 
     // LineString 경로 상에 사용자가 있는지 확인
     private fun isPointNearLine(lat: Double, lng: Double, lineCoords: List<List<Double>>): Boolean {
-        // 경로와 사용자의 현재 위치 사이의 최소 거리를 계산하여 경로 상에 있는지 확인
         var minDistance = Double.MAX_VALUE
         for (i in 0 until lineCoords.size - 1) {
             val startLat = lineCoords[i][1]
