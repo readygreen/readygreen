@@ -44,6 +44,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   Timer? _locationTimer; // 위치 업데이트 타이머
   Timer? _cameraIdleTimer; // 카메라가 멈춘 후 타이머 추가
   bool _isMapMoving = false; // 지도가 움직이는지 여부를 나타내는 변수
+  int currentRouteIndex = 0; // 현재 경로 인덱스
 
   String? _destinationName; // 도착지 이름 저장할 변수
   String? _startLocationName; // 출발지 이름 저장할 변수
@@ -143,8 +144,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   }
 
   void _onCameraIdle() {
-    print('용우너오빠 남자다 ㄷㄷㄷ ;;;;;');
-
     _cameraIdleTimer = Timer(const Duration(seconds: 2), () {
       _startLocationTimer(); // 2초 뒤 타이머 재시작
       _isMapMoving = false;
@@ -183,7 +182,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   // 타이머 시작 함수에서 카메라 업데이트 추가
   void _startLocationTimer() {
     if (_locationTimer == null || !_locationTimer!.isActive) {
-      print('용우너오빠 남자다 ㄷㄷㄷ ;;;;;');
       _locationTimer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
         _currentLocation();
         _updateLocationAndCamera(); // 위치 및 카메라 업데이트
