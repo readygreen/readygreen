@@ -16,8 +16,8 @@ import androidx.wear.compose.material.items
 import androidx.navigation.NavHostController
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.data.model.ButtonIconModel
-import com.ddubucks.readygreen.presentation.components.ButtonIconItem
-import com.ddubucks.readygreen.presentation.components.ModalItem
+import com.ddubucks.readygreen.presentation.components.ButtonIcon
+import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.TokenManager
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Yellow
@@ -82,7 +82,7 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
                 }
 
                 items(buttonList) { item ->
-                    ButtonIconItem(item = item, onClick = {
+                    ButtonIcon(item = item, onClick = {
                         if (locationPermissionGranted) {
                             when (item.label) {
                                 "자주가는 목적지" -> navController.navigate("bookmarkScreen")
@@ -103,7 +103,7 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
         }
 
         if (showModal) {
-            ModalItem(
+            Modal(
                 title = "워치 연결 해제",
                 message = "정말로 연결을 해제하시겠습니까?",
                 onConfirm = {

@@ -19,7 +19,7 @@ import h3Style
 import pStyle
 
 @Composable
-fun ModalItem(
+fun Modal(
     title: String,
     message: String,
     onConfirm: () -> Unit,

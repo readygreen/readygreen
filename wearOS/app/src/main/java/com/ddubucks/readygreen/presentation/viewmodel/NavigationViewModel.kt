@@ -87,6 +87,14 @@ class NavigationViewModel : ViewModel() {
                 route = navigationResponse.routeDTO.features
                 blinkers = navigationResponse.blinkerDTOs
 
+                // 첫 번째 Point 타입 피처의 설명을 업데이트
+                val firstPoint = route?.firstOrNull { it.geometry.type == "Point" }
+                if (firstPoint != null) {
+                    _navigationState.value = _navigationState.value.copy(
+                        currentDescription = firstPoint.properties.description ?: "안내 없음"
+                    )
+                }
+
                 // 네비게이션 활성화 시 위치 업데이트 빈도 및 정확도 조정
                 locationService?.adjustLocationRequest(
                     priority = Priority.PRIORITY_HIGH_ACCURACY,
@@ -107,6 +115,7 @@ class NavigationViewModel : ViewModel() {
             _navigationState.value = NavigationState(isNavigating = false)
         }
     }
+
 
     private fun updateNavigation(currentLocation: Location) {
         route?.let { routeFeatures ->
@@ -129,7 +138,7 @@ class NavigationViewModel : ViewModel() {
                             _navigationState.value = _navigationState.value.copy(
                                 isNavigating = true,
                                 destinationName = _navigationState.value.destinationName,
-                                currentDescription = feature.properties.description,
+                                currentDescription = feature.properties.description ?: "안내 없음",
                                 nextDirection = feature.properties.turnType,
                                 remainingDistance = distance
                             )
@@ -157,6 +166,7 @@ class NavigationViewModel : ViewModel() {
             }
         }
     }
+
 
 
     // 신호등과 가장 가까운 신호등 찾기

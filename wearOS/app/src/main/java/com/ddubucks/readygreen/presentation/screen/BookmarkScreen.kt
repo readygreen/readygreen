@@ -15,8 +15,8 @@ import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.items
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.data.model.ButtonIconModel
-import com.ddubucks.readygreen.presentation.components.ButtonIconItem
-import com.ddubucks.readygreen.presentation.components.ModalItem
+import com.ddubucks.readygreen.presentation.components.ButtonIcon
+import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkResponse
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Yellow
@@ -76,7 +76,7 @@ fun BookmarkScreen(
                             "집" -> R.drawable.bookmark_home
                             else -> R.drawable.bookmark_default
                         }
-                        ButtonIconItem(
+                        ButtonIcon(
                             item = ButtonIconModel(
                                 icon = iconResId,
                                 label = bookmark.destinationName
@@ -84,7 +84,7 @@ fun BookmarkScreen(
                             onClick = {
                                 Log.d("BookmarkScreen", "북마크 버튼 클릭: ${bookmark.destinationName}")
                                 selectedBookmark = bookmark
-                                showModal = true  // 모달을 표시하도록 설정
+                                showModal = true
                             }
                         )
                     }
@@ -101,7 +101,7 @@ fun BookmarkScreen(
         }
 
         if (showModal && selectedBookmark != null) {
-            ModalItem(
+            Modal(
                 title = "길안내 시작",
                 message = "${selectedBookmark?.destinationName}으로 길안내를 시작할까요?",
                 onConfirm = {
@@ -119,7 +119,7 @@ fun BookmarkScreen(
                     }
                 },
                 onCancel = {
-                    showModal = false  // 모달 닫기
+                    showModal = false
                 }
             )
         }

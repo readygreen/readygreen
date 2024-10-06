@@ -4,14 +4,12 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -19,8 +17,9 @@ import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.R
-import com.ddubucks.readygreen.presentation.components.ModalItem
+import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.navigation.NavigationState
+import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Red
 import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Yellow
@@ -48,23 +47,31 @@ fun NavigationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(Black),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "경로 안내", style = h3Style, color = Yellow)
+        Text(
+            text = "경로 안내",
+            style = h3Style,
+            color = Yellow
+        )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         if (navigationState.isNavigating) {
             NavigationInfo(navigationState)
         } else {
-            Text(text = "길안내 중이 아닙니다.", color = Color.White)
+            Text(
+                text = "길안내 중이 아닙니다.",
+                style = pStyle,
+                color = White
+            )
         }
     }
 
     if (showExitDialog) {
-        ModalItem(
+        Modal(
             title = "길 안내 중지",
             message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
             onConfirm = {
