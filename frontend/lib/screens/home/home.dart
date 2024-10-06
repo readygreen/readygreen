@@ -368,6 +368,7 @@ class _HomePageContentState extends State<HomePageContent> {
             Column(
               children: [
                 Container(
+                  width: MediaQuery.of(context).size.width,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -464,14 +465,26 @@ class _HomePageContentState extends State<HomePageContent> {
                                   );
                                 },
                               )
-                            : [const Text('자주 가는 목적지가 없습니다.')],
+                            : [
+                                const Text(
+                                  '자주 가는 목적지가 없습니다.',
+                                  style: TextStyle(
+                                    fontSize: 18, // 원하는 글씨 크기로 설정
+                                    fontWeight:
+                                        FontWeight.bold, // 필요한 경우, 글씨 굵기 추가
+                                  ),
+                                ),
+                                // ,
+                              ],
                       ),
-                      const Divider(
-                        // Add this Divider to create the horizontal line
-                        color: AppColors.greytext, // You can adjust the color
-                        thickness:
-                            1, // Adjust thickness for a more prominent line
-                      ),
+                      if (_bookmarks.length > 1) const SizedBox(height: 20),
+                      if (_bookmarks.length > 1)
+                        const Divider(
+                          // Add this Divider to create the horizontal line
+                          color: AppColors.greytext, // You can adjust the color
+                          thickness:
+                              1, // Adjust thickness for a more prominent line
+                        ),
                       if (_bookmarks.length > 1)
                         Center(
                           child: GestureDetector(
@@ -496,83 +509,95 @@ class _HomePageContentState extends State<HomePageContent> {
               ],
             ),
             Container(
+              width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(15), // Add border radius
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    '최근 목적지', // Add the title here
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '최근 목적지', // Add the title here
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
-                  routeRecords != null
-                      ? Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    formatDestinationName(
-                                            routeRecords?['endName']) ??
-                                        '알 수 없음',
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              ElevatedButton(
-                                onPressed: () {
-                                  print(routeRecords?['endName']);
-                                  print(routeRecords?['endLatitude']);
-                                  print(routeRecords?['endLongitude']);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => MapDirectionPage(
-                                        endLat: routeRecords?['endLatitude'],
-                                        endLng: routeRecords?['endLongitude'],
-                                        endPlaceName: routeRecords?['endName'],
+                    routeRecords != null && routeRecords!.isNotEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      formatDestinationName(
+                                              routeRecords?['endName']) ??
+                                          '알 수 없음',
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  foregroundColor: AppColors.green,
-                                  backgroundColor: Colors.white,
-                                  side: const BorderSide(
-                                    color: AppColors.green,
-                                    width: 2.0,
+                                  ],
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    print(routeRecords?['endName']);
+                                    print(routeRecords?['endLatitude']);
+                                    print(routeRecords?['endLongitude']);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MapDirectionPage(
+                                          endLat: routeRecords?['endLatitude'],
+                                          endLng: routeRecords?['endLongitude'],
+                                          endPlaceName:
+                                              routeRecords?['endName'],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: AppColors.green,
+                                    backgroundColor: Colors.white,
+                                    side: const BorderSide(
+                                      color: AppColors.green,
+                                      width: 2.0,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
+                                  child: const Text(
+                                    '길찾기',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.green,
+                                    ),
                                   ),
                                 ),
-                                child: const Text(
-                                  '길찾기',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.green,
-                                  ),
+                              ],
+                            ),
+                          )
+                        : const Column(
+                            children: [
+                              SizedBox(height: 8), // 여백 추가
+                              Text(
+                                '최근 목적지가 없습니다.',
+                                style: TextStyle(
+                                  fontSize: 18, // 글씨 크기
+                                  fontWeight: FontWeight.bold, // 글씨 굵기
                                 ),
                               ),
                             ],
-                          ),
-                        )
-                      : const Text('최근 목적지가 없습니다.'),
-                ],
-              ),
+                          )
+                  ]),
             ),
 
             const SizedBox(height: 16),
