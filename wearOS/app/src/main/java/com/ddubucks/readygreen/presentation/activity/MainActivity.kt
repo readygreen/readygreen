@@ -77,13 +77,16 @@ class MainActivity : ComponentActivity() {
                 val startDestination = if (token.isNullOrEmpty()) {
                     "linkEmailScreen"
                 } else {
-                    // 토큰이 있으면 checkNavigation을 호출하여 길안내 상태 확인
                     navigationViewModel.checkNavigation()
 
-                    // 길안내 상태를 관찰하여 처리
                     navigationViewModel.navigationCommand.observe(this) { command ->
                         if (command == "get_navigation") {
-                            navController.navigate("navigationScreen")
+                            navController.navigate("navigationScreen") {
+                                popUpTo("mainScreen") {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     }
 
