@@ -16,7 +16,11 @@ class BgcontainerMypage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final deviceHeight = MediaQuery.of(context).size.height;
     return Container(
+      constraints: BoxConstraints(
+        minHeight: deviceHeight,
+      ),
       padding: padding,
       decoration: BoxDecoration(
         color: backgroundColor, // 배경색 설정

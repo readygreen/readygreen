@@ -34,7 +34,7 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: AppColors.greybg,
       body: SingleChildScrollView(
         child: BgcontainerMypage(
           child: Column(
@@ -55,16 +55,16 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
                       const Text(
                         '내 건의함',
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          fontSize: 20,
+                          // fontWeight: FontWeight.bold,
+                          // color: Colors.black87,
                         ),
                       ),
                     ],
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              // const SizedBox(height: 10),
               feedbacks.isNotEmpty
                   ? ListView.builder(
                       shrinkWrap: true,
@@ -78,18 +78,22 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
                         return GestureDetector(
                           onTap: () {
                             setState(() {
-                              expandedIndex = expandedIndex == index ? null : index;
+                              expandedIndex =
+                                  expandedIndex == index ? null : index;
                             });
                           },
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 12.0),
                             child: AnimatedContainer(
                               duration: Duration(milliseconds: 300),
                               padding: EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 border: Border.all(
-                                  color: answered ? AppColors.routegreen : Colors.grey[300]!,
+                                  color: answered
+                                      ? AppColors.routegreen
+                                      : Colors.grey[300]!,
                                   width: 1.5,
                                 ),
                                 borderRadius: BorderRadius.circular(12),
@@ -106,7 +110,8 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -114,15 +119,23 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
                                           style: TextStyle(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 16,
-                                            color: answered ? AppColors.routegreen : Colors.black87,
+                                            color: answered
+                                                ? AppColors.routegreen
+                                                : Colors.black87,
                                           ),
                                           maxLines: isExpanded ? null : 1,
-                                          overflow: isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                                          overflow: isExpanded
+                                              ? TextOverflow.visible
+                                              : TextOverflow.ellipsis,
                                         ),
                                       ),
                                       Icon(
-                                        answered ? Icons.check_circle_outline : Icons.pending,
-                                        color: answered ? AppColors.routegreen : Colors.orangeAccent,
+                                        answered
+                                            ? Icons.check_circle_outline
+                                            : Icons.pending,
+                                        color: answered
+                                            ? AppColors.routegreen
+                                            : Colors.orangeAccent,
                                       ),
                                     ],
                                   ),
@@ -173,7 +186,16 @@ class _FeedbackListPageState extends State<FeedbackListPage> {
                   : Center(
                       child: Padding(
                         padding: const EdgeInsets.only(top: 50),
-                        child: CircularProgressIndicator(),
+                        child: Column(
+                          children: [
+                            SizedBox(height: 20),
+                            Text(
+                              '내 건의사항이 없습니다',
+                              style: TextStyle(
+                                  fontSize: 16, color: AppColors.greytext),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
             ],
