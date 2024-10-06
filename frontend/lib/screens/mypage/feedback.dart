@@ -6,7 +6,6 @@ import 'package:readygreen/widgets/mypage/cardbox_feedback.dart';
 import 'package:readygreen/widgets/mypage/cardbox_fbcontent.dart';
 import 'package:readygreen/constants/appcolors.dart';
 
-
 class FeedbackPage extends StatelessWidget {
   final FeedbackApi feedbackApi = FeedbackApi();
   final TextEditingController titleController = TextEditingController();
@@ -27,14 +26,18 @@ class FeedbackPage extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
               ),
               title: Column(
                 children: [
-                  Icon(Icons.check_circle, color: Colors.green, size: 50),
+                  Icon(Icons.check_circle, color: AppColors.green, size: 50),
                   const SizedBox(height: 10),
-                  const Text('제출 성공했습니다!'),
+                  const Text(
+                    '제출 성공했습니다!',
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ],
               ),
               actions: [
@@ -46,7 +49,8 @@ class FeedbackPage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => const MyPage()),
                     ); // 프로필 페이지로 이동
                   },
-                  child: const Text('확인'),
+                  child:
+                      const Text('확인', style: TextStyle(color: Colors.black)),
                 ),
               ],
             );
@@ -69,7 +73,8 @@ class FeedbackPage extends StatelessWidget {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          size: 20),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -91,6 +96,7 @@ class FeedbackPage extends StatelessWidget {
                   controller: titleController,
                   decoration: const InputDecoration(
                     hintText: '제목을 입력해주세요',
+                    hintStyle: TextStyle(color: AppColors.grey),
                     border: InputBorder.none,
                   ),
                 ),
@@ -106,23 +112,26 @@ class FeedbackPage extends StatelessWidget {
                   maxLines: 8,
                   decoration: const InputDecoration(
                     hintText: '내용을 입력해주세요',
+                    hintStyle: TextStyle(color: AppColors.grey),
                     border: InputBorder.none,
                   ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             Center(
               child: ElevatedButton(
                 onPressed: submitFeedback,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.routegreen, // 초록색 배경
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                  backgroundColor: AppColors.green, // 초록색 배경
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text('제출하기', style: TextStyle(fontSize: 16, color: Colors.white)),
+                child: const Text('제출하기',
+                    style: TextStyle(fontSize: 16, color: Colors.white)),
               ),
             ),
           ],
