@@ -4,11 +4,13 @@ import 'package:readygreen/constants/appcolors.dart';
 class RouteCard extends StatefulWidget {
   final List<String> routeDescriptions;
   final Function onClose;
+  // final PageController pageController; // 추가: PageController를 외부에서 받음
 
   const RouteCard({
     super.key,
     required this.routeDescriptions,
     required this.onClose,
+    // required this.pageController, // PageController 생성자에 추가
   });
 
   @override
