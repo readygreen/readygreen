@@ -13,8 +13,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -61,8 +59,10 @@ public class MapService {
         List<Point> coordinates = getBlinkerCoordinate(routeDto);
 
         // 해당 좌표의 신호등 정보
-        List<Blinker> blinkers = blinkerJDBCRepository.findAllByCoordinatesWithinRadius(coordinates, RADIUS);
-
+        List<Blinker> blinkers = List.of();
+        if (!coordinates.isEmpty()) {
+            blinkers = blinkerJDBCRepository.findAllByCoordinatesWithinRadius(coordinates, RADIUS);
+        }
         // 신호등의 상태 정보
         List<BlinkerDTO> blinkerDTOs = toBlinkerDTOs(blinkers);
 
