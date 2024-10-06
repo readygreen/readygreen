@@ -317,7 +317,7 @@ class MapStartAPI {
   // 길안내 완료 요청 (POST)
   Future<Map<String, dynamic>?> guideFinish({
     required double distance,
-    required DateTime startTime,
+    required String startTime,
     required bool watch,
   }) async {
     String? accessToken = await storage.read(key: 'accessToken');
@@ -330,7 +330,7 @@ class MapStartAPI {
     // 요청 바디 생성
     Map<String, dynamic> requestBody = {
       'distance': distance,
-      'startTime': startTime.toIso8601String(),
+      'startTime': startTime,
       'watch': watch,
     };
 
@@ -351,7 +351,7 @@ class MapStartAPI {
 
     if (response.statusCode == 200) {
       print('길안내 완료 요청 성공');
-      return jsonDecode(utf8.decode(response.bodyBytes));
+      return {'message': response.body};
     } else {
       print('길안내 완료 요청 실패: ${response.statusCode}');
       print('Response body: ${response.body}');

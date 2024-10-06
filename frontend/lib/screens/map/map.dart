@@ -22,6 +22,7 @@ class MapPage extends StatefulWidget {
   @override
   _MapPageState createState() => _MapPageState();
 }
+
 class BookmarkDTO {
   final int id;
   final String name;
@@ -81,7 +82,8 @@ class _MapPageState extends State<MapPage> {
 
     if (bookmarksData != null) {
       // 북마크 데이터를 BookmarkDTO 리스트로 변환
-      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+      List<BookmarkDTO> fetchedBookmarks =
+          bookmarksData.map<BookmarkDTO>((bookmark) {
         return BookmarkDTO(
           id: bookmark['id'],
           name: bookmark['name'],
@@ -93,9 +95,11 @@ class _MapPageState extends State<MapPage> {
       }).toList();
 
       // 변환한 데이터를 상태에 저장
-      setState(() {
-        _bookmarks = fetchedBookmarks;
-      });
+      if (mounted) {
+        setState(() {
+          _bookmarks = fetchedBookmarks;
+        });
+      }
     } else {
       print('북마크 데이터를 불러오지 못했습니다.');
     }
@@ -129,13 +133,14 @@ class _MapPageState extends State<MapPage> {
       },
     );
   }
+
   bool _isPlaceBookmarked(String placeId) {
-    
     return _bookmarks.any((bookmark) => bookmark.placeId == placeId);
   }
+
   // 새로운 장소로 이동하고 장소 선택 마커 추가하는 함수
-  void _goToPlace(
-      double lat, double lng, String placeName, String placeId, String address) async {
+  void _goToPlace(double lat, double lng, String placeName, String placeId,
+      String address) async {
     final GoogleMapController controller = await _controller.future;
 
     // 지도 이동
@@ -151,8 +156,7 @@ class _MapPageState extends State<MapPage> {
           infoWindow: InfoWindow(title: placeName),
         ),
       );
-      _placeId = 
-      _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
+      _placeId = _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
       _selectedAddress = address; // 선택된 주소 업데이트
       _selectedLat = lat; // 선택된 위도 업데이트
       _selectedLng = lng; // 선택된 경도 업데이트
@@ -216,7 +220,7 @@ class _MapPageState extends State<MapPage> {
                   MaterialPageRoute(
                     builder: (context) => MapSearchPage(
                       onPlaceSelected: (lat, lng, placeName) {
-                        _goToPlace(lat, lng, placeName,_placeId, '주소 정보 없음');
+                        _goToPlace(lat, lng, placeName, _placeId, '주소 정보 없음');
                       },
                     ),
                   ),
@@ -224,8 +228,8 @@ class _MapPageState extends State<MapPage> {
 
                 // 검색 결과를 받아서 장소 선택 마커 표시
                 if (result != null) {
-                  _goToPlace(
-                      result['lat'], result['lng'], result['name'],_placeId, '주소 정보 없음');
+                  _goToPlace(result['lat'], result['lng'], result['name'],
+                      _placeId, '주소 정보 없음');
                 }
               },
             ),

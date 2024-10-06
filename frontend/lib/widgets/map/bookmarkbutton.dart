@@ -11,7 +11,7 @@ class BookmarkButton extends StatefulWidget {
   final Color borderColor; // 테두리 색상
   final Color textColor; // 텍스트 색상
   final IconData iconData;
-  final dynamic placeId; 
+  final dynamic placeId;
   final bool checked;
 
   const BookmarkButton({
@@ -43,6 +43,7 @@ class _BookmarkButtonState extends State<BookmarkButton> {
     _isBookmarked = widget.checked; // checked 값으로 초기화
     _selectPlace(widget.placeId);
   }
+
   Future<void> _selectPlace(String placeId) async {
     GoogleMapsPlaces places =
         GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
@@ -50,22 +51,24 @@ class _BookmarkButtonState extends State<BookmarkButton> {
 
     if (response.isOkay) {
       final result = response.result;
-      setState(() {
-        _lat = result.geometry?.location.lat; // null check 추가
-        _lng = result.geometry?.location.lng; // null check 추가
-      });
-      
+      if (mounted) {
+        setState(() {
+          _lat = result.geometry?.location.lat; // null check 추가
+          _lng = result.geometry?.location.lng; // null check 추가
+        });
+      }
     } else {
       print('장소 선택 실패: ${response.errorMessage}');
     }
   }
+
   // 북마크 추가 함수 (POST)
   Future<void> _addBookmark() async {
     // 전달된 값들을 로그에 출력
     print('북마크 추가 요청:');
     print('목적지 이름: ${widget.destinationName}');
-    print('위도: ${_lat}');
-    print('경도: ${_lng}');
+    print('위도: $_lat');
+    print('경도: $_lng');
 
     bool result = await _api.addBookmark(
       name: "기타", // name은 기타로 고정
@@ -84,7 +87,7 @@ class _BookmarkButtonState extends State<BookmarkButton> {
       print('북마크 추가 실패');
     }
   }
-  
+
   // 북마크 삭제 함수 (DELETE)
   Future<void> _deleteBookmark() async {
     print('북마크 삭제 요청: 기타');

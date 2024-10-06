@@ -43,7 +43,7 @@ class _HomePageContentState extends State<HomePageContent> {
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
   bool isLoadingFortune = false; // 운세 로딩중
-  Map<String, dynamic>? routeRecords = null;
+  Map<String, dynamic>? routeRecords;
   List<Map<String, dynamic>> _bookmarks = [];
   bool _showAllBookmarks = false;
   @override
@@ -54,16 +54,17 @@ class _HomePageContentState extends State<HomePageContent> {
     _storeFortune(); //  운세 데이터 로드 및 저장
     _storeWeather();
     _loadWeatherInfo();
-    
   }
-  Future<void> _fetchMainDate()async {
-      final data = await api.getMainData();
-      print("data");
-      setState(() {
-        _bookmarks = data?['bookmarkDTOs'];
-        routeRecords = data?['routeRecordDTO'];
-      });
-    }
+
+  Future<void> _fetchMainDate() async {
+    final data = await api.getMainData();
+    print("data");
+    setState(() {
+      _bookmarks = data?['bookmarkDTOs'];
+      routeRecords = data?['routeRecordDTO'];
+    });
+  }
+
   // 위치 권한 요청 및 저장
   Future<void> _storeLocation() async {
     bool serviceEnabled;
@@ -208,21 +209,24 @@ class _HomePageContentState extends State<HomePageContent> {
       }
     }
   }
+
   String formatDestinationName(String destinationName) {
-  // Check if "대전광역시" is present in the string
-  if (destinationName.contains('대전광역시')) {
-    // Find the position of "대전광역시" and return the substring starting after it
-    int index = destinationName.indexOf('대전광역시');
-    destinationName = destinationName.substring(index + '대전광역시'.length).trim();
+    // Check if "대전광역시" is present in the string
+    if (destinationName.contains('대전광역시')) {
+      // Find the position of "대전광역시" and return the substring starting after it
+      int index = destinationName.indexOf('대전광역시');
+      destinationName =
+          destinationName.substring(index + '대전광역시'.length).trim();
+    }
+
+    // Trim long text to a maximum of 20 characters (example) and add "..." at the end
+    if (destinationName.length > 16) {
+      destinationName = '${destinationName.substring(0, 16)}...';
+    }
+
+    return destinationName;
   }
 
-  // Trim long text to a maximum of 20 characters (example) and add "..." at the end
-  if (destinationName.length > 16) {
-    destinationName = destinationName.substring(0, 16) + '...';
-  }
-
-  return destinationName;
-}
   // 저장된 날씨 정보를 스토리지에서 불러와 첫 번째 데이터 설정
   Future<void> _loadWeatherInfo() async {
     final String? storedWeatherData = await storage.read(key: 'weather');
@@ -385,19 +389,25 @@ class _HomePageContentState extends State<HomePageContent> {
                             ? List.generate(
                                 _showAllBookmarks
                                     ? _bookmarks.length
-                                    : (_bookmarks.length > 0 ? 1 : 0), // Show only the first item initially
+                                    : (_bookmarks.isNotEmpty
+                                        ? 1
+                                        : 0), // Show only the first item initially
                                 (index) {
                                   final bookmark = _bookmarks[index];
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              formatDestinationName(bookmark['destinationName']),
+                                              formatDestinationName(
+                                                  bookmark['destinationName']),
                                               style: const TextStyle(
                                                 fontSize: 22,
                                                 fontWeight: FontWeight.bold,
@@ -418,10 +428,12 @@ class _HomePageContentState extends State<HomePageContent> {
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => MapDirectionPage(
+                                                builder: (context) =>
+                                                    MapDirectionPage(
                                                   endLat: bookmark['latitude'],
                                                   endLng: bookmark['longitude'],
-                                                  endPlaceName: bookmark['destinationName'],
+                                                  endPlaceName: bookmark[
+                                                      'destinationName'],
                                                 ),
                                               ),
                                             );
@@ -434,7 +446,8 @@ class _HomePageContentState extends State<HomePageContent> {
                                               width: 2.0,
                                             ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(20),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                             ),
                                           ),
                                           child: const Text(
@@ -453,9 +466,11 @@ class _HomePageContentState extends State<HomePageContent> {
                               )
                             : [const Text('자주 가는 목적지가 없습니다.')],
                       ),
-                      const Divider( // Add this Divider to create the horizontal line
+                      const Divider(
+                        // Add this Divider to create the horizontal line
                         color: AppColors.greytext, // You can adjust the color
-                        thickness: 1, // Adjust thickness for a more prominent line
+                        thickness:
+                            1, // Adjust thickness for a more prominent line
                       ),
                       if (_bookmarks.length > 1)
                         Center(
@@ -493,9 +508,9 @@ class _HomePageContentState extends State<HomePageContent> {
                     '최근 목적지', // Add the title here
                     style: TextStyle(
                       fontSize: 14,
-                          color: Colors.grey,
+                      color: Colors.grey,
                     ),
-                  ), 
+                  ),
                   routeRecords != null
                       ? Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -506,7 +521,9 @@ class _HomePageContentState extends State<HomePageContent> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${formatDestinationName(routeRecords?['endName']) ?? '알 수 없음'}',
+                                    formatDestinationName(
+                                            routeRecords?['endName']) ??
+                                        '알 수 없음',
                                     style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
@@ -557,7 +574,6 @@ class _HomePageContentState extends State<HomePageContent> {
                 ],
               ),
             ),
-
 
             const SizedBox(height: 16),
             const CardBox(title: '주변 장소'),

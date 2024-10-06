@@ -8,6 +8,7 @@ import 'package:readygreen/main.dart';
 import 'package:readygreen/widgets/map/locationbutton.dart';
 import 'package:readygreen/widgets/map/destinationbar.dart';
 import 'package:readygreen/widgets/map/routecard.dart';
+import 'package:readygreen/widgets/map/routefinishmodal.dart';
 import 'package:readygreen/api/map_api.dart';
 import 'package:provider/provider.dart';
 import 'package:readygreen/provider/current_location.dart';
@@ -45,9 +46,89 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   bool _isMapMoving = false; // 지도가 움직이는지 여부를 나타내는 변수
 
   String? _destinationName; // 도착지 이름 저장할 변수
+  String? _startLocationName; // 출발지 이름 저장할 변수
   bool _isRouteDetailVisible = true; // 경로 상세 정보 보이기 여부
+
   double? _totalDistance; // 전체 거리
   String? _totalTime; // 예상 시간
+  List<LatLng> pointCoordinates = [];
+
+// 유클리드 거리 계산
+  double calculateDistance(LatLng currentPosition, LatLng point) {
+    double dx = currentPosition.longitude - point.longitude;
+    double dy = currentPosition.latitude - point.latitude;
+    return sqrt(dx * dx + dy * dy) * 111000;
+  }
+
+// 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
+  void _checkProximityToDestination(
+      LatLng currentLocation, int type, Map<String, dynamic>? routeData) {
+    double? destinationLat;
+    double? destinationLng;
+
+    // type에 따라 도착지 위도, 경도 다르게 처리
+    if (type == 2) {
+      destinationLat = widget.endLat;
+      destinationLng = widget.endLng;
+    } else if (routeData != null) {
+      destinationLat = routeData['endlat'];
+      destinationLng = routeData['endlng'];
+    }
+
+    if (destinationLat != null && destinationLng != null) {
+      double distance = calculateDistance(
+        currentLocation,
+        LatLng(destinationLat, destinationLng),
+      );
+      print(
+          '현재 위치: (${currentLocation.latitude}, ${currentLocation.longitude})');
+      print('도착지 위치: ($destinationLat, $destinationLng)');
+      print('계산된 거리: $distance 미터');
+      if (distance <= 5) {
+        // 도착지와의 거리가 5미터 이내일 때
+        _showRouteFinishModal();
+      }
+    } else {
+      print('도착지 정보가 없습니다.');
+    }
+  }
+
+// 모달을 띄우는 함수
+  void _showRouteFinishModal() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return RouteFinishModal(
+          onConfirm: _onFinishNavigation, // 길안내 종료 함수
+          onCancel: () {
+            Navigator.of(context).pop(); // 모달 닫기
+          },
+        );
+      },
+    );
+  }
+
+// 길안내 종료 요청 보내는 함수
+  void _onFinishNavigation() async {
+    MapStartAPI mapStartAPI = MapStartAPI();
+    var result = await mapStartAPI.guideFinish(
+      distance: _totalDistance ?? 0.0,
+      startTime: _totalTime ?? '알 수 없음',
+      watch: false,
+    );
+
+    if (result != null) {
+      print("길안내 종료 성공");
+      _cameraIdleTimer?.cancel(); // 페이지 종료 시 타이머 취소
+      _stopLocationTimer(); // 위치 타이머도 확실히 종료
+      super.dispose();
+      handleBackNavigation(context); // 메인 화면으로 돌아가기
+    } else {
+      print("길안내 종료 실패");
+    }
+
+    Navigator.of(context).pop(); // 모달 닫기
+  }
 
   // 지도 이동 시 타이머를 멈추고, 카메라가 멈춘 후 3초 뒤 타이머 재시작
   void _onCameraMove(CameraPosition position) {
@@ -80,6 +161,9 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
     double currentHeading = currentLocation.heading ?? 0.0;
 
+    LatLng currentLatLng =
+        LatLng(currentLocation.latitude!, currentLocation.longitude!);
+
     // 카메라를 사용자 위치와 방향에 맞춰 업데이트
     controller.animateCamera(CameraUpdate.newCameraPosition(
       CameraPosition(
@@ -94,8 +178,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   // 타이머 시작 함수에서 카메라 업데이트 추가
   void _startLocationTimer() {
     if (_locationTimer == null || !_locationTimer!.isActive) {
-      _locationTimer =
-          Timer.periodic(const Duration(milliseconds: 100), (Timer t) {
+      _locationTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
         _currentLocation();
         _updateLocationAndCamera(); // 위치 및 카메라 업데이트
       });
@@ -168,6 +251,13 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       if (routeData != null) {
         _processRouteData(routeData, 2); // 경로 데이터 처리
         _processBlinkerData(routeData['blinkerDTOs']); // 신호등 데이터 처리
+        // 현재 위치와 도착지의 거리를 계산하고 모달을 띄우기 위해 호출
+        _checkProximityToDestination(
+          LatLng(locationProvider.currentPosition!.latitude,
+              locationProvider.currentPosition!.longitude),
+          2,
+          routeData,
+        );
       }
     } else {
       print("현재 위치를 찾을 수 없습니다.");
@@ -219,6 +309,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           var point = geometry['coordinates'];
           coordinates.add(LatLng(point[1], point[0])); // 경도, 위도 순서로 추가
           pointCoordinates.add(LatLng(point[1], point[0]));
+          print('짜증작렬 ㅡㅡ .....');
+          print(pointCoordinates);
 
           // 경로 설명을 리스트에 추가
           var description = feature['properties']['description'];
@@ -262,11 +354,13 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
         }
         // routeData에서 도착지 정보 가져오기
         _destinationName = routeData['destination'] ?? '장소 정보가 없습니다.';
+        _startLocationName = routeData['origin'] ?? '현재위치';
         _totalDistance = routeData['distance'] ?? 0.0;
         _totalTime = routeData['time'] ?? '알 수 없음';
 
         print('거리와 시간!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         print("도착지 이름: $_destinationName");
+        print("출발지 이름: $_startLocationName");
         print("총 거리: $_totalDistance");
         print("예상 시간: $_totalTime");
       });
@@ -400,7 +494,9 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             left: screenWidth * 0,
             right: screenWidth * 0,
             child: DestinationBar(
-              currentLocation: locationProvider.currentPlaceName ?? '현재위치',
+              currentLocation: _startLocationName ??
+                  locationProvider.currentPlaceName ??
+                  '현재 위치',
               destination:
                   widget.endPlaceName ?? _destinationName ?? '', // 전달받은 도착지 이름
             ),
