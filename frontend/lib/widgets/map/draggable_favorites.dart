@@ -28,7 +28,8 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
     if (bookmarksData != null) {
       print("데이터");
       // 북마크 데이터를 BookmarkDTO 리스트로 변환
-      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+      List<BookmarkDTO> fetchedBookmarks =
+          bookmarksData.map<BookmarkDTO>((bookmark) {
         return BookmarkDTO(
           id: bookmark['id'],
           name: bookmark['name'],
@@ -40,9 +41,11 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
       }).toList();
 
       // 변환한 데이터를 상태에 저장
-      setState(() {
-        _bookmarks = fetchedBookmarks;
-      });
+      if (mounted) {
+        setState(() {
+          _bookmarks = fetchedBookmarks;
+        });
+      }
     } else {
       print('북마크 데이터를 불러오지 못했습니다.');
     }
@@ -89,27 +92,26 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
                         itemBuilder: (context, index) {
                           final bookmark = _bookmarks[index];
                           return ListTile(
-                            leading: const Icon(Icons.place),
-                            title: Text(bookmark.destinationName),
-                            trailing: CustomButton(),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MapDirectionPage(
-                                    endLat: bookmark.latitude,
-                                    endLng: bookmark.longitude,
-                                    endPlaceName: bookmark.destinationName,
+                              leading: const Icon(Icons.place),
+                              title: Text(bookmark.destinationName),
+                              trailing: const CustomButton(),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MapDirectionPage(
+                                      endLat: bookmark.latitude,
+                                      endLng: bookmark.longitude,
+                                      endPlaceName: bookmark.destinationName,
+                                    ),
                                   ),
-                                ),
-                              );
-                              // 클릭 시 수행할 작업
-                              print('${bookmark.destinationName} 클릭됨');
-                              print('${bookmark.latitude}');
-                              print('${bookmark.longitude}');
-                              // 예: 클릭 시 배경색 변경 등
-                            }
-                          );
+                                );
+                                // 클릭 시 수행할 작업
+                                print('${bookmark.destinationName} 클릭됨');
+                                print('${bookmark.latitude}');
+                                print('${bookmark.longitude}');
+                                // 예: 클릭 시 배경색 변경 등
+                              });
                         },
                       )
                     : const Center(

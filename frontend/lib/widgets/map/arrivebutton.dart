@@ -14,7 +14,7 @@ class ArriveButton extends StatefulWidget {
   final String placeId;
 
   const ArriveButton({
-    Key? key,
+    super.key,
     this.text = "도착지",
     this.borderColor = AppColors.green,
     this.textColor = AppColors.green,
@@ -23,7 +23,7 @@ class ArriveButton extends StatefulWidget {
     required this.lng,
     required this.placeName,
     required this.placeId,
-  }) : super(key: key);
+  });
 
   @override
   _ArriveButtonState createState() => _ArriveButtonState();
@@ -41,11 +41,13 @@ class _ArriveButtonState extends State<ArriveButton> {
 
     if (response.isOkay) {
       final result = response.result;
-      setState(() {
-        _lat = result.geometry?.location.lat; // null check 추가
-        _lng = result.geometry?.location.lng; // null check 추가
-        _isLoading = false; // 비동기 작업 완료
-      });
+      if (mounted) {
+        setState(() {
+          _lat = result.geometry?.location.lat; // null check 추가
+          _lng = result.geometry?.location.lng; // null check 추가
+          _isLoading = false; // 비동기 작업 완료
+        });
+      }
     } else {
       print('장소 선택 실패: ${response.errorMessage}');
       setState(() {
@@ -66,7 +68,8 @@ class _ArriveButtonState extends State<ArriveButton> {
       onTap: _isLoading
           ? null // 로딩 중에는 버튼을 비활성화
           : () {
-              print('도착지 버튼이 눌렸습니다: ${widget.placeName} (위도: $_lat, 경도: $_lng)');
+              print(
+                  '도착지 버튼이 눌렸습니다: ${widget.placeName} (위도: $_lat, 경도: $_lng)');
               // 위도, 경도, 장소 이름을 MapDirectionPage로 전달
               Navigator.push(
                 context,
