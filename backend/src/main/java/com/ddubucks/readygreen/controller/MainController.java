@@ -48,7 +48,7 @@ public class MainController {
     @GetMapping
     public ResponseEntity<MainResponseDTO> mainPage(@AuthenticationPrincipal UserDetails userDetails) throws Exception {
 
-        RouteRecord routeRecord = routeRecordRepository.findTopByMemberEmail(userDetails.getUsername())
+        RouteRecord routeRecord = routeRecordRepository.findTopByMemberEmailOrderByCreateDateDesc(userDetails.getUsername())
                 .orElse(null);
 
         // Check if routeRecord is not null before extracting data
