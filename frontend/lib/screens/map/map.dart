@@ -245,6 +245,7 @@ class _MapPageState extends State<MapPage> {
             right: MediaQuery.of(context).size.width * 0.05,
             child: LocationButton(
               onTap: () async {
+                print('kkkkk');
                 // 버튼 클릭 시 위치 정보를 다시 업데이트
                 locationProvider.updateLocation();
 
@@ -299,7 +300,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  // 지도를 클릭할 때 Google Places API로 장소 이름 가져오기
+// 지도를 클릭할 때 Google Places API로 장소 이름 가져오기
   Future<void> _addMarkerWithPlaceName(LatLng tappedLocation) async {
     final places.GoogleMapsPlaces placesApi = places.GoogleMapsPlaces(
         apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
@@ -309,10 +310,19 @@ class _MapPageState extends State<MapPage> {
     );
 
     if (response.isOkay && response.results.isNotEmpty) {
-      final placeName = response.results.first.name; // 장소 이름 가져오기
+      // print('구글 플레이스 api$response');
+      String placeName = response.results.first.name; // 장소 이름 가져오기
       final address =
           response.results.first.formattedAddress ?? '주소 정보 없음'; // 주소 가져오기
       final placeId = response.results.first.placeId;
+
+      if (RegExp(r'^[0-9\-]+$').hasMatch(placeName)) {
+        placeName = address; // 주소를 장소 이름 대신 사용
+      }
+
+      if (placeName.startsWith('대한민국 대전광역시')) {
+        placeName = address.replaceFirst('대한민국 대전광역시', '').trim();
+      }
 
       print('선택된 장소 이름: $placeName');
       print('선택된 주소: $address');

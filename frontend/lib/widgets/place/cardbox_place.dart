@@ -148,8 +148,8 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                           const Divider(
                             color: AppColors.grey, // 구분 선 색상
                             thickness: 1, // 구분 선 두께
-                            indent: 10, // 왼쪽 여백
-                            endIndent: 10, // 오른쪽 여백
+                            indent: 0, // 왼쪽 여백
+                            endIndent: 0, // 오른쪽 여백
                           ),
                       ],
                     );

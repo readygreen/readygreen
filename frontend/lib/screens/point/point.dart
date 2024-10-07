@@ -51,7 +51,7 @@ class _PointPageState extends State<PointPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       // Set the background color of the Scaffold to gray
-      backgroundColor: Colors.grey[200], // Light gray background
+      backgroundColor: AppColors.greybg,
       body: SingleChildScrollView(
         child: BackgroundContainer(
           child: Column(
@@ -67,7 +67,7 @@ class _PointPageState extends State<PointPage> {
                       '지금 내 포인트는?',
                       style: TextStyle(
                           fontSize: 20,
-                          color: Colors.black87,
+                          color: Colors.black,
                           fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 5),
@@ -81,7 +81,7 @@ class _PointPageState extends State<PointPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: GestureDetector(
@@ -96,7 +96,7 @@ class _PointPageState extends State<PointPage> {
                   },
                   child: Card(
                     elevation: 0, // 그림자 제거
-                    color: Colors.white, // Card background color to white
+                    color: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -112,9 +112,9 @@ class _PointPageState extends State<PointPage> {
                                 fontSize: 15, fontWeight: FontWeight.bold),
                           ),
                           Icon(
-                            Icons.arrow_forward,
-                            size: 24,
-                            color: Colors.green,
+                            Icons.arrow_forward_rounded,
+                            size: 25,
+                            color: AppColors.green,
                           ),
                         ],
                       ),
@@ -122,9 +122,9 @@ class _PointPageState extends State<PointPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: Card(
                   elevation: 0, // 그림자 제거
                   color: Colors.white, // Card background color to white
@@ -157,8 +157,7 @@ class _PointPageState extends State<PointPage> {
                                       : '걸음',
                                   style: TextStyle(
                                     fontSize: 24,
-                                    color:
-                                        const Color.fromARGB(255, 105, 181, 6),
+                                    color: AppColors.green,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -183,9 +182,9 @@ class _PointPageState extends State<PointPage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: Card(
                   elevation: 0, // 그림자 제거
                   color: Colors.white, // Card background color to white
@@ -238,54 +237,90 @@ class _PointPageState extends State<PointPage> {
                                 ),
                               ],
                             )
-
-                          // steps가 비어있거나 maxIndex가 유효하지 않을 경우
-                          
-                          else
-                        // const SizedBox(height: 8),
-                        Center(
-                          child: Column(
+                          Column(
                             children: [
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: steps.length > 0
-                                          ? '${steps[0]['steps']}'
-                                          : '0',
-                                      style: TextStyle(
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
+                              // 여백을 먼저 추가
+
+                              // 데이터가 없을 때 보여줄 컨테이너
+                              Container(
+                                padding: const EdgeInsets.all(16), // 여백 추가
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 24), // 좌우 여백 추가
+                                decoration: BoxDecoration(
+                                  color: Colors.white, // 배경 색상 설정
+                                  borderRadius:
+                                      BorderRadius.circular(12), // 둥근 모서리 설정
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    children: const [
+                                      Icon(
+                                        Icons.warning_amber_rounded, // 경고 아이콘
+                                        size: 40,
+                                        color: AppColors.yellow,
                                       ),
-                                    ),
-                                    TextSpan(
-                                      text: ' 걸음',
-                                      style: TextStyle(
-                                        fontSize: 16, // 걸음은 기존 크기 유지
-                                        color: Colors.black87,
+                                      SizedBox(height: 12), // 아이콘과 텍스트 사이 여백
+                                      Text(
+                                        '걸음 데이터가 없습니다.',
+                                        style: TextStyle(
+                                          fontSize: 15, // 텍스트 크기 설정
+
+                                          color:
+                                              AppColors.greytext, // 텍스트 색상 설정
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
-                              SizedBox(height: 8),
-                              Text(
-                                steps.length > 0
-                                    ? steps[0]['steps'] < steps[1]['steps']
-                                        ? '걸음수가 어제보다 줄어들었어요!'
-                                        : '오늘은 어제보다 ${steps[0]['steps'] - steps[1]['steps']}걸음 더 걸었어요!'
-                                    : '로딩중...',
-                                style: TextStyle(
-                                    fontSize: 13, color: AppColors.greytext),
-                              ),
-                              const SizedBox(height: 20),
-                              _buildWalkingTrendGraph(),
                             ],
+                          )
+
+                        // steps가 비어있거나 maxIndex가 유효하지 않을 경우
+
+                        else
+                          // const SizedBox(height: 8),
+                          Center(
+                            child: Column(
+                              children: [
+                                RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: steps.length > 0
+                                            ? '${steps[0]['steps']}'
+                                            : '0',
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: ' 걸음',
+                                        style: TextStyle(
+                                          fontSize: 16, // 걸음은 기존 크기 유지
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  steps.length > 0
+                                      ? steps[0]['steps'] < steps[1]['steps']
+                                          ? '걸음수가 어제보다 줄어들었어요!'
+                                          : '오늘은 어제보다 ${steps[0]['steps'] - steps[1]['steps']}걸음 더 걸었어요!'
+                                      : '로딩중...',
+                                  style: TextStyle(
+                                      fontSize: 13, color: AppColors.greytext),
+                                ),
+                                const SizedBox(height: 20),
+                                _buildWalkingTrendGraph(),
+                              ],
+                            ),
                           ),
-                          
-                        ),
-                        
                       ],
                     ),
                   ),

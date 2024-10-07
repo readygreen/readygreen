@@ -66,8 +66,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             ReadyGreenTheme {
                 val navController = rememberNavController()
-                val searchViewModel: SearchViewModel = viewModel()
                 val locationService = remember { LocationService(this) }
+                val searchViewModel: SearchViewModel = viewModel()
                 val mapViewModel: MapViewModel = viewModel()
                 navigationViewModel = viewModel()
 
@@ -77,6 +77,19 @@ class MainActivity : ComponentActivity() {
                 val startDestination = if (token.isNullOrEmpty()) {
                     "linkEmailScreen"
                 } else {
+                    navigationViewModel.checkNavigation()
+
+                    navigationViewModel.navigationCommand.observe(this) { command ->
+                        if (command == "get_navigation") {
+                            navController.navigate("navigationScreen") {
+                                popUpTo("mainScreen") {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+
                     "mainScreen"
                 }
 
@@ -85,18 +98,37 @@ class MainActivity : ComponentActivity() {
                     startDestination = startDestination
                 ) {
                     composable("mainScreen") { MainScreen(navController, locationService) }
-                    composable("bookmarkScreen") { BookmarkScreen() }
+                    composable("bookmarkScreen") {
+                        BookmarkScreen(
+                            navController = navController,
+                            bookmarkViewModel = viewModel(),
+                            navigationViewModel = navigationViewModel
+                        )
+                    }
                     composable("searchScreen") {
-                        SearchScreen(navController = navController, searchViewModel = searchViewModel, apiKey = BuildConfig.MAPS_API_KEY)
+                        SearchScreen(
+                            navController = navController,
+                            searchViewModel = searchViewModel,
+                            apiKey = BuildConfig.MAPS_API_KEY
+                        )
                     }
                     composable("searchResultScreen") {
-                        SearchResultScreen(navController = navController, navigationViewModel = navigationViewModel)
+                        SearchResultScreen(
+                            navController = navController,
+                            navigationViewModel = navigationViewModel
+                        )
                     }
                     composable("mapScreen") {
-                        MapScreen(locationService = locationService, mapViewModel = mapViewModel)
+                        MapScreen(
+                            locationService = locationService,
+                            mapViewModel = mapViewModel
+                        )
                     }
                     composable("navigationScreen") {
-                        NavigationScreen(navController = navController, navigationViewModel = navigationViewModel)
+                        NavigationScreen(
+                            navController = navController,
+                            navigationViewModel = navigationViewModel
+                        )
                     }
                     composable("linkEmailScreen") { LinkEmailScreen(navController) }
                     composable(

@@ -17,8 +17,12 @@ class SearchViewModel : ViewModel() {
     private val _searchResults = MutableStateFlow<List<SearchCandidate>>(emptyList())
     val searchResults: StateFlow<List<SearchCandidate>> = _searchResults
 
+    private val _searchStatus = MutableStateFlow<String>("")
+    val searchStatus: StateFlow<String> = _searchStatus
+
     fun clearSearchResults() {
         _searchResults.value = emptyList()
+        _searchStatus.value = ""
         Log.d("SearchViewModel", "검색 결과 초기화됨")
     }
 
@@ -38,8 +42,11 @@ class SearchViewModel : ViewModel() {
                 )
                 if (response.results?.isNotEmpty() == true) {
                     _searchResults.value = response.results.take(5)
+                    _searchStatus.value = "RESULTS_FOUND"
                     Log.d("SearchViewModel", "검색 결과: ${response.results.map { it.name }}")
                 } else {
+                    _searchResults.value = emptyList()
+                    _searchStatus.value = "ZERO_RESULTS"
                     Log.d("SearchViewModel", "검색 결과 없음")
                 }
                 Log.d("SearchViewModel", "API 응답: $response")

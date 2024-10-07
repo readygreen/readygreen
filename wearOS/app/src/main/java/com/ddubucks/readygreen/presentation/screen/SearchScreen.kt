@@ -2,7 +2,6 @@ package com.ddubucks.readygreen.presentation.screen
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.speech.RecognizerIntent
@@ -23,9 +22,8 @@ import com.airbnb.lottie.compose.*
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.core.service.LocationService
 import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.SearchViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
 import h3Style
 import pStyle
 
@@ -39,6 +37,7 @@ fun SearchScreen(
     val mike by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.search_mike))
     var voiceResults by remember { mutableStateOf(emptyList<String>()) }
     val searchResults by searchViewModel.searchResults.collectAsState()
+    val searchStatus by searchViewModel.searchStatus.collectAsState() // searchStatus 추가
     val context = LocalContext.current
     val locationService = remember { LocationService(context) }
 
@@ -114,9 +113,9 @@ fun SearchScreen(
         }
     }
 
-    // 검색 결과 변화 화면 전환
-    LaunchedEffect(searchResults) {
-        if (searchResults.isNotEmpty()) {
+    // 검색 상태 변화에 따른 화면 전환
+    LaunchedEffect(searchStatus) {
+        if (searchStatus == "ZERO_RESULTS" || searchResults.isNotEmpty()) {
             navController.currentBackStackEntry?.savedStateHandle?.set("searchResults", searchResults)
             Log.d("SearchScreen", "검색 결과 화면으로 이동")
             navController.navigate("searchResultScreen")
@@ -132,7 +131,7 @@ fun SearchScreen(
     ) {
         Text(
             text = "음성검색",
-            color = Yellow,
+            color = Primary,
             style = h3Style,
         )
         Spacer(modifier = Modifier.height(10.dp))

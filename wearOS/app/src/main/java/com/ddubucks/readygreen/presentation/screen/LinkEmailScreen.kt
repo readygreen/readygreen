@@ -1,17 +1,11 @@
 package com.ddubucks.readygreen.presentation.screen
 
 import androidx.compose.foundation.background
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -20,11 +14,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.wear.compose.material.Text
+import com.ddubucks.readygreen.presentation.components.TextInput
 import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.DarkGray
-import com.ddubucks.readygreen.presentation.theme.Gray
 import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Yellow
+import com.ddubucks.readygreen.presentation.theme.Primary
 import h1Style
 import pStyle
 
@@ -43,7 +37,7 @@ fun LinkEmailScreen(navController: NavController) {
         Text(
             text = "언제그린",
             style = h1Style,
-            color = Yellow,
+            color = Primary,
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
@@ -52,20 +46,13 @@ fun LinkEmailScreen(navController: NavController) {
             style = pStyle,
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+
+        TextInput(
             value = text,
-            onValueChange = { newText ->
-                text = newText
-            },
-            modifier = Modifier
-                .fillMaxWidth(0.75f)
-                .height(40.dp),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Email
-            ),
-            placeholder = { Text(text = "이메일 입력", color = Gray) },
-            shape = RoundedCornerShape(8.dp),
-            singleLine = true
+            onValueChange = { newText -> text = newText },
+            placeholderText = "이메일 입력",
+            keyboardType = KeyboardType.Email,
+            fontSize = 14
         )
         Spacer(modifier = Modifier.height(10.dp))
         TextButton(
@@ -83,7 +70,6 @@ fun LinkEmailScreen(navController: NavController) {
             Text(
                 text = "다음으로",
                 fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
                 color = White
             )
         }

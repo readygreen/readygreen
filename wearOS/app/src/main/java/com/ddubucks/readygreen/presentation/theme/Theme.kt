@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.wear.compose.material.MaterialTheme
 
 private val DarkColorPalette = Colors(
-    primary = Yellow,
+    primary = Primary,
     background = Black,
     surface = DarkGray,
     onPrimary = Black,
