@@ -202,8 +202,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   }
 
   void _onCameraIdle() {
-    _cameraIdleTimer = Timer(const Duration(seconds: 2), () {
-      _startLocationTimer(); // 2초 뒤 타이머 재시작
+    _cameraIdleTimer = Timer(const Duration(seconds: 1), () {
+      _startLocationTimer(); // 1초 뒤 타이머 재시작
       _isMapMoving = false;
     });
   }
@@ -241,7 +241,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   void _startLocationTimer() {
     if (_locationTimer == null || !_locationTimer!.isActive) {
       _locationTimer =
-          Timer.periodic(const Duration(seconds: 2), (Timer t) async {
+          Timer.periodic(const Duration(seconds: 1), (Timer t) async {
         loc.LocationData currentLocation =
             await _location.getLocation(); // 위치 정보 가져오기
         _currentLocation();
@@ -378,6 +378,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           var point = geometry['coordinates'];
           coordinates.add(LatLng(point[1], point[0])); // 경도, 위도 순서로 추가
           pointCoordinates.add(LatLng(point[1], point[0]));
+
           print('포인트 저장 $pointCoordinates');
           print('포인트 저장: ${pointCoordinates.length}개 포인트가 저장되었습니다.');
 

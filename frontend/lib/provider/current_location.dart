@@ -50,6 +50,11 @@ class CurrentLocationProvider with ChangeNotifier {
       } else {
         print('Google Places API로 주소 정보를 가져오지 못했습니다.');
       }
+      print('여기지롱~!!!!!!!!!!!!!!!!!!!');
+      print(_currentAddress);
+      print(_currentPlaceName);
+      print(currentAddress);
+      print(currentPlaceName);
     } catch (e) {
       print('위치 정보를 가져오는 데 실패했습니다: $e');
     }
