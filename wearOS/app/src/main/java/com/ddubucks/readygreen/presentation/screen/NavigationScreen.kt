@@ -41,7 +41,6 @@ fun NavigationScreen(
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
 
-    // TTS 초기화
     LaunchedEffect(Unit) {
         tts = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
@@ -51,24 +50,21 @@ fun NavigationScreen(
         }
     }
 
-    // TTS 리소스 해제
     DisposableEffect(Unit) {
         onDispose {
             tts?.shutdown()
         }
     }
 
-    // 숫자와 단위 결합 처리 및 TTS 안내
     LaunchedEffect(navigationState.currentDescription) {
         if (ttsReady && navigationState.currentDescription != null) {
             val descriptionWithUnits = navigationState.currentDescription
-                .replace(" m", " 미터")  // 숫자와 'm'을 '미터'로 변경
-                .replace(" km", " 킬로미터")  // 필요시 다른 단위도 처리
+                .replace(" m", " 미터")
+                .replace(" km", " 킬로미터")
             tts?.speak(descriptionWithUnits, TextToSpeech.QUEUE_ADD, null, "utteranceId")
         }
     }
 
-    // 뒤로가기 버튼 처리
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
             setShowExitDialog(true)
