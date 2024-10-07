@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:readygreen/constants/appcolors.dart';
 
 class BadgePage extends StatefulWidget {
+  const BadgePage({super.key});
+
   @override
   _BadgePageState createState() => _BadgePageState();
 }
@@ -29,7 +31,7 @@ class _BadgePageState extends State<BadgePage> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -41,34 +43,34 @@ class _BadgePageState extends State<BadgePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20), // 상단 여백
+              const SizedBox(height: 20), // 상단 여백
               // 선택된 뱃지 이미지
               Image.asset(
                 _selectedBadgeImage,
                 width: 150,
                 height: 150,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               // 선택된 뱃지 이름
               Text(
                 _selectedBadgeTitle,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: AppColors.green,
                   fontFamily: 'LogoFont',
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               // 선택된 뱃지 설명
               Text(
                 _selectedBadgeSubtitle,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               // 배지 리스트
               _buildBadgeCard(
                 context,
@@ -125,7 +127,7 @@ class _BadgePageState extends State<BadgePage> {
               color: Colors.grey.withOpacity(0.2),
               spreadRadius: 2,
               blurRadius: 5,
-              offset: Offset(0, 3), // 그림자 위치
+              offset: const Offset(0, 3), // 그림자 위치
             ),
           ],
         ),
@@ -137,22 +139,22 @@ class _BadgePageState extends State<BadgePage> {
               width: 50,
               height: 50,
             ),
-            SizedBox(width: 16),
+            const SizedBox(width: 16),
             // 배지 정보
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
                   ),
