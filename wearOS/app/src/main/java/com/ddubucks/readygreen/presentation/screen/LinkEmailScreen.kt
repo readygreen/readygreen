@@ -10,15 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.presentation.components.TextInput
-import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.DarkGray
-import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Primary
+import com.ddubucks.readygreen.presentation.theme.*
 import h1Style
 import pStyle
 
@@ -52,7 +50,8 @@ fun LinkEmailScreen(navController: NavController) {
             onValueChange = { newText -> text = newText },
             placeholderText = "이메일 입력",
             keyboardType = KeyboardType.Email,
-            fontSize = 14
+            fontSize = 14,
+            letterSpacing = TextUnit.Unspecified
         )
         Spacer(modifier = Modifier.height(10.dp))
         TextButton(
@@ -64,13 +63,13 @@ fun LinkEmailScreen(navController: NavController) {
                 .fillMaxWidth(0.4f),
             shape = RoundedCornerShape(40.dp),
             colors = ButtonDefaults.textButtonColors(
-                containerColor = DarkGray,
+                containerColor = if (text.isNotEmpty()) Secondary else DarkGray,
             )
         ) {
             Text(
                 text = "다음으로",
                 fontSize = 12.sp,
-                color = White
+                color = if (text.isNotEmpty()) Black else White
             )
         }
     }

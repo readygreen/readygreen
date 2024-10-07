@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.TextUnit
 import com.ddubucks.readygreen.presentation.theme.Gray
 import com.ddubucks.readygreen.presentation.theme.Black
 
@@ -24,7 +25,8 @@ fun TextInput(
     onValueChange: (String) -> Unit,
     placeholderText: String,
     keyboardType: KeyboardType = KeyboardType.Text,
-    fontSize: Int
+    fontSize: Int,
+    letterSpacing: TextUnit
 ) {
     TextField(
         value = value,
@@ -46,13 +48,14 @@ fun TextInput(
         textStyle = TextStyle(
             color = Black,
             fontSize = fontSize.sp,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            letterSpacing = letterSpacing
         ),
         singleLine = true,
         shape = RoundedCornerShape(8.dp),
         colors = TextFieldDefaults.colors(
             unfocusedIndicatorColor = Color.Transparent,
             focusedIndicatorColor = Color.Transparent
-        ),
+        )
     )
 }
