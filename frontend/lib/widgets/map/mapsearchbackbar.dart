@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/constants/appcolors.dart';
 
 class MapSearchBackBar extends StatelessWidget {
