@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:readygreen/screens/mypage/badge.dart';
 import 'package:readygreen/screens/mypage/feedback.dart';
 import 'package:readygreen/screens/mypage/feedback_list.dart';
 import 'package:readygreen/screens/mypage/myBadge.dart';
@@ -93,9 +94,13 @@ class _MyPageState extends State<MyPage> {
                           // 프로필 이미지
                           CircleAvatar(
                             radius: 35,
-                            backgroundImage: (profileData?['profileImg'] != null && profileData?['profileImg']!.isNotEmpty)
-                                ? NetworkImage(profileData!['profileImg']) as ImageProvider
-                                : const AssetImage('assets/images/user.png'), // 기본 이미지 설정
+                            backgroundImage:
+                                (profileData?['profileImg'] != null &&
+                                        profileData?['profileImg']!.isNotEmpty)
+                                    ? NetworkImage(profileData!['profileImg'])
+                                        as ImageProvider
+                                    : const AssetImage(
+                                        'assets/images/user.png'), // 기본 이미지 설정
                             onBackgroundImageError: (error, stackTrace) {
                               print('Failed to load profile image: $error');
                             },
@@ -114,9 +119,12 @@ class _MyPageState extends State<MyPage> {
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
+                              // 페이지 이동을 위한 네비게이션
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => MyBadgePage()), // BadgePage로 이동
+                                MaterialPageRoute(
+                                  builder: (context) => BadgePage(), // 이동할 페이지
+                                ),
                               );
                             },
                             child: SquareCardMypage(
@@ -126,14 +134,15 @@ class _MyPageState extends State<MyPage> {
                             ),
                           ),
                         ),
-
                         const SizedBox(width: 16),
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => MyPlacePage()), // PlacePage로 이동
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        MyPlacePage()), // PlacePage로 이동
                               );
                             },
                             child: SquareCardMypage(
@@ -145,7 +154,6 @@ class _MyPageState extends State<MyPage> {
                             ),
                           ),
                         ),
-
                       ],
                     ),
                     const SizedBox(height: 16),

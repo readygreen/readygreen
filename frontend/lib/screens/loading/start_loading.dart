@@ -50,7 +50,7 @@ class _StartLoadingPageState extends State<StartLoadingPage> {
     }
     // if()
     final profile = await newUserApi.getProfile();
-    if (profile!=null) {
+    if (profile != null) {
       // accessToken이 있으면 MainPage로 이동
       Navigator.push(
         context,
