@@ -360,7 +360,7 @@ public class MapService {
 
     @SneakyThrows
     @Transactional
-    public void deleteBookmark(String placeId, String email) {
+    public void deleteBookmark(int placeId, String email) {
         boolean exists = bookmarkRepository.existsByPlaceIdAndMemberEmail(placeId, email);
         if (!exists) {
             throw new UnauthorizedAccessException("Unauthorized Access");
