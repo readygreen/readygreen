@@ -130,7 +130,7 @@ class TrafficLightService {
     _globalTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       Set<Marker> updatedMarkers = {};
 
-      for (var trafficLightId in _trafficLightData.keys) {
+      for (var trafficLightId in List.from(_trafficLightData.keys)) {
         var trafficLight = _trafficLightData[trafficLightId]!;
 
         String currentState = trafficLight['currentState'];
