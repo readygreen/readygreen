@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:readygreen/screens/mypage/feedback.dart';
 import 'package:readygreen/screens/mypage/feedback_list.dart';
+import 'package:readygreen/screens/mypage/myBadge.dart';
+import 'package:readygreen/screens/mypage/myPlace.dart';
 import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
 import 'package:readygreen/widgets/modals/birth_modal.dart';
@@ -110,22 +112,40 @@ class _MyPageState extends State<MyPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: SquareCardMypage(
-                            title: '내 배지',
-                            imageUrl: 'assets/images/badge.png',
-                            subtitle: '설정하기',
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => MyBadgePage()), // BadgePage로 이동
+                              );
+                            },
+                            child: SquareCardMypage(
+                              title: '내 배지',
+                              imageUrl: 'assets/images/badge.png',
+                              subtitle: '설정하기',
+                            ),
                           ),
                         ),
+
                         const SizedBox(width: 16),
                         Expanded(
-                          child: SquareCardMypage(
-                            title: '내 장소',
-                            backgroundColor: Colors.white,
-                            textColor: Colors.black,
-                            imageUrl: 'assets/images/place.png',
-                            subtitle: '상세보기',
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => MyPlacePage()), // PlacePage로 이동
+                              );
+                            },
+                            child: SquareCardMypage(
+                              title: '내 장소',
+                              backgroundColor: Colors.white,
+                              textColor: Colors.black,
+                              imageUrl: 'assets/images/place.png',
+                              subtitle: '상세보기',
+                            ),
                           ),
                         ),
+
                       ],
                     ),
                     const SizedBox(height: 16),

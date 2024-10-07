@@ -83,7 +83,7 @@ class _PointPageState extends State<PointPage> {
               ),
               const SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: GestureDetector(
                   onTap: () {
                     // 페이지 이동을 처리하는 부분
@@ -209,8 +209,8 @@ class _PointPageState extends State<PointPage> {
                                 
                                 // 데이터가 없을 때 보여줄 컨테이너
                                 Container(
-                                  padding: const EdgeInsets.all(16), // 여백 추가
-                                  margin: const EdgeInsets.symmetric(horizontal: 24), // 좌우 여백 추가
+                                  padding: const EdgeInsets.all(0), // 여백 추가
+                                  margin: const EdgeInsets.symmetric(horizontal: 0), // 좌우 여백 추가
                                   decoration: BoxDecoration(
                                     color: Colors.white, // 배경 색상 설정
                                     borderRadius: BorderRadius.circular(12), // 둥근 모서리 설정
