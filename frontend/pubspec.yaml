@@ -51,6 +51,7 @@ dependencies:
   googleapis_auth: ^1.4.1
   flutter_local_notifications: ^17.2.3
   lottie: ^2.2.0
+  confetti: ^0.8.0
 
 dev_dependencies:
   flutter_test:
