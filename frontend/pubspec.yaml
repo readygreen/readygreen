@@ -121,6 +121,8 @@ flutter:
     - assets/images/fortune.png
     - assets/images/nobirth.png
     - assets/images/user.png
+    - assets/images/trophy.png
+    - assets/images/coinpig.png
     - assets/images/w-sun.png
     - assets/images/w-rain.png
     - assets/images/w-rainsnow.png

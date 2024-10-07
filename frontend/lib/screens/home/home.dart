@@ -196,7 +196,6 @@ class _HomePageContentState extends State<HomePageContent> {
         if (weatherResponse != null) {
           if (mounted) {
             setState(() {
-              print(weatherResponse);
               weatherData = List<Map<String, dynamic>>.from(weatherResponse);
             });
           }
