@@ -33,6 +33,11 @@ class CurrentLocationProvider with ChangeNotifier {
         _currentPlaceName = place.name ?? "알 수 없음";
         notifyListeners(); // 주소 정보 업데이트
       }
+      print('여기지롱~!!!!!!!!!!!!!!!!!!!');
+      print(_currentAddress);
+      print(_currentPlaceName);
+      print(currentAddress);
+      print(currentPlaceName);
     } catch (e) {
       print('위치 정보를 가져오는 데 실패했습니다: $e');
     }

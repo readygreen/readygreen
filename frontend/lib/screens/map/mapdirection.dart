@@ -343,8 +343,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           var point = geometry['coordinates'];
           coordinates.add(LatLng(point[1], point[0])); // 경도, 위도 순서로 추가
           pointCoordinates.add(LatLng(point[1], point[0]));
-          print('짜증작렬 ㅡㅡ .....');
-          print(pointCoordinates);
 
           // 경로 설명을 리스트에 추가
           var description = feature['properties']['description'];
