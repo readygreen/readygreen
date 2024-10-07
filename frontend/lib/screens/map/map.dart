@@ -240,33 +240,46 @@ class _MapPageState extends State<MapPage> {
           ),
 
           // 위치 버튼
+          // 위치 버튼 클릭 시 실행되는 함수
           Positioned(
             top: MediaQuery.of(context).size.height * 0.8,
             right: MediaQuery.of(context).size.width * 0.05,
             child: LocationButton(
               onTap: () async {
-                print('kkkkk');
-                // 버튼 클릭 시 위치 정보를 다시 업데이트
-                locationProvider.updateLocation();
+                print('위치 버튼 클릭됨');
+
+                // 위치 업데이트
+                await locationProvider.updateLocation();
 
                 // 위치가 null이 아니면 카메라를 현재 위치로 이동
                 if (locationProvider.currentPosition != null) {
-                  final GoogleMapController controller =
+                  final GoogleMapController? controller =
                       await _controller.future;
-                  controller.animateCamera(
-                    CameraUpdate.newLatLng(
-                      LatLng(
+
+                  if (controller != null && mounted) {
+                    // mounted 상태 확인
+                    try {
+                      controller.animateCamera(
+                        CameraUpdate.newLatLng(
+                          LatLng(
+                            locationProvider.currentPosition!.latitude,
+                            locationProvider.currentPosition!.longitude,
+                          ),
+                        ),
+                      );
+                      // 신호등 정보 요청
+                      _updateTrafficLights(
                         locationProvider.currentPosition!.latitude,
                         locationProvider.currentPosition!.longitude,
-                      ),
-                    ),
-                  );
-
-                  // 신호등 정보 요청
-                  _updateTrafficLights(
-                    locationProvider.currentPosition!.latitude,
-                    locationProvider.currentPosition!.longitude,
-                  );
+                      );
+                    } catch (e) {
+                      print("애니메이션 실행 중 오류 발생: $e");
+                    }
+                  } else {
+                    print("GoogleMapController가 초기화되지 않았습니다.");
+                  }
+                } else {
+                  print("위치 정보를 사용할 수 없습니다.");
                 }
               },
               screenWidth: MediaQuery.of(context).size.width,
