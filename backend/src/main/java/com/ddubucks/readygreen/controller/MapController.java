@@ -175,4 +175,12 @@ public class MapController {
         mapService.deleteBookmark(placeId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("bookmark")
+    public ResponseEntity<?> updateBookmark(@Valid @RequestBody BookmarkEditDTO bookmarkEditDTO,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+        mapService.updateBookmark(bookmarkEditDTO, userDetails.getUsername());
+        return ResponseEntity.ok("북마크가 수정되었습니다.");
+    }
+
 }
