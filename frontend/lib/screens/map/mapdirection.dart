@@ -131,6 +131,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       destinationLng = routeData['endlng'];
     }
 
+    // 도착지 위도, 경도 값이 있는지 확인
     if (destinationLat != null && destinationLng != null) {
       double distance = calculateDistance(
         currentLocation,
@@ -140,8 +141,10 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           '현재 위치: (${currentLocation.latitude}, ${currentLocation.longitude})');
       print('도착지 위치: ($destinationLat, $destinationLng)');
       print('계산된 거리: $distance 미터');
-      if (distance <= 10) {
-        // 도착지와의 거리가 5미터 이내일 때
+
+      // 도착지와의 거리가 20미터 이내일 때 모달 호출
+      if (distance <= 20) {
+        print("20미터 이내 도착 확인. 모달 표시 시도.");
         _showRouteFinishModal();
       }
     } else {
@@ -151,11 +154,15 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
 // 모달을 띄우는 함수
   void _showRouteFinishModal() {
-    if (!mounted) return; // 위젯이 렌더링되기 전에 호출되지 않도록 방지
+    // 위젯이 렌더링된 상태인지 확인
+    if (!mounted) return;
 
-    print('모달 표시 함수 호출됨'); // 로그 추가
+    print('모달 표시 함수 호출됨');
     Future.delayed(Duration.zero, () {
-      if (!mounted) return; // 위젯이 dispose된 후에 호출되지 않도록 방지
+      // 위젯이 여전히 렌더링 중인지 다시 확인
+      if (!mounted) return;
+
+      // 모달을 띄움
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -169,6 +176,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
 // 길안내 종료 요청 보내는 함수
   void _onFinishNavigation() async {
+    print('길안내 종료 함수 실행');
     MapStartAPI mapStartAPI = MapStartAPI();
     var result = await mapStartAPI.guideFinish(
       distance: _totalDistance ?? 0.0,
@@ -180,13 +188,13 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       print("길안내 종료 성공");
       _cameraIdleTimer?.cancel(); // 페이지 종료 시 타이머 취소
       _stopLocationTimer(); // 위치 타이머도 확실히 종료
-      super.dispose();
       handleBackNavigation(context); // 메인 화면으로 돌아가기
     } else {
       print("길안내 종료 실패");
     }
 
-    Navigator.of(context).pop(); // 모달 닫기
+    // 모달 닫기
+    Navigator.of(context).pop();
   }
 
   // 지도 이동 시 타이머를 멈추고, 카메라가 멈춘 후 3초 뒤 타이머 재시작
