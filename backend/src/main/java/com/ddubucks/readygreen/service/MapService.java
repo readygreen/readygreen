@@ -50,6 +50,7 @@ public class MapService {
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
 
+
     public MapResponseDTO getDestinationGuide(RouteRequestDTO routeRequestDTO, String email) {
 
         // 경로 요청
@@ -84,6 +85,30 @@ public class MapService {
                 .routeDTO(routeDto)
                 .blinkerDTOs(blinkerDTOs)
                 .build();
+    }
+
+    private void getRouteTime(RouteDTO routeDTO) {
+
+        int currentTime = 0;
+
+        for (FeatureDTO featureDTO : routeDTO.getFeatures()) {
+            if (TYPE.equals(featureDTO.getGeometry().getType()) && isValidTurnType(featureDTO.getProperties().getTurnType())) {
+                List<Double> c = (List<Double>) featureDTO.getGeometry().getCoordinates();
+
+                Point point = getPoint(c.get(0), c.get(1));
+                //신호등의 현재 시간과 지금까지 걸린 도착 r시간에서 계산
+
+                List<Blinker> blinkers = blinkerJDBCRepository.findAllByCoordinatesWithinRadius(List.of(point), RADIUS);
+
+                blinkers.get(0);    // 같은 위치에 있는 신호등
+
+            }
+            if ("LineString".equals(featureDTO.getGeometry().getType())) {
+                currentTime += featureDTO.getProperties().getTime();
+            }
+
+        }
+
     }
 
     private List<BlinkerDTO> toBlinkerDTOs(List<Blinker> blinkers) {
