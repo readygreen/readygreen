@@ -6,6 +6,7 @@ import com.ddubucks.readygreen.exception.UnauthorizedAccessException;
 import com.ddubucks.readygreen.model.Blinker;
 import com.ddubucks.readygreen.model.RouteRecord;
 import com.ddubucks.readygreen.model.bookmark.Bookmark;
+import com.ddubucks.readygreen.model.bookmark.BookmarkType;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.repository.*;
 import com.nimbusds.jose.shaded.gson.Gson;
@@ -31,6 +32,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -408,4 +410,33 @@ public class MapService {
         double distance = R * c; // 거리를 미터로 계산
         return distance;
     }
+
+    @Transactional
+    public void updateBookmark(BookmarkEditDTO bookmarkEditDTO, String username) {
+        Member member = memberRepository.findMemberByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+
+        Bookmark bookmarkToUpdate = bookmarkRepository.findByIdAndMember(bookmarkEditDTO.getId(), member)
+                .orElseThrow(() -> new IllegalArgumentException("해당 북마크가 존재하지 않습니다."));
+
+        BookmarkType newType = bookmarkEditDTO.getType();
+
+        // 'HOME'이나 'COMPANY'로 변경하려고 할 때, 기존에 해당 타입이 이미 존재하면 ETC로 변경
+        if (newType == BookmarkType.HOME || newType == BookmarkType.COMPANY) {
+            Optional<Bookmark> existingBookmark = bookmarkRepository.findByTypeAndMember(newType, member);
+
+            if (existingBookmark.isPresent() && existingBookmark.get().getId() != bookmarkToUpdate.getId()) {
+                Bookmark existing = existingBookmark.get();
+                existing.setName("기타");
+                existing.setType(BookmarkType.ETC); // 기존 집이나 회사 북마크를 'ETC'로 변경
+                bookmarkRepository.save(existing);
+            }
+        }
+
+        // 선택한 북마크의 타입을 새로운 타입으로 변경
+        bookmarkToUpdate.setType(newType);
+        bookmarkToUpdate.setName(newType.getTitle());
+        bookmarkRepository.save(bookmarkToUpdate);
+    }
+
 }
