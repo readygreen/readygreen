@@ -75,6 +75,7 @@ class _ResultMapPageState extends State<ResultMapPage> {
       );
     });
   }
+  
   Future<void> _fetchBookmarks() async {
     final bookmarksData = await mapStartAPI.fetchBookmarks();
 
