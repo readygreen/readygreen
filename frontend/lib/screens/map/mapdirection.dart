@@ -66,6 +66,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     for (int i = currentRouteIndex; i < pointCoordinates.length; i++) {
       double distance = calculateDistance(currentLocation, pointCoordinates[i]);
       if (distance <= 10) {
+        print('도착');
         // 10 미터 이내로 가까워졌을 때
         _jumpToRouteDescription(i); // RouteCard를 해당 인덱스로 넘겨줌
         currentRouteIndex = i + 1; // 다음 포인트로 인덱스 업데이트
@@ -409,7 +410,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     MapStartAPI mapStartAPI = MapStartAPI();
     var routeData = await mapStartAPI.fetchGuideInfo();
 
-    print('데이터 값~!~!~!~!~!~!~!~!~!: $routeData');
+    print('routeData 데이터 값: $routeData');
     _processRouteData(routeData, 1);
     if (routeData != null && routeData['blinkerDTOs'] != null) {
       _processBlinkerData(routeData['blinkerDTOs']); // 신호등 데이터를 처리하여 지도에 추가
