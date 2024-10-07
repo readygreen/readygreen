@@ -37,7 +37,6 @@ fun NavigationScreen(
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
 
-    // TTS 인스턴스 생성
     val context = LocalContext.current
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
@@ -52,20 +51,24 @@ fun NavigationScreen(
         }
     }
 
-    // TTS 자원 해제
+    // TTS 리소스 해제
     DisposableEffect(Unit) {
         onDispose {
             tts?.shutdown()
         }
     }
 
-    // currentDescription이 바뀔 때마다 음성 출력
+    // 숫자와 단위 결합 처리 및 TTS 안내
     LaunchedEffect(navigationState.currentDescription) {
         if (ttsReady && navigationState.currentDescription != null) {
-            tts?.speak(navigationState.currentDescription, TextToSpeech.QUEUE_FLUSH, null, null)
+            val descriptionWithUnits = navigationState.currentDescription
+                .replace(" m", " 미터")  // 숫자와 'm'을 '미터'로 변경
+                .replace(" km", " 킬로미터")  // 필요시 다른 단위도 처리
+            tts?.speak(descriptionWithUnits, TextToSpeech.QUEUE_ADD, null, "utteranceId")
         }
     }
 
+    // 뒤로가기 버튼 처리
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
             setShowExitDialog(true)
@@ -111,7 +114,6 @@ fun NavigationScreen(
             },
             onCancel = {
                 setShowExitDialog(false)
-                navController.popBackStack()
             }
         )
     }
@@ -134,7 +136,7 @@ fun NavigationInfo(navigationState: NavigationState) {
             13, 18, 19 -> R.drawable.arrow_right           // 우회전 및 관련 우회전
             14 -> R.drawable.arrow_back                    // 유턴
             else -> R.drawable.arrow_straight              // 나머지 값은 안내 없음 처리
-        } ),
+        }),
         contentDescription = "방향",
         tint = Color.Unspecified,
         modifier = Modifier.size(40.dp)
@@ -150,14 +152,16 @@ fun NavigationInfo(navigationState: NavigationState) {
 
     Spacer(modifier = Modifier.height(10.dp))
 
+    // 남은 거리에 단위 추가
     Text(
-        text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) } ?: "정보 없음"} m",
+        text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) + " 미터" } ?: "정보 없음"}",
         style = pStyle,
         color = White
     )
 
     Spacer(modifier = Modifier.height(10.dp))
 
+    // 신호등 색상 처리
     navigationState.trafficLightColor?.let { color ->
         Text(
             text = "${navigationState.trafficLightRemainingTime ?: "정보 없음"}초",

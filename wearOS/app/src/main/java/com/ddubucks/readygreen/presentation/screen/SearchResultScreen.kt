@@ -1,6 +1,7 @@
 package com.ddubucks.readygreen.presentation.screen
 
 import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -39,24 +40,52 @@ fun SearchResultScreen(
         ?.savedStateHandle
         ?.get<List<SearchCandidate>>("searchResults") ?: emptyList()
 
-    // TTS 인스턴스 생성
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
 
-    // TTS 초기화
+    // 음성이 끝난 후 페이지 전환을 제어하는 플래그
+    var navigateAfterTTS by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         tts = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 tts?.language = Locale.KOREAN
                 ttsReady = true
+
+                // TTS 음성 출력 완료 후 처리하는 리스너
+                tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                    override fun onStart(utteranceId: String?) {}
+
+                    override fun onDone(utteranceId: String?) {
+                        navigateAfterTTS = true
+                    }
+
+                    override fun onError(utteranceId: String?) {}
+                })
             }
         }
     }
 
-    // TTS 자원 해제
     DisposableEffect(Unit) {
         onDispose {
             tts?.shutdown()
+        }
+    }
+
+    LaunchedEffect(navigateAfterTTS) {
+        if (navigateAfterTTS && selectedPlace != null) {
+            val place = selectedPlace
+            if (place != null) {
+                navigationViewModel.startNavigation(
+                    context,
+                    place.geometry.location.lat,
+                    place.geometry.location.lng,
+                    place.name
+                )
+                navController.navigate("navigationScreen") {
+                    popUpTo("mainScreen") { inclusive = false }
+                }
+            }
         }
     }
 
@@ -107,11 +136,6 @@ fun SearchResultScreen(
                 ButtonText(item = ButtonModel(result.name), onClick = {
                     selectedPlace = result
                     showConfirmationDialog = true
-
-                    // 선택된 목적지 이름을 TTS로 읽기
-                    if (ttsReady && result.name != null) {
-                        tts?.speak("${result.name}로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, null)
-                    }
                 })
             }
             item {
@@ -128,16 +152,8 @@ fun SearchResultScreen(
             message = "${selectedPlace?.name}로 길 안내를 시작하시겠습니까?",
             onConfirm = {
                 val place = selectedPlace
-                if (place != null) {
-                    navigationViewModel.startNavigation(
-                        context,
-                        place.geometry.location.lat,
-                        place.geometry.location.lng,
-                        place.name
-                    )
-                    navController.navigate("navigationScreen") {
-                        popUpTo("mainScreen") { inclusive = false }
-                    }
+                if (place != null && ttsReady && place.name != null) {
+                    tts?.speak("${place.name}로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
                 }
                 showConfirmationDialog = false
             },

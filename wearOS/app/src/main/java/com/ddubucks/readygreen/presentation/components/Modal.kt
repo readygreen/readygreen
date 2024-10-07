@@ -15,6 +15,7 @@ import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Gray
 import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Primary
+import com.ddubucks.readygreen.presentation.theme.Secondary
 import h3Style
 import pStyle
 
@@ -60,7 +61,7 @@ fun Modal(
                 Button(
                     onClick = onConfirm,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Primary,
+                        containerColor = Secondary,
                         contentColor = Black
                     )
                 ) {

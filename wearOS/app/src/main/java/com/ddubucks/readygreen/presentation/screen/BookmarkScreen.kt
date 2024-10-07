@@ -1,5 +1,7 @@
 package com.ddubucks.readygreen.presentation.screen
 
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -24,6 +26,7 @@ import com.ddubucks.readygreen.presentation.viewmodel.BookmarkViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import h3Style
 import pStyle
+import java.util.*
 
 @Composable
 fun BookmarkScreen(
@@ -36,8 +39,62 @@ fun BookmarkScreen(
     var showModal by remember { mutableStateOf(false) }
     var selectedBookmark by remember { mutableStateOf<BookmarkResponse?>(null) }
 
+    // TTS 관련 상태 및 플래그
+    var ttsReady by remember { mutableStateOf(false) }
+    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
+    var navigateAfterTTS by remember { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         bookmarkViewModel.getBookmarks()
+    }
+
+    LaunchedEffect(Unit) {
+        tts = TextToSpeech(context) { status ->
+            if (status == TextToSpeech.SUCCESS) {
+                tts?.language = Locale.KOREAN
+                ttsReady = true
+
+                // TTS가 끝났을 때 콜백 설정
+                tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
+                    override fun onStart(utteranceId: String?) {}
+
+                    override fun onDone(utteranceId: String?) {
+                        // TTS가 끝난 후 페이지 이동 플래그 활성화
+                        navigateAfterTTS = true
+                    }
+
+                    override fun onError(utteranceId: String?) {}
+                })
+            }
+        }
+    }
+
+    // TTS 자원 해제
+    DisposableEffect(Unit) {
+        onDispose {
+            tts?.shutdown()
+        }
+    }
+
+    // TTS가 끝난 후 페이지 전환 처리
+    LaunchedEffect(navigateAfterTTS) {
+        if (navigateAfterTTS && selectedBookmark != null) {
+            val place = selectedBookmark
+            if (place != null) {
+                // 길 안내를 시작하고 페이지 전환
+                navigationViewModel.startNavigation(
+                    context,
+                    place.latitude,
+                    place.longitude,
+                    place.destinationName
+                )
+                navController.navigate("navigationScreen") {
+                    popUpTo("mainScreen") { inclusive = false }
+                }
+                // 플래그 초기화
+                navigateAfterTTS = false
+            }
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -105,18 +162,12 @@ fun BookmarkScreen(
                 title = "길안내 시작",
                 message = "${selectedBookmark?.destinationName}으로 길안내를 시작할까요?",
                 onConfirm = {
-                    showModal = false
-                    selectedBookmark?.let { bookmark ->
-                        navigationViewModel.startNavigation(
-                            context,
-                            bookmark.latitude,
-                            bookmark.longitude,
-                            bookmark.destinationName
-                        )
-                        navController.navigate("navigationScreen") {
-                            popUpTo("mainScreen") { inclusive = false }
-                        }
+                    val place = selectedBookmark
+                    if (place != null && ttsReady && place.destinationName != null) {
+                        // TTS로 길 안내 메시지 출력
+                        tts?.speak("${place.destinationName}으로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
                     }
+                    showModal = false
                 },
                 onCancel = {
                     showModal = false

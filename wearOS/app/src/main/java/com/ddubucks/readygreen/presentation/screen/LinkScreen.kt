@@ -20,6 +20,7 @@ import pStyle
 import android.widget.Toast
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.em
 import com.ddubucks.readygreen.presentation.components.TextInput
 
 @Composable
@@ -64,7 +65,8 @@ fun LinkScreen(
             },
             placeholderText = "인증번호 입력",
             keyboardType = KeyboardType.Number,
-            fontSize = 22
+            fontSize = 20,
+            letterSpacing = 0.3.em
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -90,12 +92,12 @@ fun LinkScreen(
                 .fillMaxWidth(0.4f),
             shape = RoundedCornerShape(40.dp),
             colors = ButtonDefaults.textButtonColors(
-                containerColor = DarkGray,
+                containerColor = if (authNumber.length == 6) Secondary else DarkGray,
             )
         ) {
             Text(
                 text = "시작하기",
-                color = White,
+                color = if (authNumber.length == 6) Black else White,  // 입력에 따라 텍스트 색상 변경
                 fontSize = 12.sp
             )
         }
