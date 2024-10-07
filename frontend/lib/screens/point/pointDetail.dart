@@ -159,8 +159,10 @@ class _PointDetailPageState extends State<PointDetailPage> {
       imagePath = 'assets/images/foot.png'; // 걸음수일 때 사용할 이미지
     } else if (firstWord == '운세') {
       imagePath = 'assets/images/star.png'; // 운세일 때 사용할 이미지
-    } else {
+    } else if(firstWord == '제보'){
       imagePath = 'assets/images/rainbow.png'; // 기본 이미지 (필요시)
+    }else{
+      imagePath = 'assets/images/rainbow.png';
     }
 
     return Container(
