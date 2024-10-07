@@ -18,4 +18,5 @@ public class BlinkerDTO {
     private int remainingTime; // 상태 변환 남은 시간
     private double latitude;
     private double longitude;
+    private int index;  // 경로 인덱스
 }

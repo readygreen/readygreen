@@ -52,13 +52,50 @@ public class MapService {
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
 
-    public MapResponseDTO getDestinationGuide(RouteRequestDTO routeRequestDTO, String email) {
+    class Node {
+        RouteDTO routeDTO;
+        int totalSecond;
+    }
 
-        // 경로 요청
-        RouteDTO routeDto = route(routeRequestDTO);
+    public MapResponseDTO getDestinationGuide(RouteRequestDTO routeRequestDTO, String email) {
+        // 현재 시간
+        LocalTime nowTime = LocalTime.now();
+
+        Node[] routeTotalSecond = new Node[4];
+
+        for (int i = 0; i < 4; i++) {
+            routeTotalSecond[i] = new Node();
+        }
+
+        // 추천 경로 요청
+        routeRequestDTO.searchReco();
+        routeTotalSecond[0].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[0].totalSecond = getRouteTotalSecond(routeTotalSecond[0].routeDTO, nowTime);
+
+        // 추천 경로 + 대로
+        routeRequestDTO.searchRecoAndMainRoad();
+        routeTotalSecond[1].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[1].totalSecond = getRouteTotalSecond(routeTotalSecond[1].routeDTO, nowTime);
+
+        // 최단 경로
+        routeRequestDTO.searchShort();
+        routeTotalSecond[2].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[2].totalSecond = getRouteTotalSecond(routeTotalSecond[2].routeDTO, nowTime);
+
+        // 최단 경로 + 계단 없음
+        routeRequestDTO.searchShortAndNonStair();
+        routeTotalSecond[3].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[3].totalSecond = getRouteTotalSecond(routeTotalSecond[3].routeDTO, nowTime);
+
+        int minSecondIndex = 0;
+        for (int i = 1; i < 4; i++) {
+            if (routeTotalSecond[minSecondIndex].totalSecond > routeTotalSecond[i].totalSecond) {
+                minSecondIndex = i;
+            }
+        }
 
         // 경로 내 신호등 위치
-        List<Point> coordinates = getBlinkerCoordinate(routeDto);
+        List<Point> coordinates = getBlinkerCoordinate(routeTotalSecond[minSecondIndex].routeDTO);
 
         // 해당 좌표의 신호등 정보
         List<Blinker> blinkers = List.of();
@@ -83,9 +120,48 @@ public class MapService {
         );
 
         return MapResponseDTO.builder()
-                .routeDTO(routeDto)
+                .routeDTO(routeTotalSecond[minSecondIndex].routeDTO)
                 .blinkerDTOs(blinkerDTOs)
                 .build();
+    }
+
+    private int getRouteTotalSecond(RouteDTO routeDTO, LocalTime nowTime) {
+
+        int currentSecond = 0;
+
+        for (FeatureDTO featureDTO : routeDTO.getFeatures()) {
+            if (TYPE.equals(featureDTO.getGeometry().getType()) && isValidTurnType(featureDTO.getProperties().getTurnType())) {
+                List<Double> c = (List<Double>) featureDTO.getGeometry().getCoordinates();
+
+                //신호등의 현재 시간과 지금까지 걸린 도착 r시간에서 계산
+                System.out.println(c.get(0) + " " + c.get(1));
+                Blinker blinker = blinkerRepository.findBlinkerNearByCoordinate(c.get(0), c.get(1));
+
+                System.out.println(blinker.getCoordinate().getX() + " " + blinker.getCoordinate().getY());
+
+
+                // 걸리는 시간getBlinkerTime
+                int remainTime = getBlinkerTime(blinker.getStartTime(), nowTime.plusSeconds(currentSecond), blinker.getGreenDuration(), blinker.getRedDuration());
+
+                String status = getBlinkerState(blinker.getStartTime(), nowTime.plusSeconds(currentSecond), blinker.getGreenDuration(), blinker.getRedDuration());
+
+                // 남은 시간이 초록불의 1/3 보다 작으면 다음 빨간불 초 + 파란불 초 값
+                if ("GREEN".equals(status) && remainTime < (blinker.getGreenDuration() / 3)) {
+                    currentSecond += remainTime + blinker.getRedDuration();
+                }
+
+                // 빨간불이면 빨간 불 대기 시간
+                else if ("RED".equals(status)) {
+                    currentSecond += remainTime;
+                }
+            }
+            if ("LineString".equals(featureDTO.getGeometry().getType())) {
+                currentSecond += featureDTO.getProperties().getTime();
+            }
+
+        }
+
+        return currentSecond;
     }
 
     private List<BlinkerDTO> toBlinkerDTOs(List<Blinker> blinkers) {
