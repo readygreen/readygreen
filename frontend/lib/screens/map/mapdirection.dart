@@ -168,8 +168,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   }
 
   void _onCameraIdle() {
-    _cameraIdleTimer = Timer(const Duration(seconds: 2), () {
-      _startLocationTimer(); // 2초 뒤 타이머 재시작
+    _cameraIdleTimer = Timer(const Duration(seconds: 1), () {
+      _startLocationTimer(); // 1초 뒤 타이머 재시작
       _isMapMoving = false;
     });
   }
@@ -207,7 +207,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   void _startLocationTimer() {
     if (_locationTimer == null || !_locationTimer!.isActive) {
       _locationTimer =
-          Timer.periodic(const Duration(seconds: 2), (Timer t) async {
+          Timer.periodic(const Duration(seconds: 1), (Timer t) async {
         loc.LocationData currentLocation =
             await _location.getLocation(); // 위치 정보 가져오기
         _currentLocation();

@@ -49,7 +49,8 @@ Future<BitmapDescriptor> createCircleMarker(
 class TrafficLightService {
   final MapStartAPI api = MapStartAPI();
   Timer? _globalTimer; // 하나의 전역 타이머
-  final Map<String, Map<String, dynamic>> _trafficLightData = {}; // 신호등 데이터를 저장하는 Map
+  final Map<String, Map<String, dynamic>> _trafficLightData =
+      {}; // 신호등 데이터를 저장하는 Map
 
   // 신호등 정보를 받아와 마커로 지도에 표시하는 함수
   Future<void> addTrafficLightsToMap({
