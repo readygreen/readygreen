@@ -41,6 +41,7 @@ public class MapController {
     public ResponseEntity<MapResponseDTO> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         MapResponseDTO mapResponseDTO = mapService.getDestinationGuide(routeRequestDTO, userDetails.getUsername());
         Double distance = mapService.getDistance(mapResponseDTO.getRouteDTO().getFeatures());
+
         mapResponseDTO.setOrigin(routeRequestDTO.getStartName());
         mapResponseDTO.setDestination(routeRequestDTO.getEndName());
         mapResponseDTO.setEndlng(routeRequestDTO.getEndX());
