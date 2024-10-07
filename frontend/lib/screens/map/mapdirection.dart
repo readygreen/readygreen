@@ -54,23 +54,54 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   String? _totalTime; // 예상 시간
   List<LatLng> pointCoordinates = [];
 
-// 유클리드 거리 계산
+// // 유클리드 거리 계산
+//   double calculateDistance(LatLng currentPosition, LatLng point) {
+//     double dx = currentPosition.longitude - point.longitude;
+//     double dy = currentPosition.latitude - point.latitude;
+//     return sqrt(dx * dx + dy * dy) * 111000;
+//   }
+  // 하버사인 공식
   double calculateDistance(LatLng currentPosition, LatLng point) {
-    double dx = currentPosition.longitude - point.longitude;
-    double dy = currentPosition.latitude - point.latitude;
-    return sqrt(dx * dx + dy * dy) * 111000;
+    const double R = 6371000; // 지구 반지름 (미터 단위)
+    double lat1 = currentPosition.latitude * (pi / 180);
+    double lon1 = currentPosition.longitude * (pi / 180);
+    double lat2 = point.latitude * (pi / 180);
+    double lon2 = point.longitude * (pi / 180);
+
+    double dLat = lat2 - lat1;
+    double dLon = lon2 - lon1;
+
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(lat1) * cos(lat2) * sin(dLon / 2) * sin(dLon / 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    double distance = R * c; // 두 좌표 간의 거리 계산
+    return distance;
   }
 
 // point 와 현재위치 거리 체크
   void _checkProximityToRoutePoints(LatLng currentLocation) {
-    for (int i = currentRouteIndex; i < pointCoordinates.length; i++) {
+    // currentRouteIndex가 1번 인덱스부터 시작하도록 설정
+    print('포인트 리스트 $pointCoordinates');
+    int startIndex = (currentRouteIndex < 1) ? 1 : currentRouteIndex;
+
+    for (int i = startIndex; i < pointCoordinates.length; i++) {
       double distance = calculateDistance(currentLocation, pointCoordinates[i]);
+
+      // 10 미터 이내로 가까워졌을 때만 인덱스 업데이트
       if (distance <= 10) {
         print('도착');
-        // 10 미터 이내로 가까워졌을 때
         _jumpToRouteDescription(i); // RouteCard를 해당 인덱스로 넘겨줌
         currentRouteIndex = i + 1; // 다음 포인트로 인덱스 업데이트
-        break;
+
+        // 마지막 포인트에 도착하면 종료 모달 체크
+        if (i == pointCoordinates.length - 1) {
+          print('마지막 포인트 도착');
+          _checkProximityToDestination(currentLocation, 2, null);
+        }
+        break; // 10미터 이내 도착한 첫 번째 포인트에서 루프 종료
+      } else {
+        print('포인트 $i: 거리 $distance 미터, 도착 처리 안됨');
       }
     }
   }
@@ -109,7 +140,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           '현재 위치: (${currentLocation.latitude}, ${currentLocation.longitude})');
       print('도착지 위치: ($destinationLat, $destinationLng)');
       print('계산된 거리: $distance 미터');
-      if (distance <= 5) {
+      if (distance <= 10) {
         // 도착지와의 거리가 5미터 이내일 때
         _showRouteFinishModal();
       }
@@ -120,17 +151,20 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
 
 // 모달을 띄우는 함수
   void _showRouteFinishModal() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return RouteFinishModal(
-          onConfirm: _onFinishNavigation, // 길안내 종료 함수
-          onCancel: () {
-            Navigator.of(context).pop(); // 모달 닫기
-          },
-        );
-      },
-    );
+    if (!mounted) return; // 위젯이 렌더링되기 전에 호출되지 않도록 방지
+
+    print('모달 표시 함수 호출됨'); // 로그 추가
+    Future.delayed(Duration.zero, () {
+      if (!mounted) return; // 위젯이 dispose된 후에 호출되지 않도록 방지
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return RouteFinishModal(
+            onConfirm: _onFinishNavigation, // 길안내 종료 함수
+          );
+        },
+      );
+    });
   }
 
 // 길안내 종료 요청 보내는 함수
@@ -327,7 +361,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       List<dynamic> features = routeData['routeDTO']['features'];
       List<LatLng> coordinates = [];
       List<String> descriptions = []; // 추가된 부분: 경로 설명을 담을 리스트
-      List<LatLng> pointCoordinates = [];
+      pointCoordinates.clear();
 
       for (var feature in features) {
         var geometry = feature['geometry'];
@@ -345,6 +379,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           coordinates.add(LatLng(point[1], point[0])); // 경도, 위도 순서로 추가
           pointCoordinates.add(LatLng(point[1], point[0]));
           print('포인트 저장 $pointCoordinates');
+          print('포인트 저장: ${pointCoordinates.length}개 포인트가 저장되었습니다.');
 
           // 경로 설명을 리스트에 추가
           var description = feature['properties']['description'];
