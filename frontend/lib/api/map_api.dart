@@ -133,7 +133,7 @@ class MapStartAPI {
   }
 
   // 즐겨찾기 삭제 (DELETE)
-  Future<bool> deleteBookmark(String placeId) async {
+  Future<bool> deleteBookmark(int placeId) async {
     String? accessToken = await storage.read(key: 'accessToken');
 
     final response = await http.delete(
@@ -358,4 +358,28 @@ class MapStartAPI {
       return null;
     }
   }
+
+  Future<void> updateBookmarkType(int id, int newType) async {
+    String? accessToken = await storage.read(key: 'accessToken');
+    
+    final response = await http.put(
+      Uri.parse('$baseUrl/map/bookmark'),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        'id': id,
+        'type': newType==0?"HOME" : newType==1 ? "COMPANY" :"ETC", // "HOME", "COMPANY", "ETC" 중 하나
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('북마크 수정 성공');
+    } else {
+      print('북마크 수정 실패: ${response.statusCode}, ${response.body}');
+    }
+  }
+
 }

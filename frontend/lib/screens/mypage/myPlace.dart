@@ -67,7 +67,8 @@ class _MyPlacePageState extends State<MyPlacePage> {
                       context,
                       bookmark.name, // 실제 데이터의 이름 사용
                       bookmark.destinationName, // 목적지 이름
-                      Icons.place, // 아이콘 설정 (필요에 따라 변경 가능)
+                      Icons.place,
+                      bookmark.id 
                     ),
                   ],
                 );
@@ -77,7 +78,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
   }
 
   // 장소 아이템 빌드 함수
-  Widget _buildPlaceItem(BuildContext context, String title, String placeName, IconData icon) {
+  Widget _buildPlaceItem(BuildContext context, String title, String placeName, IconData icon, int id) {
     return ListTile(
       leading: title=="기타"? Icon(Icons.favorite, size: 35, color: Colors.green) : title=="집"? Icon(Icons.home, size: 35, color: Colors.orange) : Icon(Icons.business, size: 35, color: Colors.blue),
       title: Text(
@@ -92,13 +93,13 @@ class _MyPlacePageState extends State<MyPlacePage> {
           IconButton(
             icon: const Icon(size:20,Icons.edit),
             onPressed: () {
-              _showEditModal(context, title, placeName);
+              _showEditModal(context, title, placeName, id);
             },
           ),
           IconButton(
             icon: const Icon(size:20,Icons.delete),
             onPressed: () {
-              _showDeleteModal(context, placeName);
+              _showDeleteModal(context, placeName, id);
             },
           ),
         ],
@@ -107,7 +108,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
   }
 
   // 수정 모달
-  void _showEditModal(BuildContext context, String title, String placeName) {
+  void _showEditModal(BuildContext context, String title, String placeName, int id) {
   // 선택된 인덱스를 외부에서 관리
   int selectedIndex = -1;
 
@@ -285,8 +286,11 @@ class _MyPlacePageState extends State<MyPlacePage> {
                   Align(
                     alignment: Alignment.center, // 버튼을 가운데로 정렬
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context, selectedIndex); // 선택된 인덱스를 반환하며 모달 닫기
+                      onPressed: () async {
+
+                        await mapStartAPI.updateBookmarkType(id, selectedIndex);
+                        await _fetchBookmarks();
+                        Navigator.pop(context);
                       },
                       child: const Text('수정하기'),
                       style: ElevatedButton.styleFrom(
@@ -313,7 +317,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
 
 
   // 삭제 모달
-  void _showDeleteModal(BuildContext context, String placeName) {
+  void _showDeleteModal(BuildContext context, String placeName, int id) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -349,9 +353,11 @@ class _MyPlacePageState extends State<MyPlacePage> {
                       const SizedBox(height: 32), // 내용과 버튼 간 간격
                       Center(
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             // 삭제 로직 추가
-                            Navigator.pop(context); // 모달 닫기
+                              await mapStartAPI.deleteBookmark(id);
+                              await _fetchBookmarks();
+                              Navigator.pop(context);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red, // 빨간색 배경
