@@ -231,6 +231,12 @@ class _MapPageState extends State<MapPage> {
                   _goToPlace(result['lat'], result['lng'], result['name'],
                       _placeId, '주소 정보 없음');
                 }
+                // 검색 후 뒤로 돌아왔을 때 키보드 내리기
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    FocusScope.of(context).unfocus();
+                  }
+                });
               },
             ),
           ),
@@ -253,10 +259,10 @@ class _MapPageState extends State<MapPage> {
 
                 // 위치가 null이 아니면 카메라를 현재 위치로 이동
                 if (locationProvider.currentPosition != null) {
-                  final GoogleMapController? controller =
+                  final GoogleMapController controller =
                       await _controller.future;
 
-                  if (controller != null && mounted) {
+                  if (mounted) {
                     // mounted 상태 확인
                     try {
                       controller.animateCamera(
