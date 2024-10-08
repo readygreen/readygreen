@@ -1,5 +1,6 @@
 package com.ddubucks.readygreen.controller;
 
+import com.ddubucks.readygreen.dto.ProfileResponseDTO;
 import com.ddubucks.readygreen.dto.SignupRequestDTO;
 import com.ddubucks.readygreen.model.Badge;
 import com.ddubucks.readygreen.repository.BadgeRepository;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -69,7 +71,7 @@ public class MemberController {
     public ResponseEntity<Member> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails) {
         System.out.println(userDetails.getUsername());
         Member member = memberService.getMemberInfo(userDetails.getUsername());
-        badgeRepository.findBadgeTypeByMemberEmail(userDetails.getUsername());
         return ResponseEntity.ok(member);
     }
+
 }
