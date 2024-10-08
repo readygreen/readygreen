@@ -59,6 +59,13 @@ class _HomePageContentState extends State<HomePageContent> {
     print("data");
     setState(() {
       _bookmarks = data?['bookmarkDTOs'];
+
+      // 집 > 회사 > 기타 순으로 정렬
+      _bookmarks.sort((a, b) {
+        const priority = {'집': 0, '회사': 1, '기타': 2};
+        return priority[a['name']]!.compareTo(priority[b['name']]!);
+      });
+
       routeRecords = data?['routeRecordDTO'];
     });
   }
