@@ -69,6 +69,7 @@ public class MemberController {
     public ResponseEntity<Member> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails) {
         System.out.println(userDetails.getUsername());
         Member member = memberService.getMemberInfo(userDetails.getUsername());
+        badgeRepository.findBadgeTypeByMemberEmail(userDetails.getUsername());
         return ResponseEntity.ok(member);
     }
 }

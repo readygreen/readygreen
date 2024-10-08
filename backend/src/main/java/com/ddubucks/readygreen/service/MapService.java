@@ -360,14 +360,14 @@ public class MapService {
 
     @SneakyThrows
     @Transactional
-    public void deleteBookmark(int id, String email) {
-        System.out.println(id+" "+email);
-        boolean exists = bookmarkRepository.existsByIdAndMemberEmail(id, email);
+    public void deleteBookmark(String placeId, String email) {
+        System.out.println(placeId+" "+email);
+        boolean exists = bookmarkRepository.existsByPlaceIdAndMemberEmail(placeId, email);
         System.out.println(exists);
         if (!exists) {
             throw new UnauthorizedAccessException("Unauthorized Access");
         }
-        bookmarkRepository.deleteByIdAndMemberEmail(id, email);
+        bookmarkRepository.deleteByPlaceIdAndMemberEmail(placeId, email);
     }
 
     public RouteRecordResponseDTO getRouteRecord(String email) {
