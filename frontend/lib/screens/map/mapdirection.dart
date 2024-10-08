@@ -54,12 +54,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   String? _totalTime; // 예상 시간
   List<LatLng> pointCoordinates = [];
 
-// // 유클리드 거리 계산
-//   double calculateDistance(LatLng currentPosition, LatLng point) {
-//     double dx = currentPosition.longitude - point.longitude;
-//     double dy = currentPosition.latitude - point.latitude;
-//     return sqrt(dx * dx + dy * dy) * 111000;
-//   }
   // 하버사인 공식
   double calculateDistance(LatLng currentPosition, LatLng point) {
     const double R = 6371000; // 지구 반지름 (미터 단위)
@@ -322,7 +316,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       if (routeData != null) {
         _processRouteData(routeData, 2); // 경로 데이터 처리
         _processBlinkerData(routeData['blinkerDTOs']); // 신호등 데이터 처리
-        // 현재 위치와 도착지의 거리를 계산하고 모달을 띄우기 위해 호출
+        // 현재 위치와 도착지의 거리를 계산하고 모달2을 띄우기 위해 호출
         _checkProximityToDestination(
           LatLng(locationProvider.currentPosition!.latitude,
               locationProvider.currentPosition!.longitude),
@@ -338,18 +332,17 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   // 신호등 데이터를 처리하고 신호등 마커를 지도에 추가하는 함수
   void _processBlinkerData(List<dynamic> blinkerData) {
     if (blinkerData.isNotEmpty) {
-      // 신호등 ID 리스트 생성
-      List<int> blinkerIds =
-          blinkerData.map<int>((b) => b['id'] as int).toList();
-
       // 신호등을 지도에 추가
       _trafficLightService.addTrafficLightsByIdToMap(
-        blinkerIds: blinkerIds,
+        blinkerData: blinkerData,
         markers: _markers,
         onMarkersUpdated: (updatedMarkers) {
           if (mounted) {
             setState(() {
-              _markers.addAll(updatedMarkers); // 업데이트된 신호등 마커 추가
+              // 업데이트된 신호등 마커를 기존 마커에 추가
+              _markers.clear(); // 이전 마커 제거
+              _markers.addAll(updatedMarkers); // 업데이트된 마커 추가
+              print("마커 업데이트: ${_markers.length}개 마커가 업데이트되었습니다.");
             });
           }
         },
