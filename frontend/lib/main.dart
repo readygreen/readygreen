@@ -140,7 +140,19 @@ class _MainPageState extends State<MainPage> {
         if (message.data.containsKey('type')) {
           String type = message.data['type'];
           print('받은 메시지 타입: $type');
+          if (type == '1') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const MapDirectionPage()),
+            );
+          }else if(type=='2'){
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const MainPage()),
+            );
+          }
         }
+        
       }
       if (!mounted) return;
       RemoteNotification? notification = message.notification;

@@ -127,6 +127,7 @@ class _MapPageState extends State<MapPage> {
       onMarkersUpdated: (newMarkers) {
         if (mounted) {
           setState(() {
+            _trafficLightMarkers.clear();
             _trafficLightMarkers.addAll(newMarkers); // 기존 신호등 마커 업데이트
           });
         }

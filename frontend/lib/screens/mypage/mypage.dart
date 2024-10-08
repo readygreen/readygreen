@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:readygreen/screens/mypage/badge.dart';
 import 'package:readygreen/screens/mypage/feedback.dart';
 import 'package:readygreen/screens/mypage/feedback_list.dart';
+// import 'package:readygreen/screens/mypage/myBadge.dart';
 import 'package:readygreen/screens/mypage/myPlace.dart';
 import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
@@ -350,7 +351,7 @@ class _MyPageState extends State<MyPage> {
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () async {
-              _showDeleteUser(context); // 탈퇴 확인 창 호출
+              _showDeleteConfirmationDialog(context); // 탈퇴 확인 창 호출
             },
             child: _buildItem('회원탈퇴'),
           ),
@@ -369,7 +370,7 @@ class _MyPageState extends State<MyPage> {
   }
 
   // 탈퇴 알림창
-  Future<void> _showDeleteUser(BuildContext context) async {
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // 다른 곳을 눌러도 창이 닫히지 않게 설정

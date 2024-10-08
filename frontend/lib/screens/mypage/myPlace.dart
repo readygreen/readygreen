@@ -334,7 +334,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
     );
   }
 
-  // 삭제 모달
+// 삭제 모달
   void _showDeleteModal(BuildContext context, String placeName, int id) {
     showDialog(
       context: context,
