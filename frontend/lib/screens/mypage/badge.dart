@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:readygreen/api/user_api.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/widgets/common/badgecong.dart';
 
 class BadgePage extends StatefulWidget {
   const BadgePage({super.key});
@@ -7,19 +11,122 @@ class BadgePage extends StatefulWidget {
   @override
   _BadgePageState createState() => _BadgePageState();
 }
+class BadgeDTO {
+  final String title;
+  final String subtitle;
+  final String image;
+  bool hasBadge;
+
+  BadgeDTO({
+    required this.title,
+    required this.subtitle,
+    required this.image,
+    this.hasBadge = false,
+  });
+}
+
 
 class _BadgePageState extends State<BadgePage> {
   // 대표 뱃지의 초기값
-  String _selectedBadgeTitle = '행운 만땅';
-  String _selectedBadgeSubtitle = '행운이 가득해요';
-  String _selectedBadgeImage = 'assets/images/badge.png';
+  List<BadgeDTO> badges = [
+    BadgeDTO(
+      title: '언제그린 가족',
+      subtitle: '회원 가입을 축하해요',
+      image: 'assets/images/signupcong.png',
+      hasBadge: true,
+    ),
+    BadgeDTO(
+      title: '행운 만땅',
+      subtitle: '행운이 가득해요',
+      image: 'assets/images/badge.png',
+      hasBadge: false,
+    ),
+    BadgeDTO(
+      title: '걷기 챔피언',
+      subtitle: '하루 동안 10,000보 이상 걸었어요',
+      image: 'assets/images/trophy.png',
+      hasBadge: false,
+    ),
+    BadgeDTO(
+      title: '티끌모아 태산',
+      subtitle: '10,000포인트 달성했어요',
+      image: 'assets/images/coinpig.png',
+      hasBadge: false,
+    ),
+  ];
+  final NewUserApi newUserApi = NewUserApi();
+  final storage = const FlutterSecureStorage();
+  String? fortune = "";
+  int selectedIndex = 0;
+  @override
+  void initState() {
+    
+    super.initState();
+    _fetchBadgeInfo();
+    _fetchGetBadge();
+  }
+ Future<void> _fetchGetBadge() async {
+  fortune = await storage.read(key: 'fortune');
+  print("Badge 정보 가져오기 시작");
 
-  // 뱃지 선택 함수
-  void _selectBadge(String title, String subtitle, String imageUrl) {
+  // badges 리스트를 순회
+  for (int i = 1; i < badges.length; i++) {
+    BadgeDTO badge = badges[i];
+    if(!badge.hasBadge){
+      if(i==1){
+        print("fortune");
+        print(fortune);
+        if(fortune!="111" && fortune!=""){
+          print(fortune);
+          if(await newUserApi.postBadgeFortune()){
+            _showCelebration(i);
+            _fetchBadgeInfo();
+           break;
+          }
+        }
+      }else if(i==2){
+        if(await newUserApi.postBadgeStep()){
+           _showCelebration(i);
+           _fetchBadgeInfo();
+           break;
+        }
+      }else if(i==3){
+      if(await newUserApi.postBadgePoint()){
+           _showCelebration(i);
+           _fetchBadgeInfo();
+           break;
+        }
+      }   
+    }
+
+  }
+  print("Badge 정보 가져오기 완료");
+}
+  Future<void> _fetchBadgeInfo() async {
+    
+    Map<String, dynamic>? fetchedBadge = await newUserApi.getBadge();
+    if (fetchedBadge != null && fetchedBadge['type'] is String) {
+      String badgeTypes = fetchedBadge['type'];  // 문자열로 되어 있는 type 값
+
+      setState(() {
+        selectedIndex = fetchedBadge['title'];
+        // badgeTypes 문자열에서 각 문자를 가져와 hasBadge 값을 업데이트
+        for (int i = 0; i < badgeTypes.length; i++) {
+          if (i < badges.length) {
+            if (badgeTypes[i] == '1') {
+              badges[i+1].hasBadge = true;
+            } else {
+              badges[i+1].hasBadge = false;
+            }
+          }
+        }
+      });
+    }
+  }
+  Future<void> _editBadge(int index) async {
+    newUserApi.postBadge(index);
     setState(() {
-      _selectedBadgeTitle = title;
-      _selectedBadgeSubtitle = subtitle;
-      _selectedBadgeImage = imageUrl;
+      selectedIndex = index;
     });
   }
 
@@ -46,14 +153,14 @@ class _BadgePageState extends State<BadgePage> {
               const SizedBox(height: 20), // 상단 여백
               // 선택된 뱃지 이미지
               Image.asset(
-                _selectedBadgeImage,
+                badges[selectedIndex].image,
                 width: 150,
                 height: 150,
               ),
               const SizedBox(height: 16),
               // 선택된 뱃지 이름
               Text(
-                _selectedBadgeTitle,
+                badges[selectedIndex].title,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -64,7 +171,7 @@ class _BadgePageState extends State<BadgePage> {
               const SizedBox(height: 8),
               // 선택된 뱃지 설명
               Text(
-                _selectedBadgeSubtitle,
+                badges[selectedIndex].subtitle,
                 style: const TextStyle(
                   fontSize: 16,
                   color: Colors.grey,
@@ -72,24 +179,19 @@ class _BadgePageState extends State<BadgePage> {
               ),
               const SizedBox(height: 30),
               // 배지 리스트
-              _buildBadgeCard(
-                context,
-                'assets/images/badge.png',
-                '행운 만땅',
-                '행운이 가득해요',
-              ),
-              _buildBadgeCard(
-                context,
-                'assets/images/trophy.png', // 트로피 이미지 경로
-                '걷기 챔피언',
-                '하루 동안 10,000보 이상 걸었어요',
-              ),
-
-              _buildBadgeCard(
-                context,
-                'assets/images/coinpig.png', // 코인 이미지 경로
-                '티끌모아 태산',
-                '10,000포인트 달성했어요',
+              Column(
+                children: badges.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  BadgeDTO badge = entry.value;
+                  return _buildBadgeCard(
+                    context,
+                    badge.image,
+                    badge.title,
+                    badge.subtitle,
+                    index,
+                    hasBadge: badge.hasBadge // 선택 여부 설정
+                  );
+                }).toList(),
               ),
             ],
           ),
@@ -99,71 +201,88 @@ class _BadgePageState extends State<BadgePage> {
   }
 
   // 배지 카드 빌드 함수
-  Widget _buildBadgeCard(
-    BuildContext context,
-    String imageUrl,
-    String title,
-    String subtitle, {
-    bool isSelected = false,
-  }) {
-    return GestureDetector(
-      onTap: () {
-        _selectBadge(title, subtitle, imageUrl); // 뱃지 선택 시 대표 뱃지 업데이트
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 15),
-        padding: const EdgeInsets.all(15.0),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12.0),
-          border: Border.all(
-            color: _selectedBadgeTitle == title
-                ? AppColors.green
-                : AppColors.grey, // 선택된 카드에 대한 강조
-            width: 2,
+// 배지 카드 빌드 함수
+Widget _buildBadgeCard(
+  BuildContext context,
+  String imageUrl,
+  String title,
+  String subtitle,
+  int index, {
+  bool hasBadge = false,
+}) {
+  return GestureDetector(
+    onTap: () {
+      if (hasBadge) {
+        _editBadge(index);
+      } else {
+        print('배지를 아직 획득하지 못했습니다.');
+      }
+    },
+    child: Container(
+      margin: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 15),
+      padding: const EdgeInsets.all(15.0),
+      decoration: BoxDecoration(
+        color: hasBadge ? Colors.white : Colors.grey.withOpacity(0.1), // 배경을 더 부드럽게 흐리게 설정
+        borderRadius: BorderRadius.circular(12.0),
+        border: Border.all(
+          color: index == selectedIndex && hasBadge
+              ? AppColors.green
+              : AppColors.grey, // 선택된 카드에 대한 강조 (획득한 경우에만)
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.05),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3), // 그림자 위치
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 2,
-              blurRadius: 5,
-              offset: const Offset(0, 3), // 그림자 위치
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // 배지 이미지
-            Image.asset(
-              imageUrl,
-              width: 50,
-              height: 50,
-            ),
-            const SizedBox(width: 16),
-            // 배지 정보
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
+        ],
       ),
-    );
-  }
+      child: Row(
+        children: [
+          // 배지 이미지
+          Image.asset(
+            hasBadge ? imageUrl : 'assets/images/lock.png', // 잠금 상태 이미지
+            width: 50,
+            height: 50,
+          ),
+          const SizedBox(width: 16),
+          // 배지 정보
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                hasBadge ? title : '숨겨진 뱃지',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: hasBadge ? AppColors.green : Colors.grey, // 잠금 상태면 회색 텍스트
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                hasBadge ? subtitle : '숨겨진 뱃지를 찾아보세요.', // 잠금 상태면 고정된 메시지 표시
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+void _showCelebration(int badgeCondition) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return CelebrationWidget(badgeCondition: badgeCondition);
+    },
+  );
+}
+
+
 }

@@ -104,35 +104,39 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  # assets:
+  #   - assets/images/foot.png
+  #   - assets/images/star.png
+  #   - assets/images/rainbow.png
+  #   - assets/images/walk.png
+  #   - assets/images/coin.png
+  #   - assets/images/coins.png
+  #   - assets/images/icon.png
+  #   - assets/images/map.png
+  #   - assets/images/kakao.png
+  #   - assets/images/luck.png
+  #   - assets/images/mic.png
+  #   - assets/images/badge.png
+  #   - assets/images/place.png
+  #   - assets/images/placepage.png
+  #   - assets/images/fortune.png
+  #   - assets/images/nobirth.png
+  #   - assets/images/user.png
+  #   - assets/images/trophy.png
+  #   - assets/images/coinpig.png
+  #   - assets/images/w-sun.png
+  #   - assets/images/w-rain.png
+  #   - assets/images/w-rainsnow.png
+  #   - assets/images/w-suncloud.png
+  #   - assets/images/w-cloudy.png
+  #   - assets/images/w-snow.png
+  #   - assets/images/w-default.png
+  #   - assets/lottie/search_mike.json
+  #   - assets/images
+  #   - assets/image
   assets:
-    - assets/images/foot.png
-    - assets/images/star.png
-    - assets/images/rainbow.png
-    - assets/images/walk.png
-    - assets/images/coin.png
-    - assets/images/coins.png
-    - assets/images/icon.png
-    - assets/images/map.png
-    - assets/images/kakao.png
-    - assets/images/luck.png
-    - assets/images/mic.png
-    - assets/images/badge.png
-    - assets/images/place.png
-    - assets/images/placepage.png
-    - assets/images/fortune.png
-    - assets/images/nobirth.png
-    - assets/images/user.png
-    - assets/images/trophy.png
-    - assets/images/coinpig.png
-    - assets/images/signupcong.png
-    - assets/images/w-sun.png
-    - assets/images/w-rain.png
-    - assets/images/w-rainsnow.png
-    - assets/images/w-suncloud.png
-    - assets/images/w-cloudy.png
-    - assets/images/w-snow.png
-    - assets/images/w-default.png
-    - assets/lottie/search_mike.json
+    - assets/lottie/  # lottie 폴더 내 모든 파일 포함
+    - assets/images/
 
   fonts:
     - family: CustomFont
