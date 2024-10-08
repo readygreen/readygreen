@@ -18,9 +18,9 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
     @Query("SELECT COUNT(b) FROM Bookmark b WHERE b.id IN :bookmarkIDs AND b.member.email = :email")
     int countByIdIn(List<Integer> bookmarkIDs, String email);
 
-    boolean existsByPlaceIdAndMemberEmail(int placeId, String email);
+    boolean existsByIdAndMemberEmail(int id, String email);
 
-    void deleteByPlaceIdAndMemberEmail(int placeId, String email);
+    void deleteByIdAndMemberEmail(int id, String email);
 
     Optional<Bookmark> findByTypeAndMember(BookmarkType type, Member member);
 

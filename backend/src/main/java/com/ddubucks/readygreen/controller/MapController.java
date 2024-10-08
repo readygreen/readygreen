@@ -171,9 +171,9 @@ public class MapController {
     }
 
     @DeleteMapping("bookmark")
-    public ResponseEntity<?> deleteBookmark(@RequestParam(name = "placeId") int placeId,
+    public ResponseEntity<?> deleteBookmark(@RequestParam(name = "placeId") int id,
                                             @AuthenticationPrincipal UserDetails userDetails) {
-        mapService.deleteBookmark(placeId, userDetails.getUsername());
+        mapService.deleteBookmark(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
 
