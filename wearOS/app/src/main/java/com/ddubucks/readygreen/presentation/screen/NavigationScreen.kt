@@ -3,7 +3,6 @@ package com.ddubucks.readygreen.presentation.screen
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +19,6 @@ import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.navigation.NavigationState
 import com.ddubucks.readygreen.presentation.theme.*
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
-import androidx.compose.animation.core.Animatable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
@@ -70,9 +68,6 @@ fun NavigationScreen(
 
         if (navigationState.isNavigating) {
             NavigationInfo(navigationState)
-            Spacer(modifier = Modifier.height(20.dp))
-            ProgressBarWithSignal(navigationState)
-            Spacer(modifier = Modifier.height(10.dp))
         } else {
             Text(
                 text = "길안내 중이 아닙니다.",
@@ -154,21 +149,5 @@ fun NavigationInfo(navigationState: NavigationState) {
             )
         }
     }
-}
-
-@Composable
-fun ProgressBarWithSignal(navigationState: NavigationState) {
-    val progress = remember { Animatable(0f) }
-
-    LaunchedEffect(navigationState.remainingDistance) {
-        progress.animateTo(navigationState.remainingDistance?.toFloat() ?: 0f)
-    }
-
-    LinearProgressIndicator(
-        progress = progress.value / 100,
-        color = if (navigationState.trafficLightColor == "GREEN") Color.Green else Red,
-        backgroundColor = Gray,
-        modifier = Modifier.fillMaxWidth().height(8.dp)
-    )
 }
 
