@@ -44,7 +44,7 @@ public class ReportController {
     }
 
     // 사용자가 신호등 제보 + 반영
-    @PostMapping("blinker")
+    @PutMapping("blinker")
     public ResponseEntity<String> submitBlinker(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ReportBlinkerRequestDTO reportBlinkerRequestDTO){
         try {
             // 신호등 정보 업데이트
