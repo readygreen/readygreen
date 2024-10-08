@@ -26,7 +26,6 @@ class BookmarkDTO {
   });
 }
 
-
 class MapSearchResultPage extends StatefulWidget {
   final List<Prediction> autoCompleteResults;
   final String searchQuery; // 검색어 추가
@@ -64,7 +63,8 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
     print(bookmarksData);
     if (bookmarksData != null) {
       // 북마크 데이터를 BookmarkDTO 리스트로 변환
-      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+      List<BookmarkDTO> fetchedBookmarks =
+          bookmarksData.map<BookmarkDTO>((bookmark) {
         return BookmarkDTO(
           id: bookmark['id'],
           name: bookmark['name'],
@@ -78,7 +78,6 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
       // 변환한 데이터를 상태에 저장
       setState(() {
         _bookmarks = fetchedBookmarks;
-        
       });
     } else {
       print('북마크 데이터를 불러오지 못했습니다.');
@@ -92,13 +91,13 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
     final response = await places.getDetailsByPlaceId(placeId, language: 'ko');
 
     if (response.isOkay) {
-  final result = response.result;
+      final result = response.result;
 
-  print(result.placeId);
-  return "${result.name}\n${result.formattedAddress ?? ''}";
-  } else {
-    return "정보를 가져오지 못했습니다.";
-  }
+      print(result.placeId);
+      return "${result.name}\n${result.formattedAddress ?? ''}";
+    } else {
+      return "정보를 가져오지 못했습니다.";
+    }
   }
 
   // 장소가 선택되었을 때 위도, 경도, 장소 이름을 저장하는 함수
@@ -140,9 +139,11 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
       print('장소 선택 실패: ${response.errorMessage}');
     }
   }
+
   bool _isPlaceBookmarked(String placeId) {
     return _bookmarks.any((bookmark) => bookmark.placeId == placeId);
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,9 +153,9 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
           // 검색 바 배치
           Padding(
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).size.height * 0.04,
-              left: MediaQuery.of(context).size.width * 0.05,
-              right: MediaQuery.of(context).size.width * 0.05,
+              top: MediaQuery.of(context).size.height * 0.06,
+              left: MediaQuery.of(context).size.width * 0.06,
+              right: MediaQuery.of(context).size.width * 0.06,
             ),
             child: MapSearchBackBar(
               placeName: widget.searchQuery, // 초기 선택된 장소 이름을 이곳에 표시
@@ -203,7 +204,7 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                         placeName: placeName,
                         address: address,
                         placeId: result.placeId!,
-                        checked : _isPlaceBookmarked(result.placeId!),
+                        checked: _isPlaceBookmarked(result.placeId!),
                         onTap: () {
                           // 장소 선택 시 위도, 경도, 이름을 저장
                           _selectPlace(result.placeId!);

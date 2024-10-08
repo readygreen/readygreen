@@ -142,10 +142,14 @@ class _MapPageState extends State<MapPage> {
   // 새로운 장소로 이동하고 장소 선택 마커 추가하는 함수
   void _goToPlace(double lat, double lng, String placeName, String placeId,
       String address) async {
-    final GoogleMapController controller = await _controller.future;
-
-    // 지도 이동
-    controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
+    if (_controller.isCompleted) {
+      final GoogleMapController controller = await _controller.future;
+      // 지도 이동
+      controller
+          .animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
+    } else {
+      print("GoogleMapController가 초기화되지 않았습니다.");
+    }
 
     // 장소 선택 마커 추가
     setState(() {
@@ -157,10 +161,10 @@ class _MapPageState extends State<MapPage> {
           infoWindow: InfoWindow(title: placeName),
         ),
       );
-      _placeId = _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
-      _selectedAddress = address; // 선택된 주소 업데이트
-      _selectedLat = lat; // 선택된 위도 업데이트
-      _selectedLng = lng; // 선택된 경도 업데이트
+      _placeId = _selectedPlaceName = placeName;
+      _selectedAddress = address;
+      _selectedLat = lat;
+      _selectedLng = lng;
     });
   }
 
@@ -232,6 +236,12 @@ class _MapPageState extends State<MapPage> {
                   _goToPlace(result['lat'], result['lng'], result['name'],
                       _placeId, '주소 정보 없음');
                 }
+                // 검색 후 뒤로 돌아왔을 때 키보드 내리기
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    FocusScope.of(context).unfocus();
+                  }
+                });
               },
             ),
           ),
@@ -254,10 +264,10 @@ class _MapPageState extends State<MapPage> {
 
                 // 위치가 null이 아니면 카메라를 현재 위치로 이동
                 if (locationProvider.currentPosition != null) {
-                  final GoogleMapController? controller =
+                  final GoogleMapController controller =
                       await _controller.future;
 
-                  if (controller != null && mounted) {
+                  if (mounted) {
                     // mounted 상태 확인
                     try {
                       controller.animateCamera(

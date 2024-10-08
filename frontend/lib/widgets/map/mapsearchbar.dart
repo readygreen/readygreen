@@ -159,13 +159,13 @@ class _MapSearchBarState extends State<MapSearchBar> {
               onFieldSubmitted: widget.onSearchSubmitted,
             ),
           ),
-          IconButton(
-            icon: Icon(_isListening ? Icons.mic : Icons.mic_none_rounded,
-                color: AppColors.black),
-            onPressed: _isListening
-                ? () => _stopListening(context)
-                : () => _startListening(context),
-          ),
+          // IconButton(
+          //   icon: Icon(_isListening ? Icons.mic : Icons.mic_none_rounded,
+          //       color: AppColors.black),
+          //   onPressed: _isListening
+          //       ? () => _stopListening(context)
+          //       : () => _startListening(context),
+          // ),
         ],
       ),
     );

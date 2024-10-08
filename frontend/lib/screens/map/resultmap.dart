@@ -5,6 +5,7 @@ import 'package:readygreen/api/map_api.dart';
 import 'package:readygreen/widgets/map/mapsearchbackbar.dart';
 import 'package:readygreen/widgets/map/placecard.dart';
 import 'package:readygreen/screens/map/mapsearch.dart';
+
 class BookmarkDTO {
   final int id;
   final String name;
@@ -24,6 +25,7 @@ class BookmarkDTO {
     required this.placeId,
   });
 }
+
 class ResultMapPage extends StatefulWidget {
   final double lat;
   final double lng;
@@ -31,7 +33,7 @@ class ResultMapPage extends StatefulWidget {
   final String address;
   final String searchQuery;
   final dynamic placeId;
-  
+
   const ResultMapPage({
     super.key,
     required this.lat,
@@ -75,13 +77,14 @@ class _ResultMapPageState extends State<ResultMapPage> {
       );
     });
   }
-  
+
   Future<void> _fetchBookmarks() async {
     final bookmarksData = await mapStartAPI.fetchBookmarks();
 
     if (bookmarksData != null) {
       // 북마크 데이터를 BookmarkDTO 리스트로 변환
-      List<BookmarkDTO> fetchedBookmarks = bookmarksData.map<BookmarkDTO>((bookmark) {
+      List<BookmarkDTO> fetchedBookmarks =
+          bookmarksData.map<BookmarkDTO>((bookmark) {
         return BookmarkDTO(
           id: bookmark['id'],
           name: bookmark['name'],
@@ -100,6 +103,7 @@ class _ResultMapPageState extends State<ResultMapPage> {
       print('북마크 데이터를 불러오지 못했습니다.');
     }
   }
+
   Future<void> _goToPlace(double lat, double lng) async {
     final GoogleMapController controller = await _controller.future;
     controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
@@ -109,9 +113,11 @@ class _ResultMapPageState extends State<ResultMapPage> {
     _controller.complete(controller);
     _goToPlace(widget.lat, widget.lng); // 전달받은 위치로 카메라 이동
   }
+
   bool _isPlaceBookmarked(String placeId) {
     return _bookmarks.any((bookmark) => bookmark.placeId == placeId);
   }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -134,9 +140,9 @@ class _ResultMapPageState extends State<ResultMapPage> {
           ),
           // 검색 바 배치
           Positioned(
-            top: screenHeight * 0.04,
-            left: screenWidth * 0.05,
-            right: screenWidth * 0.05,
+            top: screenHeight * 0.06,
+            left: screenWidth * 0.06,
+            right: screenWidth * 0.06,
             child: MapSearchBackBar(
               placeName: widget.searchQuery.isNotEmpty
                   ? widget.searchQuery
