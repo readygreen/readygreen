@@ -1,10 +1,8 @@
 package com.ddubucks.readygreen.presentation.screen
 
-import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,58 +21,30 @@ import com.ddubucks.readygreen.presentation.retrofit.navigation.NavigationState
 import com.ddubucks.readygreen.presentation.theme.*
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
-import kotlinx.coroutines.launch
+import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
 import h3Style
 import pStyle
 import secStyle
-import java.util.*
 
 @Composable
 fun NavigationScreen(
     navController: NavHostController,
-    navigationViewModel: NavigationViewModel = viewModel()
+    navigationViewModel: NavigationViewModel = viewModel(),
 ) {
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    var ttsReady by remember { mutableStateOf(false) }
-    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
-    var isSpeaking by remember { mutableStateOf(false) }
+    val ttsViewModel = remember { TTSViewModel(context) }
 
-    // TTS 설정
-    LaunchedEffect(Unit) {
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.KOREAN
-                ttsReady = true
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            tts?.shutdown()
-        }
-    }
-
-    // TTS 음성 안내 상태 및 실행
     LaunchedEffect(navigationState.currentDescription) {
-        if (ttsReady && navigationState.currentDescription != null) {
-            val descriptionWithUnits = navigationState.currentDescription
-                .replace(" m", " 미터")
-                .replace(" km", " 킬로미터")
-            tts?.speak(descriptionWithUnits, TextToSpeech.QUEUE_ADD, null, "utteranceId")
-            isSpeaking = true
-        } else {
-            isSpeaking = false
+        navigationState.currentDescription?.let { description ->
+            ttsViewModel.speakText(description)
         }
     }
 
-    // 뒤로가기 버튼 처리
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
             setShowExitDialog(true)
@@ -83,7 +53,6 @@ fun NavigationScreen(
         }
     }
 
-    // 전체 레이아웃
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,7 +60,6 @@ fun NavigationScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // 제목 표시
         Text(
             text = "경로 안내",
             style = h3Style,
@@ -100,11 +68,10 @@ fun NavigationScreen(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // 길 안내가 진행 중일 때만 정보 표시
         if (navigationState.isNavigating) {
-            NavigationInfo(navigationState) // 경로 안내 정보 카드
+            NavigationInfo(navigationState)
             Spacer(modifier = Modifier.height(20.dp))
-            ProgressBarWithSignal(navigationState) // 신호등 및 진행 상태 표시
+            ProgressBarWithSignal(navigationState)
             Spacer(modifier = Modifier.height(10.dp))
         } else {
             Text(
@@ -115,7 +82,6 @@ fun NavigationScreen(
         }
     }
 
-    // 길 안내 중지 확인 다이얼로그
     if (showExitDialog) {
         Modal(
             title = "길 안내 중지",
@@ -139,14 +105,12 @@ fun NavigationInfo(navigationState: NavigationState) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // 목적지 이름
         Text(
             text = navigationState.destinationName ?: "목적지 정보 없음",
             style = pStyle,
             color = White
         )
         Spacer(modifier = Modifier.height(10.dp))
-        // 방향 아이콘
         Icon(
             painter = painterResource(id = when (navigationState.nextDirection) {
                 11 -> R.drawable.arrow_straight                // 직진
@@ -178,7 +142,6 @@ fun NavigationInfo(navigationState: NavigationState) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // 신호등 정보 표시
         navigationState.trafficLightColor?.let { color ->
             Text(
                 text = "${navigationState.trafficLightRemainingTime ?: "정보 없음"}초",
