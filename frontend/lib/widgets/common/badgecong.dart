@@ -3,11 +3,9 @@ import 'package:confetti/confetti.dart';
 import 'package:readygreen/constants/appcolors.dart';
 
 class CelebrationWidget extends StatefulWidget {
-  final String badgeMessage;
-  final String badgeImage;
+  final int badgeCondition; // 넘겨받은 조건 (ex. 1 2 3 ... )
 
-  const CelebrationWidget(
-      {super.key, required this.badgeMessage, required this.badgeImage});
+  const CelebrationWidget({super.key, required this.badgeCondition});
 
   @override
   _CelebrationWidgetState createState() => _CelebrationWidgetState();
@@ -15,6 +13,23 @@ class CelebrationWidget extends StatefulWidget {
 
 class _CelebrationWidgetState extends State<CelebrationWidget> {
   late ConfettiController _controllerCenter;
+
+  // 조건에 따라 메시지와 이미지를 매핑
+  final Map<int, Map<String, String>> _badgeData = {
+    1: {
+      'message': '행운만땅',
+      'image': 'assets/images/badge.png',
+    },
+    2: {
+      'message': '걷기 챔피언',
+      'image': 'assets/images/trophy.png',
+    },
+    3: {
+      'message': '티끌모아 태산',
+      'image': 'assets/images/coinpig.png',
+    },
+    // 다른 조건도 추가 가능
+  };
 
   @override
   void initState() {
@@ -32,6 +47,11 @@ class _CelebrationWidgetState extends State<CelebrationWidget> {
 
   @override
   Widget build(BuildContext context) {
+    // 조건에 맞는 메시지와 이미지 불러오기
+    final badgeInfo = _badgeData[widget.badgeCondition]!;
+    final badgeMessage = badgeInfo['message']!;
+    final badgeImage = badgeInfo['image']!;
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -61,7 +81,7 @@ class _CelebrationWidgetState extends State<CelebrationWidget> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Image.asset(
-                  widget.badgeImage, // 전달받은 이미지 경로
+                  badgeImage, // 매핑된 이미지 경로
                   width: 100,
                   height: 170,
                 ),
@@ -70,7 +90,7 @@ class _CelebrationWidgetState extends State<CelebrationWidget> {
                     style:
                         TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
-                Text('"${widget.badgeMessage}"를 획득하셨습니다!'),
+                Text('"$badgeMessage"를 획득하셨습니다!'),
                 const SizedBox(height: 24),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(
