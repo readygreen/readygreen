@@ -74,4 +74,10 @@ public class MemberController {
         return ResponseEntity.ok(member);
     }
 
+    @GetMapping("badge")
+    public  ResponseEntity<Integer> getTitleBadge(@AuthenticationPrincipal UserDetails userDetails){
+        Badge badge = badgeRepository.findBadgeByMemberEmail(userDetails.getUsername());
+        return ResponseEntity.ok(badge.getTitle());
+    }
+
 }
