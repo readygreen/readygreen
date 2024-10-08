@@ -202,4 +202,148 @@ class NewUserApi {
       print('회원탈퇴 에러: $e');
     }
   }
+
+  Future<Map<String, dynamic>?> getBadge() async {
+    print("Badge 정보 요청");
+    String? accessToken = await storage.read(key: 'accessToken'); // 액세스 토큰 불러오기
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/badge'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData = jsonDecode(response.body);
+        String type = responseData['type'];
+        int title = responseData['title'];
+
+        print('Badge 정보: type = \$type, title = \$title');
+        return responseData;
+      } else {
+        print('Badge 정보를 가져오는 데 실패했습니다. 상태 코드: \${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Badge 정보 요청 에러: \$e');
+      return null;
+    }
+  }
+  Future<void> postBadge(int title) async {
+    print("Badge 정보 POST 요청");
+    String? accessToken = await storage.read(key: 'accessToken'); // 액세스 토큰 불러오기
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/badge?title=$title'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken',
+          'Content-Type': 'application/json',
+        },
+        body: '{}', // 빈 JSON 객체를 전송
+      );
+
+      // 응답 본문 출력하여 확인
+      print('서버 응답: ${response.body}');
+
+      // if (response.statusCode == 200) {
+      //   Map<String, dynamic> responseData = jsonDecode(response.body);
+      //   print('Badge POST 요청 성공: $responseData');
+      // } else {
+      //   print('Badge POST 요청 실패. 상태 코드: ${response.statusCode}');
+      //   return null;
+      // }
+    } catch (e) {
+      print('Badge POST 요청 에러: $e');
+      return null;
+    }
+  }
+  Future<bool> postBadgeStep() async {
+    print("Badge step POST 요청");
+
+    String? accessToken = await storage.read(key: 'accessToken'); // 액세스 토큰 불러오기
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/badge/step'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken', // 액세스 토큰 추가
+          'Content-Type': 'application/json',    // 요청의 본문 형식 설정
+        },
+        body: '', // 빈 본문 전송
+      );
+
+      if (response.statusCode == 200) {
+        print('Badge step POST 요청 성공');
+        return true;
+      } else {
+        print('Badge step POST 요청 실패. 상태 코드: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Badge step POST 요청 에러: $e');
+      return false;
+    }
+  }
+  Future<bool> postBadgeFortune() async {
+    print("fortune step POST 요청");
+
+    String? accessToken = await storage.read(key: 'accessToken'); // 액세스 토큰 불러오기
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/badge/fortune'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken', // 액세스 토큰 추가
+          'Content-Type': 'application/json',    // 요청의 본문 형식 설정
+        },
+        body: '', // 빈 본문 전송
+      );
+
+      if (response.statusCode == 200) {
+        print('Badge fortune POST 요청 성공');
+        return true;
+      } else {
+        print('Badge fortune POST 요청 실패. 상태 코드: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Badge fortune POST 요청 에러: $e');
+      return false;
+    }
+  }
+  Future<bool> postBadgePoint() async {
+    print("Badge point POST 요청");
+
+    String? accessToken = await storage.read(key: 'accessToken'); // 액세스 토큰 불러오기
+
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/badge/point'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken', // 액세스 토큰 추가
+          'Content-Type': 'application/json',    // 요청의 본문 형식 설정
+        },
+        body: '', // 빈 본문 전송
+      );
+
+      if (response.statusCode == 200) {
+        print('Badge point POST 요청 성공');
+        return true;
+      } else {
+        print('Badge point POST 요청 실패. 상태 코드: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Badge point POST 요청 에러: $e');
+      return false;
+    }
+  }
 }
