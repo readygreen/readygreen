@@ -132,6 +132,7 @@ class NavigationViewModel : ViewModel() {
         var closestFeature: Feature? = null
         var minDistance = Double.MAX_VALUE
         val distanceThreshold = 10.0 // 안내 변경 기준
+        var shouldUpdate = true // 상태 업데이트 여부
 
         route?.forEach { feature ->
             when (feature.geometry.type) {
@@ -145,6 +146,11 @@ class NavigationViewModel : ViewModel() {
                         if (distance < minDistance) {
                             minDistance = distance
                             closestFeature = feature
+                        }
+
+                        // 특정 거리 내에서는 상태를 유지
+                        if (distance < distanceThreshold) {
+                            shouldUpdate = false
                         }
                     }
                 }
@@ -161,17 +167,19 @@ class NavigationViewModel : ViewModel() {
             }
         }
 
-        // 가장 가까운 포인트가 유연성 범위 내에 있을 때만 안내
-        closestFeature?.let { feature ->
-            if (minDistance < distanceThreshold) {
-                Log.d("NavigationViewModel", "다음 지점에 10미터 이내로 접근: ${feature.properties.name}")
-                _navigationState.value = _navigationState.value.copy(
-                    currentDescription = feature.properties.description ?: "안내 없음",
-                    nextDirection = feature.properties.turnType,
-                    remainingDistance = minDistance
-                )
+        // 상태가 업데이트 가능한 경우만 처리
+        if (shouldUpdate) {
+            closestFeature?.let { feature ->
+                if (minDistance < distanceThreshold) {
+                    Log.d("NavigationViewModel", "다음 지점에 10미터 이내로 접근: ${feature.properties.name}")
+                    _navigationState.value = _navigationState.value.copy(
+                        currentDescription = feature.properties.description ?: "안내 없음",
+                        nextDirection = feature.properties.turnType,
+                        remainingDistance = minDistance
+                    )
 
-                updateBlinkerInfo() // 경로 업데이트 시마다 신호등 정보 갱신
+                    updateBlinkerInfo() // 경로 업데이트 시마다 신호등 정보 갱신
+                }
             }
         }
 
@@ -181,6 +189,7 @@ class NavigationViewModel : ViewModel() {
             finishNavigation()
         }
     }
+
 
     // 신호등 정보를 업데이트
     private fun updateBlinkerInfo() {
