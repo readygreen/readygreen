@@ -248,29 +248,28 @@ class TrafficLightService {
   }
 
   Future<void> showCustomBottomSheet(
-    BuildContext context, String currentState, int remainingTime) {
-  return showModalBottomSheet(
-    context: context, // 여기에서 context를 받아 사용
-    builder: (BuildContext context) {
-      return Container(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text('신호등 상태: $currentState'),
-            Text('남은 시간: $remainingTime초'),
-            ElevatedButton(
-              onPressed: () {
-                print('Button clicked!');
-                Navigator.pop(context); // Bottom sheet 닫기
-              },
-              child: const Text('상세 정보 보기'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
+      BuildContext context, String currentState, int remainingTime) {
+    return showModalBottomSheet(
+      context: context, // 여기에서 context를 받아 사용
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text('신호등 상태: $currentState'),
+              Text('남은 시간: $remainingTime초'),
+              ElevatedButton(
+                onPressed: () {
+                  print('Button clicked!');
+                  Navigator.pop(context); // Bottom sheet 닫기
+                },
+                child: const Text('상세 정보 보기'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
