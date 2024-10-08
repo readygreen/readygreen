@@ -123,6 +123,7 @@ public class MapController {
                     .build();
             stepRepository.save(newSteps);
         }
+        member.setStep(member.getStep()+steps);
 
         member.setSpeed(speedKmPerHour);
         memberRepository.save(member);
