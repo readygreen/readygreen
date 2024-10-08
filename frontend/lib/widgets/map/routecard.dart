@@ -3,13 +3,11 @@ import 'package:readygreen/constants/appcolors.dart';
 
 class RouteCard extends StatefulWidget {
   final List<String> routeDescriptions;
-  final Function onClose;
   final PageController pageController; // 추가: PageController를 외부에서 받음
 
   const RouteCard({
     super.key,
     required this.routeDescriptions,
-    required this.onClose,
     required this.pageController, // PageController 생성자에 추가
   });
 
@@ -23,7 +21,7 @@ class _RouteCardState extends State<RouteCard> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return SizedBox(
-      height: 117,
+      height: 107,
       child: PageView.builder(
         controller: widget.pageController, // PageController 설정
         itemCount: widget.routeDescriptions.length,
@@ -33,7 +31,8 @@ class _RouteCardState extends State<RouteCard> {
             child: Card(
               color: AppColors.white,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 17.0, vertical: 12.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,12 +46,6 @@ class _RouteCardState extends State<RouteCard> {
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () {
-                            widget.onClose();
-                          },
                         ),
                       ],
                     ),

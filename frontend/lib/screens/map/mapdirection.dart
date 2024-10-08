@@ -594,13 +594,17 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             onCameraIdle: _onCameraIdle, // 지도가 멈췄을 때 호출
           ),
           Positioned(
-            top: screenHeight * 0.8,
+            // _isRouteDetailVisible 상태에 따라 버튼 위치 조정
+            bottom: _isRouteDetailVisible
+                ? screenHeight * 0.25
+                : screenHeight * 0.12,
             right: screenWidth * 0.05,
             child: LocationButton(
               onTap: _currentLocation,
               screenWidth: screenWidth,
             ),
           ),
+
           Positioned(
             top: screenHeight * 0,
             left: screenWidth * 0,
@@ -694,17 +698,12 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           // 기존 코드
           if (_isRouteDetailVisible == true) // 상세 경로 보일 때
             Positioned(
-              top: screenHeight * 0.18, // 카드 위치 조정
+              top: screenHeight * 0.76, // 카드 위치 조정
               left: screenWidth * 0.02,
               right: screenWidth * 0.02,
               child: RouteCard(
                 routeDescriptions: _routeDescriptions,
                 pageController: _pageController,
-                onClose: () {
-                  setState(() {
-                    _isRouteDetailVisible = false; // 닫기 버튼 클릭 시 카드 닫기
-                  });
-                },
               ), // 경로 설명 카드 추가
             ),
         ],
