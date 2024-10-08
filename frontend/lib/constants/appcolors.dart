@@ -12,8 +12,10 @@ class AppColors {
   static const Color blue = Color(0xFF428EFF); // 날씨
   static const Color darkblue = Color(0xFF2D3765); // 운세 버튼 배경
   static const Color weaherblue = Color(0xFFC3E0FF); // 날씨 버튼 배경
-  static const Color kakao = Color(0xFFF9E000); // 즐겨찾기
+  static const Color kakao = Color.fromARGB(255, 255, 221, 0); // 카카오
   static const Color yellow = Color(0xFFFFD000); // 즐겨찾기
   static const Color purple = Color(0xFFC68ACB); // 운세
   static const Color pink = Color(0xFFF7887B); // 생일
+  static const Color orange = Color(0xFFFCAA3F); // 집
+  static const Color bluecompany = Color.fromARGB(255, 95, 167, 255); // 회사
 }
