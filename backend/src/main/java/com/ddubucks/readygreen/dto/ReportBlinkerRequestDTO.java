@@ -10,8 +10,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReportBlinkerRequestDTO {
-    private int id1;
-    private int id2;
+    private int id;
     @JsonFormat(pattern = "HH:mm:ss")
     private LocalTime startTime;
     @JsonFormat(pattern = "HH:mm:ss")
