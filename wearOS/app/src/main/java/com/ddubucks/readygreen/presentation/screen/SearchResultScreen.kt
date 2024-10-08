@@ -45,6 +45,7 @@ fun SearchResultScreen(
 
     // 음성이 끝난 후 페이지 전환을 제어하는 플래그
     var navigateAfterTTS by remember { mutableStateOf(false) }
+    var isSpeaking by remember { mutableStateOf(false) } // TTS 진행 여부 플래그
 
     LaunchedEffect(Unit) {
         tts = TextToSpeech(context) { status ->
@@ -54,13 +55,18 @@ fun SearchResultScreen(
 
                 // TTS 음성 출력 완료 후 처리하는 리스너
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                    override fun onStart(utteranceId: String?) {}
+                    override fun onStart(utteranceId: String?) {
+                        isSpeaking = true // TTS가 시작되면 로딩 화면을 표시
+                    }
 
                     override fun onDone(utteranceId: String?) {
+                        isSpeaking = false // TTS 종료 시 로딩 화면 숨기기
                         navigateAfterTTS = true
                     }
 
-                    override fun onError(utteranceId: String?) {}
+                    override fun onError(utteranceId: String?) {
+                        isSpeaking = false // 오류 발생 시 플래그 비활성화
+                    }
                 })
             }
         }
@@ -72,6 +78,7 @@ fun SearchResultScreen(
         }
     }
 
+    // TTS가 끝난 후 페이지 전환 처리
     LaunchedEffect(navigateAfterTTS) {
         if (navigateAfterTTS && selectedPlace != null) {
             val place = selectedPlace
@@ -89,77 +96,82 @@ fun SearchResultScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier.height(10.dp))
-        ScalingLazyColumn(
+    // TTS가 진행 중일 때 LoadingScreen을 표시
+    if (isSpeaking) {
+        LoadingScreen()
+    } else {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Black),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            item {
-                Text(
-                    text = "검색 결과",
-                    color = Primary,
-                    style = h3Style,
-                )
-            }
-
-            item { Spacer(modifier = Modifier.height(20.dp)) }
-
-            item {
-                if (searchResults.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(10.dp))
+            ScalingLazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Black),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                item {
                     Text(
-                        text = "목적지를 선택해주세요",
-                        color = White,
-                        style = pStyle,
-                    )
-                } else {
-                    Text(
-                        text = "검색 결과가 없습니다.",
-                        color = White,
-                        style = pStyle,
+                        text = "검색 결과",
+                        color = Primary,
+                        style = h3Style,
                     )
                 }
-            }
 
-            item { Spacer(modifier = Modifier.height(10.dp)) }
+                item { Spacer(modifier = Modifier.height(20.dp)) }
 
-            items(searchResults) { result ->
-                ButtonText(item = ButtonModel(result.name), onClick = {
-                    selectedPlace = result
-                    showConfirmationDialog = true
-                })
-            }
-            item {
-                ButtonText(item = ButtonModel("음성 다시 입력"), onClick = {
-                    navController.popBackStack()
-                })
+                item {
+                    if (searchResults.isNotEmpty()) {
+                        Text(
+                            text = "목적지를 선택해주세요",
+                            color = White,
+                            style = pStyle,
+                        )
+                    } else {
+                        Text(
+                            text = "검색 결과가 없습니다.",
+                            color = White,
+                            style = pStyle,
+                        )
+                    }
+                }
+
+                item { Spacer(modifier = Modifier.height(10.dp)) }
+
+                items(searchResults) { result ->
+                    ButtonText(item = ButtonModel(result.name), onClick = {
+                        selectedPlace = result
+                        showConfirmationDialog = true
+                    })
+                }
+                item {
+                    ButtonText(item = ButtonModel("음성 다시 입력"), onClick = {
+                        navController.popBackStack()
+                    })
+                }
             }
         }
-    }
 
-    if (showConfirmationDialog && selectedPlace != null) {
-        Modal(
-            title = "길 안내 시작",
-            message = "${selectedPlace?.name}로 길 안내를 시작하시겠습니까?",
-            onConfirm = {
-                val place = selectedPlace
-                if (place != null && ttsReady && place.name != null) {
-                    tts?.speak("${place.name}로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
+        if (showConfirmationDialog && selectedPlace != null) {
+            Modal(
+                title = "길 안내 시작",
+                message = "${selectedPlace?.name}로 길 안내를 시작하시겠습니까?",
+                onConfirm = {
+                    val place = selectedPlace
+                    if (place != null && ttsReady && place.name != null) {
+                        tts?.speak("${place.name}로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
+                    }
+                    showConfirmationDialog = false
+                },
+                onCancel = {
+                    showConfirmationDialog = false
                 }
-                showConfirmationDialog = false
-            },
-            onCancel = {
-                showConfirmationDialog = false
-            }
-        )
+            )
+        }
     }
 }
