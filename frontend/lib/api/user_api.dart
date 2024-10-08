@@ -187,6 +187,7 @@ class NewUserApi {
 
   // 회원 탈퇴
   Future<void> deleteUser() async {
+    print("회원탈퇴 요청");
     String? accessToken = await storage.read(key: 'accessToken');
     try {
       final response = await http.delete(Uri.parse('$baseUrl/auth'), headers: {

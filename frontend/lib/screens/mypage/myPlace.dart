@@ -107,41 +107,40 @@ class _MyPlacePageState extends State<MyPlacePage> {
     );
   }
 
-  // 수정 모달
+   // 수정 모달
   void _showEditModal(BuildContext context, String title, String placeName, int id) {
-  // 선택된 인덱스를 외부에서 관리
-  int selectedIndex = -1;
+    // 선택된 인덱스를 외부에서 관리
+    int selectedIndex = -1;
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder( // 상태를 관리하기 위한 StatefulBuilder 사용
-        builder: (context, setState) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // 모달의 모서리 둥글게
-            ),
-            child: 
-            Container(
-              padding: const EdgeInsets.all(16), // 모달 내부에 패딩 추가
-              width: MediaQuery.of(context).size.width * 0.9, // 모달 너비를 화면의 90%로 설정
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(height: 15,),
-                  // "즐겨찾기 수정" 텍스트 추가
-                  const Text(
-                    '즐겨찾기 수정',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder( // 상태를 관리하기 위한 StatefulBuilder 사용
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20), // 모달의 모서리 둥글게
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16), // 모달 내부에 패딩 추가
+                width: MediaQuery.of(context).size.width * 0.9, // 모달 너비를 화면의 90%로 설정
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(height: 15),
+                    // "즐겨찾기 수정" 텍스트 추가
+                    const Text(
+                      '즐겨찾기 수정',
+                      style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20), // 텍스트와 아이콘 간의 간격
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
+                    const SizedBox(height: 20), // 텍스트와 아이콘 간의 간격
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -280,115 +279,227 @@ class _MyPlacePageState extends State<MyPlacePage> {
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 35), // 아이콘과 버튼 사이 간격
-                  Align(
-                    alignment: Alignment.center, // 버튼을 가운데로 정렬
-                    child: ElevatedButton(
-                      onPressed: () async {
-
-                        await mapStartAPI.updateBookmarkType(id, selectedIndex);
-                        await _fetchBookmarks();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('수정하기'),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        backgroundColor: Colors.green, // 버튼 색상
-                        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12), // 버튼 모서리를 둥글게
+                      ],
+                    ),
+                    const SizedBox(height: 35), // 아이콘과 버튼 사이 간격
+                    Align(
+                      alignment: Alignment.center, // 버튼을 가운데로 정렬
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          bool success = await mapStartAPI.updateBookmarkType(id, selectedIndex);
+                          await _fetchBookmarks();
+                          Navigator.pop(context);
+                          _showResultModal(context, success ? '수정 성공' : '수정 실패');
+                        },
+                        child: const Text('수정하기'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          backgroundColor: Colors.green, // 버튼 색상
+                          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12), // 버튼 모서리를 둥글게
+                          ),
                         ),
                       ),
                     ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+
+// 삭제 모달
+  void _showDeleteModal(BuildContext context, String placeName, int id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20), // 모달의 모서리를 둥글게
+              ),
+              child: Stack(
+                alignment: Alignment.topRight, // x 버튼을 오른쪽 상단에 배치
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0), // 내부 패딩 추가
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center, // 좌우 가운데 정렬
+                      children: [
+                        const SizedBox(height: 16), // x 버튼 아래 간격
+                        const Text(
+                          '즐겨찾기 삭제',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center, // 텍스트 가운데 정렬
+                        ),
+                        const SizedBox(height: 16), // 제목과 내용 간 간격
+                        const Text(
+                          '이 장소를 자주 가는 목적지에서 \n삭제하시겠습니까?',
+                          textAlign: TextAlign.center, // 텍스트 가운데 정렬
+                        ),
+                        const SizedBox(height: 32), // 내용과 버튼 간 간격
+                        Center(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              bool success = await mapStartAPI.deleteBookmark(id);
+                              await _fetchBookmarks();
+                              Navigator.pop(context);
+                              _showResultModal(context, success ? '삭제 성공' : '삭제 실패');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red, // 빨간색 배경
+                              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8), // 버튼 모서리 둥글게
+                              ),
+                            ),
+                            child: const Text(
+                              '삭제하기',
+                              style: TextStyle(color: Colors.white), // 흰색 텍스트
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, color: Colors.grey), // 회색 x 버튼
+                    onPressed: () {
+                      Navigator.pop(context); // x 버튼 클릭 시 모달 닫기
+                    },
                   ),
                 ],
               ),
-            ),
-          );
-        },
-      );
-    },
-  );
-}
+            );
+          },
+        );
+      },
+    );
+  }
 
-
-
-  // 삭제 모달
-  void _showDeleteModal(BuildContext context, String placeName, int id) {
+void _showResultModal(BuildContext context, String message) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20), // 모달의 모서리를 둥글게
-            ),
-            child: Stack(
-              alignment: Alignment.topRight, // x 버튼을 오른쪽 상단에 배치
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0), // 내부 패딩 추가
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center, // 좌우 가운데 정렬
-                    children: [
-                      const SizedBox(height: 16), // x 버튼 아래 간격
-                      const Text(
-                        '즐겨찾기 삭제',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center, // 텍스트 가운데 정렬
-                      ),
-                      const SizedBox(height: 16), // 제목과 내용 간 간격
-                      const Text(
-                        '이 장소를 자주 가는 목적지에서 \n삭제하시겠습니까?',
-                        textAlign: TextAlign.center, // 텍스트 가운데 정렬
-                      ),
-                      const SizedBox(height: 32), // 내용과 버튼 간 간격
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            // 삭제 로직 추가
-                              await mapStartAPI.deleteBookmark(id);
-                              await _fetchBookmarks();
-                              Navigator.pop(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red, // 빨간색 배경
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // 버튼 모서리 둥글게
-                            ),
-                          ),
-                          child: const Text(
-                            '삭제하기',
-                            style: TextStyle(color: Colors.white), // 흰색 텍스트
-                          ),
-                        ),
-                      ),
-                    ],
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20), // 모서리 둥글게
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0), // 패딩 추가로 디자인 개선
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 아이콘 추가로 성공/실패 시 시각적 요소 제공
+              Icon(
+                message == '수정 성공' || message == '삭제 성공'
+                    ? Icons.check_circle_outline
+                    : Icons.error_outline,
+                color: message == '수정 성공' || message == '삭제 성공'
+                    ? AppColors.green
+                    : Colors.red,
+                size: 60,
+              ),
+              const SizedBox(height: 16), // 간격 추가
+              Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 22, // 텍스트 크기 약간 줄임
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87, // 텍스트 색상 변경
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24), // 텍스트와 버튼 사이에 간격 추가
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context); // 모달 닫기
+                },
+                child: const Text(
+                  '확인',
+                  style: TextStyle(
+                    color: Colors.white, // 버튼 텍스트 하얀색
+                    fontSize: 18,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.grey), // 회색 x 버튼
-                  onPressed: () {
-                    Navigator.pop(context); // x 버튼 클릭 시 모달 닫기
-                  },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  backgroundColor: AppColors.green, // 버튼 배경색
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12), // 버튼 모서리 둥글게
+                  ),
+                  elevation: 4, // 버튼에 그림자 추가
                 ),
-              ],
-            ),
-          );
-        },
+              ),
+            ],
+          ),
+        ),
       );
     },
   );
 }
+
+
+  // 아이콘 빌드 함수
+  Widget _buildIconOption(BuildContext context, int selectedIndex, int index, IconData icon, Color color, String label, StateSetter setState) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedIndex = index;
+        });
+      },
+      child: Column(
+        children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            child: selectedIndex == index
+                ? Container(
+                    key: ValueKey<int>(index),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 50,
+                      color: color,
+                    ),
+                  )
+                : Container(
+                    key: ValueKey<int>(index + 10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 50,
+                      color: color,
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    );
+  }
 
 
 
