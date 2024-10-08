@@ -1,6 +1,8 @@
 package com.ddubucks.readygreen.controller;
 
 import com.ddubucks.readygreen.dto.SignupRequestDTO;
+import com.ddubucks.readygreen.model.Badge;
+import com.ddubucks.readygreen.repository.BadgeRepository;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import com.ddubucks.readygreen.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,12 +27,19 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final BadgeRepository badgeRepository;
 
     @PostMapping
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO) {
         System.out.println("회원가입");
         System.out.println(signupRequestDTO.getSmartphone());
-        memberService.signup(signupRequestDTO);
+        Member member = memberService.signup(signupRequestDTO);
+        Badge badge = Badge.builder()
+                .type("000")
+                .title(0)
+                .member(member)
+                .build();
+        badgeRepository.save(badge);
         return ResponseEntity.ok("회원가입 성공");
     }
 
