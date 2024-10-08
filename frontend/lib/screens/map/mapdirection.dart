@@ -144,44 +144,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     }
   }
 
-// // 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
-//   void _checkProximityToDestination(
-//       LatLng currentLocation, int type, Map<String, dynamic>? routeData) {
-//     double? destinationLat;
-//     double? destinationLng;
-
-//     // type에 따라 도착지 위도, 경도 다르게 처리
-//     if (type == 2) {
-//       destinationLat = widget.endLat;
-//       destinationLng = widget.endLng;
-//     } else if (routeData != null) {
-//       destinationLat = routeData['endlat'];
-//       destinationLng = routeData['endlng'];
-//     }
-
-//     // 도착지 위도, 경도 값이 있는지 확인
-//     if (destinationLat != null && destinationLng != null) {
-//       double distance = calculateDistance(
-//         currentLocation,
-//         LatLng(destinationLat, destinationLng),
-//       );
-//       print(
-//           '현재 위치: (${currentLocation.latitude}, ${currentLocation.longitude})');
-//       print('도착지 위치: ($destinationLat, $destinationLng)');
-//       print('계산된 거리: $distance 미터');
-
-//       // _showRouteFinishModal();
-
-//       // 도착지와의 거리가 20미터 이내일 때 모달 호출
-//       if (distance <= 20) {
-//         print("20미터 이내 도착 확인. 모달 표시 시도.");
-//         _showRouteFinishModal();
-//       }
-//     } else {
-//       print('도착지 정보가 없습니다.');
-//     }
-//   }
-
 // 모달을 띄우는 함수
   void _showRouteFinishModal() {
     // 위젯이 렌더링된 상태인지 확인
@@ -463,11 +425,18 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             ),
           );
         }
+
         // routeData에서 도착지 정보 가져오기
         _destinationName = routeData['destination'] ?? '장소 정보가 없습니다.';
         _startLocationName = routeData['origin'] ?? '현재위치';
         _totalDistance = routeData['distance'] ?? 0.0;
         _totalTime = routeData['time'] ?? '알 수 없음';
+
+        // null-safe 연산자 ?.를 사용하여 null 체크 및 처리
+        if (_destinationName?.contains('대한민국 대전광역시') == true) {
+          _destinationName =
+              _destinationName?.replaceFirst('대한민국 대전광역시', '').trim();
+        }
 
         print('거리와 시간!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         print("도착지 이름: $_destinationName");

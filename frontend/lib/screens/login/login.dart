@@ -183,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
           width: deviceWidth * 0.79,
           height: 50,
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 255, 221, 0),
+            color: AppColors.kakao,
             borderRadius: BorderRadius.circular(15),
           ),
           child: Row(
