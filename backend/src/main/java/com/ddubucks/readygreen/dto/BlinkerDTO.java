@@ -11,7 +11,7 @@ import java.time.LocalTime;
 @Builder
 public class BlinkerDTO {
     private int id;
-    private LocalTime lastAccessTime;
+    private LocalTime startTime;
     private int greenDuration;
     private int redDuration;
     private String currentState; // 현재 상태 (RED, GREEN)
