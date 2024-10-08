@@ -47,12 +47,12 @@ class MapSearchBackBar extends StatelessWidget {
               },
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.mic_none_rounded, color: AppColors.black),
-            onPressed: () {
-              onVoiceSearch();
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(Icons.mic_none_rounded, color: AppColors.black),
+          //   onPressed: () {
+          //     onVoiceSearch();
+          //   },
+          // ),
           IconButton(
             icon: const Icon(Icons.close_rounded, color: AppColors.black),
             onPressed: () {
