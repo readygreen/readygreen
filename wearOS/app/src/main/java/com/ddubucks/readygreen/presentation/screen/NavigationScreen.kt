@@ -150,4 +150,3 @@ fun NavigationInfo(navigationState: NavigationState) {
         }
     }
 }
-

@@ -43,6 +43,7 @@ fun BookmarkScreen(
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var navigateAfterTTS by remember { mutableStateOf(false) }
+    var isSpeaking by remember { mutableStateOf(false) } // TTS 진행 여부 플래그
 
     LaunchedEffect(Unit) {
         bookmarkViewModel.getBookmarks()
@@ -56,14 +57,18 @@ fun BookmarkScreen(
 
                 // TTS가 끝났을 때 콜백 설정
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                    override fun onStart(utteranceId: String?) {}
+                    override fun onStart(utteranceId: String?) {
+                        isSpeaking = true // TTS 시작 시 플래그 활성화
+                    }
 
                     override fun onDone(utteranceId: String?) {
-                        // TTS가 끝난 후 페이지 이동 플래그 활성화
+                        isSpeaking = false // TTS 종료 시 플래그 비활성화
                         navigateAfterTTS = true
                     }
 
-                    override fun onError(utteranceId: String?) {}
+                    override fun onError(utteranceId: String?) {
+                        isSpeaking = false // 에러 발생 시 플래그 비활성화
+                    }
                 })
             }
         }
@@ -97,82 +102,88 @@ fun BookmarkScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Black),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            ScalingLazyColumn {
-                item {
-                    Text(
-                        text = "자주가는 목적지",
-                        style = h3Style,
-                        color = Primary,
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-                if (bookmarks.isNotEmpty()) {
+    // 로딩 중일 때 Lottie 애니메이션 기반의 LoadingScreen을 보여줍니다.
+    if (isSpeaking) {
+        LoadingScreen() // TTS가 진행 중일 때 로딩 화면을 보여줍니다.
+    } else {
+        // 기존 UI 렌더링
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Black),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                ScalingLazyColumn {
                     item {
                         Text(
-                            text = "목적지를 선택해주세요.",
-                            style = pStyle,
-                            color = Color.White,
+                            text = "자주가는 목적지",
+                            style = h3Style,
+                            color = Primary,
                         )
                     }
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
                     }
-                    items(bookmarks) { bookmark ->
-                        val iconResId = when (bookmark.name) {
-                            "회사" -> R.drawable.bookmark_office
-                            "집" -> R.drawable.bookmark_home
-                            else -> R.drawable.bookmark_default
+                    if (bookmarks.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "목적지를 선택해주세요.",
+                                style = pStyle,
+                                color = Color.White,
+                            )
                         }
-                        ButtonIcon(
-                            item = ButtonIconModel(
-                                icon = iconResId,
-                                label = bookmark.destinationName
-                            ),
-                            onClick = {
-                                Log.d("BookmarkScreen", "북마크 버튼 클릭: ${bookmark.destinationName}")
-                                selectedBookmark = bookmark
-                                showModal = true
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        items(bookmarks) { bookmark ->
+                            val iconResId = when (bookmark.name) {
+                                "회사" -> R.drawable.bookmark_office
+                                "집" -> R.drawable.bookmark_home
+                                else -> R.drawable.bookmark_default
                             }
-                        )
-                    }
-                } else {
-                    item {
-                        Text(
-                            text = "저장된 북마크가 없습니다.",
-                            style = pStyle,
-                            color = Color.White,
-                        )
+                            ButtonIcon(
+                                item = ButtonIconModel(
+                                    icon = iconResId,
+                                    label = bookmark.destinationName
+                                ),
+                                onClick = {
+                                    Log.d("BookmarkScreen", "북마크 버튼 클릭: ${bookmark.destinationName}")
+                                    selectedBookmark = bookmark
+                                    showModal = true
+                                }
+                            )
+                        }
+                    } else {
+                        item {
+                            Text(
+                                text = "저장된 북마크가 없습니다.",
+                                style = pStyle,
+                                color = Color.White,
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        if (showModal && selectedBookmark != null) {
-            Modal(
-                title = "길안내 시작",
-                message = "${selectedBookmark?.destinationName}으로 길안내를 시작할까요?",
-                onConfirm = {
-                    val place = selectedBookmark
-                    if (place != null && ttsReady && place.destinationName != null) {
-                        // TTS로 길 안내 메시지 출력
-                        tts?.speak("${place.destinationName}으로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
+            if (showModal && selectedBookmark != null) {
+                Modal(
+                    title = "길안내 시작",
+                    message = "${selectedBookmark?.destinationName}으로 길안내를 시작할까요?",
+                    onConfirm = {
+                        val place = selectedBookmark
+                        if (place != null && ttsReady && place.destinationName != null) {
+                            // TTS로 길 안내 메시지 출력
+                            tts?.speak("${place.destinationName}으로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
+                        }
+                        showModal = false
+                    },
+                    onCancel = {
+                        showModal = false
                     }
-                    showModal = false
-                },
-                onCancel = {
-                    showModal = false
-                }
-            )
+                )
+            }
         }
     }
 }
