@@ -361,7 +361,7 @@ class MapStartAPI {
 
   Future<bool> updateBookmarkType(int id, int newType) async {
     String? accessToken = await storage.read(key: 'accessToken');
-    
+
     final response = await http.put(
       Uri.parse('$baseUrl/map/bookmark'),
       headers: {
@@ -371,7 +371,11 @@ class MapStartAPI {
       },
       body: jsonEncode({
         'id': id,
-        'type': newType==0?"HOME" : newType==1 ? "COMPANY" :"ETC", // "HOME", "COMPANY", "ETC" 중 하나
+        'type': newType == 0
+            ? "HOME"
+            : newType == 1
+                ? "COMPANY"
+                : "ETC", // "HOME", "COMPANY", "ETC" 중 하나
       }),
     );
 
@@ -383,5 +387,4 @@ class MapStartAPI {
       return false;
     }
   }
-
 }

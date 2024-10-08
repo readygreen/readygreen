@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/api/map_api.dart';
+import 'package:intl/intl.dart';
 
 // 동그라미 모양 마커를 텍스트와 함께 생성하는 함수
 Future<BitmapDescriptor> createCircleMarker(
@@ -196,55 +197,121 @@ class TrafficLightService {
     _globalTimer = null;
   }
 
+  // 길안내
   // 신호등 ID로 신호등 정보를 받아와 지도에 표시하는 함수
   Future<void> addTrafficLightsByIdToMap({
-    required List<int> blinkerIds,
+    required List<dynamic> blinkerData,
     required Set<Marker> markers,
     required Function(Set<Marker>) onMarkersUpdated,
   }) async {
-    // 신호등 정보 요청 (ID로)
-    final List<dynamic>? trafficLightData =
-        await api.fetchBlinkerInfoByIds(blinkerIds: blinkerIds);
+    Set<Marker> newMarkers = {};
 
-    if (trafficLightData != null) {
-      Set<Marker> newMarkers = {};
+    // 각 신호등에 대해 상태와 타이머를 관리하는 리스트
+    List<Timer> timers = [];
 
-      for (var trafficLight in trafficLightData) {
-        double lat = trafficLight['latitude'];
-        double lng = trafficLight['longitude'];
-        String currentState = trafficLight['currentState'];
-        int remainingTime = trafficLight['remainingTime'];
-        int greenDuration = trafficLight['greenDuration'];
-        int redDuration = trafficLight['redDuration'];
+    for (var trafficLight in blinkerData) {
+      double lat = trafficLight['latitude'];
+      double lng = trafficLight['longitude'];
+      int greenDuration = trafficLight['greenDuration']; // 초록불 지속 시간 (초)
+      int redDuration = trafficLight['redDuration']; // 빨간불 지속 시간 (초)
+      int totalDuration = greenDuration + redDuration; // 총 주기 (초)
+      String startTimeString =
+          trafficLight['startTime']; // 초록불 시작 시간 (HH:mm:ss)
+      // 현재 시간 가져오기
+      // 초록불 시작 시간을 DateTime으로 변환
+      // 1. 현재 시간과 초록불 시작 시간의 차이를 초 단위로 계산
+      // 2. 경과한 시간을 총 주기로 나눈 나머지 구하기
+      // 3. 나머지가 초록불 지속 시간보다 작으면 초록불, 크면 빨간불
+      DateTime now = DateTime.now();
+      DateTime startTime = DateFormat('HH:mm:ss').parse(startTimeString);
+      startTime = DateTime(now.year, now.month, now.day, startTime.hour,
+          startTime.minute, startTime.second);
+      Duration difference = now.difference(startTime);
+      int elapsedSeconds = difference.inSeconds; // 경과한 시간 (초 단위)
+      int remainder = elapsedSeconds % totalDuration; // 주기를 초 단위로 나눈 나머지
+
+      print('총 주기 $totalDuration, 빨강 $redDuration, 초록 $greenDuration');
+      print('current time $now');
+      print('green start time : $startTime');
+      print('현재시간 초록시간 차를 초로 바꿈 : $elapsedSeconds');
+      print('경과한 시간 나머지 $remainder');
+      // 초기 상태 및 남은 시간 계산
+      String currentState;
+      int remainingTime;
+      if (remainder < greenDuration) {
+        currentState = "GREEN";
+        remainingTime = greenDuration - remainder;
+      } else {
+        currentState = "RED";
+        remainingTime = totalDuration - remainder;
+      }
+
+      // 상태에 따른 색상 설정
+      Color circleColor =
+          currentState == "RED" ? AppColors.red : AppColors.green;
+      BitmapDescriptor customMarker =
+          await createCircleMarker('$remainingTime', circleColor);
+
+      // 마커 추가
+      Marker trafficMarker = Marker(
+        markerId: MarkerId(trafficLight['id'].toString()),
+        position: LatLng(lat, lng),
+        icon: customMarker,
+        infoWindow: InfoWindow(
+          title: '신호등 상태: $currentState',
+          snippet: '남은 시간: $remainingTime초',
+        ),
+      );
+
+      newMarkers.add(trafficMarker);
+
+      // 타이머로 신호등 상태 업데이트
+      Timer timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+        if (remainingTime > 0) {
+          remainingTime--; // 남은 시간 감소
+        } else {
+          // 시간이 0이 되면 상태 전환
+          if (currentState == "GREEN") {
+            currentState = "RED";
+            remainingTime = redDuration; // 빨간불 주기로 변경
+          } else {
+            currentState = "GREEN";
+            remainingTime = greenDuration; // 초록불 주기로 변경
+          }
+        }
 
         // 상태에 따른 색상 설정
-        Color circleColor =
-            currentState == "RED" ? AppColors.red : AppColors.green;
+        circleColor = currentState == "RED" ? AppColors.red : AppColors.green;
 
-        // 커스텀 마커 생성 및 초기 표시
-        BitmapDescriptor customMarker =
-            await createCircleMarker('$remainingTime', circleColor);
+        // 새로운 커스텀 마커 생성
+        customMarker = await createCircleMarker('$remainingTime', circleColor);
 
-        // 신호등의 Marker 추가
-        Marker trafficMarker = Marker(
-          markerId: MarkerId(trafficLight['id'].toString()),
+        // 업데이트된 마커 생성
+        Marker updatedMarker = Marker(
+          markerId: trafficMarker.markerId,
           position: LatLng(lat, lng),
-          icon: customMarker, // 커스텀 마커 사용
+          icon: customMarker,
           infoWindow: InfoWindow(
             title: '신호등 상태: $currentState',
             snippet: '남은 시간: $remainingTime초',
           ),
         );
 
-        // 마커 업데이트 세트에 추가
-        newMarkers.add(trafficMarker);
-      }
+        // 업데이트된 마커 저장
+        newMarkers.removeWhere(
+            (marker) => marker.markerId == trafficMarker.markerId); // 기존 마커 제거
+        newMarkers.add(updatedMarker); // 업데이트된 마커 추가
 
-      // 마커를 업데이트하는 콜백 호출
-      onMarkersUpdated(newMarkers);
-    } else {
-      print('신호등 정보를 가져오지 못했습니다.');
+        // 마커 업데이트 콜백 호출
+        onMarkersUpdated(newMarkers);
+      });
+
+      // 타이머를 리스트에 추가
+      timers.add(timer);
     }
+
+    // 마커를 업데이트하는 콜백 호출
+    onMarkersUpdated(newMarkers);
   }
 
   Future<void> showCustomBottomSheet(
