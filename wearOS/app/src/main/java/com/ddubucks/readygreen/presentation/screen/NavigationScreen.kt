@@ -1,6 +1,5 @@
 package com.ddubucks.readygreen.presentation.screen
 
-import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,48 +17,29 @@ import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.navigation.NavigationState
-import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Primary
+import com.ddubucks.readygreen.presentation.theme.*
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
 import h3Style
 import pStyle
 import secStyle
-import java.util.*
 
 @Composable
 fun NavigationScreen(
     navController: NavHostController,
-    navigationViewModel: NavigationViewModel = viewModel()
+    navigationViewModel: NavigationViewModel = viewModel(),
 ) {
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    var ttsReady by remember { mutableStateOf(false) }
-    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
-
-    LaunchedEffect(Unit) {
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.KOREAN
-                ttsReady = true
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            tts?.shutdown()
-        }
-    }
+    val ttsViewModel = remember { TTSViewModel(context) }
 
     LaunchedEffect(navigationState.currentDescription) {
-        if (ttsReady && navigationState.currentDescription != null) {
-            val descriptionWithUnits = navigationState.currentDescription
-                .replace(" m", " 미터")
-                .replace(" km", " 킬로미터")
-            tts?.speak(descriptionWithUnits, TextToSpeech.QUEUE_ADD, null, "utteranceId")
+        navigationState.currentDescription?.let { description ->
+            ttsViewModel.speakText(description)
         }
     }
 
@@ -115,41 +95,44 @@ fun NavigationScreen(
 
 @Composable
 fun NavigationInfo(navigationState: NavigationState) {
-    Text(
-        text = navigationState.destinationName ?: "목적지 정보 없음",
-        style = pStyle,
-        color = White
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = navigationState.destinationName ?: "목적지 정보 없음",
+            style = pStyle,
+            color = White
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        Icon(
+            painter = painterResource(id = when (navigationState.nextDirection) {
+                11 -> R.drawable.arrow_straight                // 직진
+                12, 16, 17 -> R.drawable.arrow_left            // 좌회전 및 관련 좌회전
+                13, 18, 19 -> R.drawable.arrow_right           // 우회전 및 관련 우회전
+                14 -> R.drawable.arrow_back                    // 유턴
+                else -> R.drawable.arrow_straight              // 나머지 값은 안내 없음 처리
+            }),
+            contentDescription = "방향",
+            tint = Color.Unspecified,
+            modifier = Modifier.size(40.dp)
+        )
 
-    Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-    Icon(
-        painter = painterResource(id = when (navigationState.nextDirection) {
-            11 -> R.drawable.arrow_straight                // 직진
-            12, 16, 17 -> R.drawable.arrow_left            // 좌회전 및 관련 좌회전
-            13, 18, 19 -> R.drawable.arrow_right           // 우회전 및 관련 우회전
-            14 -> R.drawable.arrow_back                    // 유턴
-            else -> R.drawable.arrow_straight              // 나머지 값은 안내 없음 처리
-        }),
-        contentDescription = "방향",
-        tint = Color.Unspecified,
-        modifier = Modifier.size(40.dp)
-    )
+        Text(
+            text = navigationState.currentDescription ?: "안내 없음",
+            style = pStyle,
+            color = White
+        )
 
-    Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
-    Text(
-        text = navigationState.currentDescription ?: "안내 없음",
-        style = pStyle,
-        color = White
-    )
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    // 남은 거리에 단위 추가
-    Text(
-        text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) + " 미터" } ?: "정보 없음"}",
-        style = pStyle,
-        color = White
-    )
+        Text(
+            text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) + " 미터" } ?: "정보 없음"}",
+            style = pStyle,
+            color = White
+        )
+    }
 }
