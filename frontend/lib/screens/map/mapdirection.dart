@@ -116,41 +116,71 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     );
   }
 
-// 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
+  // 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
   void _checkProximityToDestination(
       LatLng currentLocation, int type, Map<String, dynamic>? routeData) {
-    double? destinationLat;
-    double? destinationLng;
+    // 도착지 위도, 경도 대신 마지막 포인트 값을 사용
+    if (pointCoordinates.isNotEmpty) {
+      LatLng lastPoint = pointCoordinates.last;
 
-    // type에 따라 도착지 위도, 경도 다르게 처리
-    if (type == 2) {
-      destinationLat = widget.endLat;
-      destinationLng = widget.endLng;
-    } else if (routeData != null) {
-      destinationLat = routeData['endlat'];
-      destinationLng = routeData['endlng'];
-    }
-
-    // 도착지 위도, 경도 값이 있는지 확인
-    if (destinationLat != null && destinationLng != null) {
+      // 마지막 포인트와 현재 위치의 거리 계산
       double distance = calculateDistance(
         currentLocation,
-        LatLng(destinationLat, destinationLng),
+        lastPoint,
       );
+
       print(
           '현재 위치: (${currentLocation.latitude}, ${currentLocation.longitude})');
-      print('도착지 위치: ($destinationLat, $destinationLng)');
+      print('마지막 포인트 위치: (${lastPoint.latitude}, ${lastPoint.longitude})');
       print('계산된 거리: $distance 미터');
 
-      // 도착지와의 거리가 20미터 이내일 때 모달 호출
-      if (distance <= 20) {
-        print("20미터 이내 도착 확인. 모달 표시 시도.");
+      // 20미터 이내 도착하면 모달 호출
+      if (distance <= 10) {
+        print("10미터 이내 도착 확인. 모달 표시 시도.");
         _showRouteFinishModal();
       }
     } else {
-      print('도착지 정보가 없습니다.');
+      print('포인트 리스트가 비어 있습니다.');
     }
   }
+
+// // 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
+//   void _checkProximityToDestination(
+//       LatLng currentLocation, int type, Map<String, dynamic>? routeData) {
+//     double? destinationLat;
+//     double? destinationLng;
+
+//     // type에 따라 도착지 위도, 경도 다르게 처리
+//     if (type == 2) {
+//       destinationLat = widget.endLat;
+//       destinationLng = widget.endLng;
+//     } else if (routeData != null) {
+//       destinationLat = routeData['endlat'];
+//       destinationLng = routeData['endlng'];
+//     }
+
+//     // 도착지 위도, 경도 값이 있는지 확인
+//     if (destinationLat != null && destinationLng != null) {
+//       double distance = calculateDistance(
+//         currentLocation,
+//         LatLng(destinationLat, destinationLng),
+//       );
+//       print(
+//           '현재 위치: (${currentLocation.latitude}, ${currentLocation.longitude})');
+//       print('도착지 위치: ($destinationLat, $destinationLng)');
+//       print('계산된 거리: $distance 미터');
+
+//       // _showRouteFinishModal();
+
+//       // 도착지와의 거리가 20미터 이내일 때 모달 호출
+//       if (distance <= 20) {
+//         print("20미터 이내 도착 확인. 모달 표시 시도.");
+//         _showRouteFinishModal();
+//       }
+//     } else {
+//       print('도착지 정보가 없습니다.');
+//     }
+//   }
 
 // 모달을 띄우는 함수
   void _showRouteFinishModal() {
@@ -188,13 +218,15 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       print("길안내 종료 성공");
       _cameraIdleTimer?.cancel(); // 페이지 종료 시 타이머 취소
       _stopLocationTimer(); // 위치 타이머도 확실히 종료
+
+      // Navigator.of(context).pop();
       handleBackNavigation(context); // 메인 화면으로 돌아가기
     } else {
       print("길안내 종료 실패");
     }
 
     // 모달 닫기
-    Navigator.of(context).pop();
+    // Navigator.of(context).pop();
   }
 
   // 지도 이동 시 타이머를 멈추고, 카메라가 멈춘 후 3초 뒤 타이머 재시작
@@ -324,7 +356,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       );
 
       // 응답 데이터 출력
-      print('데이터 값~!~!~!~!~!~!~!~!~!: $routeData');
+      print('경로 요청 routeData : $routeData');
       if (routeData != null) {
         _processRouteData(routeData, 2); // 경로 데이터 처리
         _processBlinkerData(routeData['blinkerDTOs']); // 신호등 데이터 처리

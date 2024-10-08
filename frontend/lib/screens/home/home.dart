@@ -292,7 +292,7 @@ class _HomePageContentState extends State<HomePageContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 35),
+            const SizedBox(height: 50),
             const Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -367,7 +367,7 @@ class _HomePageContentState extends State<HomePageContent> {
                 Container(
                   width: MediaQuery.of(context).size.width,
                   constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height * 0.1,
+                    minHeight: MediaQuery.of(context).size.height * 0.13,
                   ),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -410,7 +410,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                               formatDestinationName(
                                                   bookmark['destinationName']),
                                               style: const TextStyle(
-                                                fontSize: 20,
+                                                fontSize: 18,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                               maxLines: 2, // 최대 2줄로 설정
@@ -463,6 +463,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                 },
                               )
                             : [
+                                const SizedBox(height: 12),
                                 const Text(
                                   '자주 가는 목적지가 없습니다.',
                                   style: TextStyle(
@@ -508,7 +509,7 @@ class _HomePageContentState extends State<HomePageContent> {
             Container(
               width: MediaQuery.of(context).size.width,
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * 0.1,
+                minHeight: MediaQuery.of(context).size.height * 0.13,
               ),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -538,9 +539,12 @@ class _HomePageContentState extends State<HomePageContent> {
                                       '${routeRecords?['endName']}',
                                       // '${formatDestinationName(routeRecords?['endName'])}',
                                       style: const TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                       ),
+                                      maxLines: 2, // 최대 2줄로 설정
+                                      overflow: TextOverflow
+                                          .ellipsis, // 넘치는 텍스트는 '...'로 표시
                                     ),
                                   ],
                                 ),
@@ -587,7 +591,7 @@ class _HomePageContentState extends State<HomePageContent> {
                           )
                         : Column(
                             children: const [
-                              SizedBox(height: 8), // 여백 추가
+                              SizedBox(height: 10), // 여백 추가
                               Text(
                                 '최근 목적지가 없습니다.',
                                 style: TextStyle(

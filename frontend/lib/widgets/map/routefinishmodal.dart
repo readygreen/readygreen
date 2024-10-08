@@ -29,7 +29,10 @@ class RouteFinishModal extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          onPressed: onConfirm,
+          onPressed: () {
+            Navigator.of(context).pop(); // 모달 닫기
+            onConfirm(); // onConfirm 콜백 실행 (페이지 이동)
+          },
           style: TextButton.styleFrom(
             foregroundColor: Colors.black,
             textStyle: const TextStyle(
