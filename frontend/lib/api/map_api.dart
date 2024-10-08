@@ -359,7 +359,7 @@ class MapStartAPI {
     }
   }
 
-  Future<void> updateBookmarkType(int id, int newType) async {
+  Future<bool> updateBookmarkType(int id, int newType) async {
     String? accessToken = await storage.read(key: 'accessToken');
     
     final response = await http.put(
@@ -377,8 +377,10 @@ class MapStartAPI {
 
     if (response.statusCode == 200) {
       print('북마크 수정 성공');
+      return true;
     } else {
       print('북마크 수정 실패: ${response.statusCode}, ${response.body}');
+      return false;
     }
   }
 
