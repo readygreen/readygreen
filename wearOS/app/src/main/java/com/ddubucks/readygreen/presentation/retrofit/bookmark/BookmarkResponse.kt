@@ -13,3 +13,12 @@ data class BookmarkResponse(
     val alertTime: String,
     val placeId: String
 )
+
+
+data class PlaceResponse(
+    val results: List<PlaceResult>
+)
+
+data class PlaceResult(
+    val formattedAddress: String
+)

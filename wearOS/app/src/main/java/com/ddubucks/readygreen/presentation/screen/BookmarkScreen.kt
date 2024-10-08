@@ -39,11 +39,10 @@ fun BookmarkScreen(
     var showModal by remember { mutableStateOf(false) }
     var selectedBookmark by remember { mutableStateOf<BookmarkResponse?>(null) }
 
-    // TTS 관련 상태 및 플래그
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var navigateAfterTTS by remember { mutableStateOf(false) }
-    var isSpeaking by remember { mutableStateOf(false) } // TTS 진행 여부 플래그
+    var isSpeaking by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         bookmarkViewModel.getBookmarks()
@@ -55,38 +54,34 @@ fun BookmarkScreen(
                 tts?.language = Locale.KOREAN
                 ttsReady = true
 
-                // TTS가 끝났을 때 콜백 설정
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {
-                        isSpeaking = true // TTS 시작 시 플래그 활성화
+                        isSpeaking = true
                     }
 
                     override fun onDone(utteranceId: String?) {
-                        isSpeaking = false // TTS 종료 시 플래그 비활성화
+                        isSpeaking = false
                         navigateAfterTTS = true
                     }
 
                     override fun onError(utteranceId: String?) {
-                        isSpeaking = false // 에러 발생 시 플래그 비활성화
+                        isSpeaking = false
                     }
                 })
             }
         }
     }
 
-    // TTS 자원 해제
     DisposableEffect(Unit) {
         onDispose {
             tts?.shutdown()
         }
     }
 
-    // TTS가 끝난 후 페이지 전환 처리
     LaunchedEffect(navigateAfterTTS) {
         if (navigateAfterTTS && selectedBookmark != null) {
             val place = selectedBookmark
             if (place != null) {
-                // 길 안내를 시작하고 페이지 전환
                 navigationViewModel.startNavigation(
                     context,
                     place.latitude,
@@ -96,17 +91,14 @@ fun BookmarkScreen(
                 navController.navigate("navigationScreen") {
                     popUpTo("mainScreen") { inclusive = false }
                 }
-                // 플래그 초기화
                 navigateAfterTTS = false
             }
         }
     }
 
-    // 로딩 중일 때 Lottie 애니메이션 기반의 LoadingScreen을 보여줍니다.
     if (isSpeaking) {
-        LoadingScreen() // TTS가 진행 중일 때 로딩 화면을 보여줍니다.
+        LoadingScreen()
     } else {
-        // 기존 UI 렌더링
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -174,7 +166,6 @@ fun BookmarkScreen(
                     onConfirm = {
                         val place = selectedBookmark
                         if (place != null && ttsReady && place.destinationName != null) {
-                            // TTS로 길 안내 메시지 출력
                             tts?.speak("${place.destinationName}으로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
                         }
                         showModal = false

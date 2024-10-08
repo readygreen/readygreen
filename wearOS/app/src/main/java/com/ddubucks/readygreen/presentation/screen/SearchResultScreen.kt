@@ -43,9 +43,8 @@ fun SearchResultScreen(
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
 
-    // 음성이 끝난 후 페이지 전환을 제어하는 플래그
     var navigateAfterTTS by remember { mutableStateOf(false) }
-    var isSpeaking by remember { mutableStateOf(false) } // TTS 진행 여부 플래그
+    var isSpeaking by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         tts = TextToSpeech(context) { status ->
@@ -53,19 +52,18 @@ fun SearchResultScreen(
                 tts?.language = Locale.KOREAN
                 ttsReady = true
 
-                // TTS 음성 출력 완료 후 처리하는 리스너
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {
-                        isSpeaking = true // TTS가 시작되면 로딩 화면을 표시
+                        isSpeaking = true
                     }
 
                     override fun onDone(utteranceId: String?) {
-                        isSpeaking = false // TTS 종료 시 로딩 화면 숨기기
+                        isSpeaking = false
                         navigateAfterTTS = true
                     }
 
                     override fun onError(utteranceId: String?) {
-                        isSpeaking = false // 오류 발생 시 플래그 비활성화
+                        isSpeaking = false
                     }
                 })
             }
@@ -78,7 +76,6 @@ fun SearchResultScreen(
         }
     }
 
-    // TTS가 끝난 후 페이지 전환 처리
     LaunchedEffect(navigateAfterTTS) {
         if (navigateAfterTTS && selectedPlace != null) {
             val place = selectedPlace
@@ -96,7 +93,6 @@ fun SearchResultScreen(
         }
     }
 
-    // TTS가 진행 중일 때 LoadingScreen을 표시
     if (isSpeaking) {
         LoadingScreen()
     } else {
