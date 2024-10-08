@@ -85,6 +85,8 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material:material:<latest_version>")
+
 
     // Wear OS에서 데이터 레이어 (모바일 연결)
     implementation("com.google.android.gms:play-services-wearable:18.0.0")

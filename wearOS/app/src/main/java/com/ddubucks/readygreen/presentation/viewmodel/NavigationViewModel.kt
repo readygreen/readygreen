@@ -93,6 +93,8 @@ class NavigationViewModel : ViewModel() {
             route = navigationResponse.routeDTO.features
             blinkers = navigationResponse.blinkerDTOs
 
+            updateBlinkerInfo() // 신호등 정보 업데이트 추가
+
             // 첫 번째 포인트 설명 업데이트
             route?.firstOrNull { it.geometry.type == "Point" }?.let { firstPoint ->
                 _navigationState.value = _navigationState.value.copy(
@@ -168,11 +170,10 @@ class NavigationViewModel : ViewModel() {
                     nextDirection = feature.properties.turnType,
                     remainingDistance = minDistance
                 )
+
+                updateBlinkerInfo() // 경로 업데이트 시마다 신호등 정보 갱신
             }
         }
-
-        // 신호등 상태 업데이트
-        blinkers?.let { updateTrafficLight(currentLat, currentLng, it) }
 
         // 목적지 도착 여부 확인
         if (hasReachedDestination(route?.lastOrNull(), currentLat, currentLng)) {
@@ -181,75 +182,19 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
-    private fun updateTrafficLight(currentLat: Double, currentLng: Double, blinkers: List<BlinkerDTO>) {
-        val nextTrafficLight = findNextTrafficLightOnRoute(currentLat, currentLng, blinkers)
-
-        nextTrafficLight?.let { blinker ->
-            val currentTimeInSeconds = System.currentTimeMillis() / 1000
-            val lastAccessTimeInSeconds = convertTimeToSeconds(blinker.lastAccessTime)
-            val elapsedTimeInSeconds = currentTimeInSeconds - lastAccessTimeInSeconds
-            val cycleDuration = blinker.greenDuration + blinker.redDuration
-            val timeInCurrentCycle = elapsedTimeInSeconds % cycleDuration
-
-            val currentState: String
-            val remainingTime: Int
-
-            if (timeInCurrentCycle < blinker.greenDuration) {
-                currentState = "GREEN"
-                remainingTime = blinker.greenDuration - timeInCurrentCycle.toInt()
-            } else {
-                currentState = "RED"
-                remainingTime = blinker.redDuration - (timeInCurrentCycle - blinker.greenDuration).toInt()
-            }
-
-            _navigationState.value = _navigationState.value.copy(
-                trafficLightColor = currentState,
-                trafficLightRemainingTime = remainingTime
-            )
-        }
-    }
-
-    // 시간을 초 단위로 변환하는 함수
-    private fun convertTimeToSeconds(timeString: String): Long {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-        return try {
-            val date = dateFormat.parse(timeString)
-            date?.time?.div(1000) ?: 0L // 밀리초를 초로 변환
-        } catch (e: Exception) {
-            Log.e("NavigationViewModel", "시간 변환 오류: ${e.message}")
-            0L
-        }
-    }
-
-
-    // 경로 상에서 다음 신호등을 찾는 함수
-    private fun findNextTrafficLightOnRoute(currentLat: Double, currentLng: Double, blinkers: List<BlinkerDTO>): BlinkerDTO? {
-        var nextTrafficLight: BlinkerDTO? = null
-        var minDistance = Double.MAX_VALUE
-
-        route?.forEach { feature ->
-            when (feature.geometry.type) {
-                "LineString" -> {
-                    val lineCoords = feature.geometry.getCoordinatesAsLineString()
-                    lineCoords?.forEach { coord ->
-                        val segmentLat = coord[1]
-                        val segmentLng = coord[0]
-
-                        blinkers.forEach { blinker ->
-                            val distanceToBlinker = calculateDistance(segmentLat, segmentLng, blinker.latitude, blinker.longitude)
-                            if (distanceToBlinker < 10) { // 신호등이 경로 좌표와 가까운지 확인 (10미터 이내)
-                                val currentDistance = calculateDistance(currentLat, currentLng, blinker.latitude, blinker.longitude)
-                                if (currentDistance > 0 && currentDistance < minDistance) {
-                                    minDistance = currentDistance
-                                    nextTrafficLight = blinker
-                                }
-                            }
-                        }
-                    }
+    // 신호등 정보를 업데이트
+    private fun updateBlinkerInfo() {
+        blinkers?.forEach { blinker ->
+            route?.forEach { feature ->
+                if (feature.properties.index == blinker.index) {
+                    // 해당 경로의 신호등 정보와 매칭
+                    _navigationState.value = _navigationState.value.copy(
+                        trafficLightColor = blinker.currentState,
+                        trafficLightRemainingTime = blinker.remainingTime
+                    )
                 }
             }
         }
-        return nextTrafficLight
     }
 
     // 목적지 도착 여부 확인
