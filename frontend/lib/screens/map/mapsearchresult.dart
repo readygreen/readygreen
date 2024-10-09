@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:readygreen/api/map_api.dart';
+import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/map/mapsearchbackbar.dart';
 import 'package:readygreen/widgets/map/placecard.dart';
 import 'package:readygreen/screens/map/resultmap.dart';
@@ -187,7 +188,10 @@ class _MapSearchResultPageState extends State<MapSearchResultPage> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
-                        child: CircularProgressIndicator(),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.green), // 로딩 인디케이터 색상
+                        ),
                       );
                     } else if (snapshot.hasError || !snapshot.hasData) {
                       return const ListTile(
