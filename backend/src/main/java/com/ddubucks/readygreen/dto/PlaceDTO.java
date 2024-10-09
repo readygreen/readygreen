@@ -1,27 +1,18 @@
-package com.ddubucks.readygreen.model;
+package com.ddubucks.readygreen.dto;
 
-import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@Table(name = "place")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Place {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class PlaceDTO {
     private int id;
-
     private String name;
     private String category;
     private String address;
-    private String number;
     private String type;
     private double latitude;
     private double longitude;
-
 }

@@ -1,29 +1,55 @@
 package com.ddubucks.readygreen.controller;
 
-import com.ddubucks.readygreen.model.Place;
+import com.ddubucks.readygreen.dto.PlaceDTO;
 import com.ddubucks.readygreen.service.PlaceService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+
 @RestController
 @RequestMapping("/place")
-@RequiredArgsConstructor
 public class PlaceController {
 
     private final PlaceService placeService;
 
-    // 카테고리별 장소 리스트 제공
-    @GetMapping
-    public List<Place> getPlaces(@RequestParam String category) {
-        return placeService.getPlacesByCategory(category);
+    @Autowired
+    public PlaceController(PlaceService placeService) {
+        this.placeService = placeService;
     }
 
-    // 모든 장소 가져오기
-    @GetMapping("/all")
-    public List<Place> getAllPlaces() {
-        return placeService.getAllPlaces();
+    /**
+     * 현재 위치를 기준으로 특정 type의 장소를 가까운 순으로 반환합니다.
+     *
+     * @param type - 장소의 유형
+     * @param userLatitude - 사용자의 현재 위도
+     * @param userLongitude - 사용자의 현재 경도
+     * @return 가까운 순으로 정렬된 type별 장소 목록
+     */
+    @GetMapping("/nearby")
+    public ResponseEntity<List<PlaceDTO>> getPlacesByTypeAndProximity(
+            @RequestParam String type,
+            @RequestParam double userLatitude,
+            @RequestParam double userLongitude) {
+
+        List<PlaceDTO> places = placeService.getPlacesByTypeAndProximity(type, userLatitude, userLongitude);
+        return ResponseEntity.ok(places);
+    }
+
+    /**
+     * 현재 위치를 기준으로 모든 장소를 가까운 순으로 반환합니다.
+     *
+     * @param userLatitude - 사용자의 현재 위도
+     * @param userLongitude - 사용자의 현재 경도
+     * @return 가까운 순으로 정렬된 장소 목록
+     */
+    @GetMapping("/nearby/all")
+    public ResponseEntity<List<PlaceDTO>> getAllPlacesSortedByProximity(
+            @RequestParam double userLatitude,
+            @RequestParam double userLongitude) {
+
+        List<PlaceDTO> places = placeService.getAllPlacesSortedByProximity(userLatitude, userLongitude);
+        return ResponseEntity.ok(places);
     }
 }
