@@ -48,7 +48,6 @@ fun NavigationScreen(
         }
     }
 
-
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
             setShowExitDialog(true)
