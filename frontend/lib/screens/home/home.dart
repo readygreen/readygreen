@@ -212,7 +212,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
     // Trim long text to a maximum of 20 characters (example) and add "..." at the end
     if (destinationName.length > 16) {
-      destinationName = destinationName.substring(0, 16) + '...';
+      destinationName = '${destinationName.substring(0, 16)}...';
     }
 
     return destinationName;
@@ -384,7 +384,7 @@ class _HomePageContentState extends State<HomePageContent> {
                             ? List.generate(
                                 _showAllBookmarks
                                     ? _bookmarks.length
-                                    : (_bookmarks.length > 0
+                                    : (_bookmarks.isNotEmpty
                                         ? 1
                                         : 0), // Show only the first item initially
                                 (index) {
@@ -580,8 +580,8 @@ class _HomePageContentState extends State<HomePageContent> {
                             ],
                           ),
                         )
-                      : Column(
-                          children: const [
+                      : const Column(
+                          children: [
                             SizedBox(height: 10), // 여백 추가
                             Text(
                               '최근 목적지가 없습니다.',
