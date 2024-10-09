@@ -1,6 +1,7 @@
 package com.ddubucks.readygreen.model;
 
 import com.ddubucks.readygreen.model.member.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
@@ -11,6 +12,7 @@ import org.locationtech.jts.geom.Point;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class RouteRecord extends BaseEntity {
     @Id
@@ -29,6 +31,7 @@ public class RouteRecord extends BaseEntity {
     @Column(nullable = false, columnDefinition = "POINT SRID 4326")
     private Point endCoordinate;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

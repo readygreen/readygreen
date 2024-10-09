@@ -59,13 +59,11 @@ public class QuestionService {
     }
 
     // 특정 사용자의 질문 조회
-    public List<QuestionDTO> getQuestionsByMember(String email) {
+    public List<Question> getQuestionsByMember(String email) {
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
-        return questionRepository.findByMember(member).stream()
-                .map(this::mapToQuestionDTO)
-                .collect(Collectors.toList());
+        return questionRepository.findByMember(member);
     }
 
     // 특정 질문에 답변 (관리자)

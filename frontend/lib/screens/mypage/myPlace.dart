@@ -86,6 +86,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
                         bookmark.name, // 실제 데이터의 이름 사용
                         bookmark.destinationName, // 목적지 이름
                         Icons.place,
+                        bookmark.placeId,
                         bookmark.id),
                   ],
                 );
@@ -96,7 +97,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
 
   // 장소 아이템 빌드 함수
   Widget _buildPlaceItem(BuildContext context, String title, String placeName,
-      IconData icon, int id) {
+      IconData icon, String placeId, int id) {
     return ListTile(
       leading: Container(
         width: 50, // 고정된 너비
@@ -140,7 +141,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
           IconButton(
             icon: const Icon(size: 20, Icons.delete),
             onPressed: () {
-              _showDeleteModal(context, placeName, id);
+              _showDeleteModal(context, placeName, placeId);
             },
           ),
         ],
@@ -362,7 +363,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
   }
 
 // 삭제 모달
-  void _showDeleteModal(BuildContext context, String placeName, int id) {
+  void _showDeleteModal(BuildContext context, String placeName, String placeId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -402,7 +403,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
                           child: ElevatedButton(
                             onPressed: () async {
                               // 삭제 로직 추가
-                              await mapStartAPI.deleteBookmark(id);
+                              await mapStartAPI.deleteBookmark(placeId);
                               await _fetchBookmarks();
                               Navigator.pop(context);
                             },

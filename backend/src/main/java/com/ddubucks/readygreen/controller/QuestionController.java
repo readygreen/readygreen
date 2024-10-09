@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import com.ddubucks.readygreen.model.Question;
 
 import java.util.List;
 
@@ -23,8 +24,8 @@ public class QuestionController {
     }
 
     // 특정 사용자의 질문 조회 (사용자)
-    @GetMapping("/user")
-    public List<QuestionDTO> getQuestionsByMember(@AuthenticationPrincipal UserDetails userDetails) {
+    @GetMapping
+    public List<Question> getQuestionsByMember(@AuthenticationPrincipal UserDetails userDetails) {
         return questionService.getQuestionsByMember(userDetails.getUsername());
     }
 
