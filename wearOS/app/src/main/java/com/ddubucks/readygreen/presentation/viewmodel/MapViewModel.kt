@@ -29,7 +29,8 @@ class MapViewModel : ViewModel() {
             try {
                 val response = mapApi.getMap(latitude, longitude, radius)
                 _mapData.value = response
-                Log.d("MapViewModel", "교통 신호 정보 조회 성공")
+                Log.d("MapViewModel", "교통 신호 정보 조회 성공: ${response.blinkerDTOs}")
+
             } catch (e: Exception) {
                 Log.e("MapViewModel", "신호등 정보 조회 중 오류 발생", e)
             }

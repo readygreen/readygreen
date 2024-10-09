@@ -18,6 +18,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class NavigationViewModel : ViewModel() {
@@ -107,6 +108,12 @@ class NavigationViewModel : ViewModel() {
             // 신호등 정보 업데이트
             updateBlinkerInfo()
 
+            // 남은 거리와 시작 시간 설정
+            _navigationState.value = _navigationState.value.copy(
+                remainingDistance = navigationResponse.distance,
+                startTime = navigationResponse.time // 여기서 시작 시간을 설정합니다.
+            )
+
             // 위치 업데이트 빈도 설정
             locationService?.adjustLocationRequest(
                 priority = Priority.PRIORITY_HIGH_ACCURACY,
@@ -126,6 +133,7 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
+
     // 신호등 정보를 업데이트하는 함수
     private fun updateBlinkerInfo() {
         blinkers?.forEach { blinker ->
@@ -141,6 +149,34 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
+
+    fun calculateTrafficLightState(blinker: BlinkerDTO): Pair<String, Int> {
+        // "HH:mm:ss" 포맷의 startTime을 Date 객체로 변환
+        val format = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val startDate = format.parse(blinker.startTime)
+
+        // 현재 시간 가져오기
+        val currentTime = Date()
+
+        // 신호 주기 계산
+        val totalDuration = blinker.greenDuration + blinker.redDuration
+
+        // startTime으로부터 경과한 시간 계산
+        val elapsedTime = (currentTime.time - startDate.time) / 1000 // 초 단위
+
+        // 경과한 시간에 따라 현재 상태 결정
+        val cycleTime = elapsedTime % totalDuration
+
+        return if (cycleTime < blinker.greenDuration) {
+            // 초록불 상태
+            val remainingTime = (blinker.greenDuration - cycleTime).toInt() // Int로 변환
+            Pair("GREEN", remainingTime)
+        } else {
+            // 빨간불 상태
+            val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt() // Int로 변환
+            Pair("RED", remainingTime)
+        }
+    }
 
 
     private fun updateNavigation(currentLocation: Location) {
@@ -160,26 +196,30 @@ class NavigationViewModel : ViewModel() {
 
                     // 현재 위치가 다음 포인트 반경 15미터 이내인지 확인
                     if (distance < 15.0) {
-                        // 포인트의 description 확인
-                        if (feature.properties.description == "도착") {
-                            Log.d("NavigationViewModel", "목적지에 도착했습니다!")
-                            finishNavigation() // 길안내 종료
-                        } else {
-                            Log.d(
-                                "NavigationViewModel",
-                                "다음 지점으로 이동: ${feature.properties.description}"
-                            )
-                            currentIndex++ // 다음 포인트로 이동
-                            updateCurrentDescription() // 다음 포인트의 설명 업데이트
+                        Log.d(
+                            "NavigationViewModel",
+                            "다음 지점으로 이동: ${feature.properties.description}"
+                        )
+                        currentIndex++
+                        updateCurrentDescription()
+                        updateBlinkerInfo()
 
-                            // 신호등 정보 업데이트
-                            updateBlinkerInfo()
+                        // 현재 신호등 정보 업데이트
+                        blinkers?.forEach { blinker ->
+                            if (feature.properties.index == blinker.index) {
+                                val (state, remainingTime) = calculateTrafficLightState(blinker)
+                                _navigationState.value = _navigationState.value.copy(
+                                    trafficLightColor = state,
+                                    trafficLightRemainingTime = remainingTime
+                                )
+                            }
                         }
                     }
                 }
             }
         }
     }
+
 
 
     // 두 좌표 사이의 거리를 계산
@@ -214,7 +254,7 @@ class NavigationViewModel : ViewModel() {
         val currentState = navigationState.value
         val request = NavigationfinishRequest(
             distance = currentState.remainingDistance ?: 0.0,
-            startTime = currentState.startTime ?: "",
+            startTime = currentState.startTime ?: "", // 여기서 저장한 startTime을 사용
             watch = true
         )
 
@@ -235,6 +275,7 @@ class NavigationViewModel : ViewModel() {
             }
         })
     }
+
 
 
     // 네비게이션 중단

@@ -33,6 +33,7 @@ fun NavigationScreen(
 ) {
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
+    val (showArrivalDialog, setShowArrivalDialog) = remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val ttsViewModel = remember { TTSViewModel(context) }
@@ -40,8 +41,13 @@ fun NavigationScreen(
     LaunchedEffect(navigationState.currentDescription) {
         navigationState.currentDescription?.let { description ->
             ttsViewModel.speakText(description)
+
+            if (description == "도착") {
+                setShowArrivalDialog(true)
+            }
         }
     }
+
 
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
@@ -88,6 +94,22 @@ fun NavigationScreen(
             },
             onCancel = {
                 setShowExitDialog(false)
+                navController.popBackStack()
+            }
+        )
+    }
+
+    if (showArrivalDialog) {
+        Modal(
+            title = "목적지 도착",
+            message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
+            onConfirm = {
+                navigationViewModel.finishNavigation()
+                setShowArrivalDialog(false)
+                navController.popBackStack()
+            },
+            onCancel = {
+                setShowArrivalDialog(false)
             }
         )
     }
@@ -137,7 +159,6 @@ fun NavigationInfo(navigationState: NavigationState) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // 신호등 정보 표시
         navigationState.currentBlinkerInfo?.let { blinker ->
             val remainingTimeColor = when (blinker.currentState) {
                 "RED" -> Red
@@ -145,9 +166,9 @@ fun NavigationInfo(navigationState: NavigationState) {
                 else -> Gray
             }
             Text(
-                text = "남은 시간: ${blinker.remainingTime} 초",
+                text = "${blinker.remainingTime}초",
                 style = secStyle,
-                color = remainingTimeColor // 상태에 따라 색상 변경
+                color = remainingTimeColor
             )
         } ?: Text(
             text = "신호등 없음",
