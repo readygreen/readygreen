@@ -5,7 +5,6 @@ import kotlin.String
 import kotlin.Int
 import kotlin.collections.List
 
-// 최상위 응답 데이터 클래스
 data class NavigationResponse(
     val routeDTO: RouteDTO, // 경로 정보
     val blinkerDTOs: List<BlinkerDTO>, // 신호등 정보
@@ -66,7 +65,7 @@ data class Properties(
     val totalTime: Int, // 총 소요 시간
     val distance: Int, // 현재 세그먼트의 거리
     val time: Int, // 현재 세그먼트의 소요 시간
-    val turnType: Int, // 방향 타입 (예: 200 - 직진, 13 - 우회전)
+    val turnType: Int, // 방향 타입
     val pointType: String // 포인트 타입 (예: SP, GP 등)
 )
 

@@ -22,6 +22,7 @@ import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
 import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
+import kotlinx.coroutines.delay
 import h3Style
 import pStyle
 import secStyle
@@ -43,6 +44,7 @@ fun NavigationScreen(
             ttsViewModel.speakText(description)
 
             if (description == "도착") {
+                ttsViewModel.speakText("목적지에 도착하였습니다")
                 setShowArrivalDialog(true)
             }
         }
@@ -116,6 +118,10 @@ fun NavigationScreen(
 
 @Composable
 fun NavigationInfo(navigationState: NavigationState) {
+    val (remainingTime, setRemainingTime) = remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
+    val (currentBlinkerState, setCurrentBlinkerState) = remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
+    val isNavigating = navigationState.isNavigating
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -151,28 +157,13 @@ fun NavigationInfo(navigationState: NavigationState) {
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) + " 미터" } ?: "정보 없음"}",
-            style = pStyle,
-            color = White
-        )
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        navigationState.currentBlinkerInfo?.let { blinker ->
-            val remainingTimeColor = when (blinker.currentState) {
+            text = "${remainingTime}초",
+            style = secStyle,
+            color = when (currentBlinkerState) {
                 "RED" -> Red
                 "GREEN" -> Green
                 else -> Gray
             }
-            Text(
-                text = "${blinker.remainingTime}초",
-                style = secStyle,
-                color = remainingTimeColor
-            )
-        } ?: Text(
-            text = "신호등 없음",
-            style = pStyle,
-            color = White
         )
     }
 }

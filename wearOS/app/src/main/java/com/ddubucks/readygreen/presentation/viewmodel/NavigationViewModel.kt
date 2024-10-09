@@ -22,22 +22,23 @@ import java.util.Date
 import java.util.Locale
 
 class NavigationViewModel : ViewModel() {
-
-    private val _navigationState = MutableStateFlow(NavigationState())
-    val navigationState: StateFlow<NavigationState> = _navigationState
     private var locationService: LocationService? = null
-    private var route: List<Feature>? = null
-    private var blinkers: List<BlinkerDTO>? = null
-
     private val _navigationCommand = MutableLiveData<String>()
     val navigationCommand: LiveData<String> get() = _navigationCommand
 
-    // 현재 위치를 저장할 변수 추가
+    // 길안내 상태
+    private val _navigationState = MutableStateFlow(NavigationState())
+    val navigationState: StateFlow<NavigationState> = _navigationState
+    private var route: List<Feature>? = null
+    private var blinkers: List<BlinkerDTO>? = null
+
+    // 현재 위치
     private var currentLocation: Location? = null
     private var currentIndex = 0 // 현재 안내 중인 경로 포인트 인덱스
     private var pointIndexList: List<Int> = emptyList() // Type이 Point인 인덱스 리스트
 
-    // 네비게이션 시작
+
+    // 길안내 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
         locationService = LocationService(context)
         _navigationState.value = _navigationState.value.copy(destinationName = name)
@@ -45,7 +46,6 @@ class NavigationViewModel : ViewModel() {
         locationService?.getLastLocation { location ->
             if (location != null) {
                 Log.d("NavigationViewModel", "현재 위치: ${location.latitude}, ${location.longitude}")
-                // 현재 위치를 저장
                 currentLocation = location
                 initiateNavigation(location.latitude, location.longitude, lat, lng, name)
             } else {
@@ -55,7 +55,7 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
-    // 길안내 시작 요청
+    // 길안내 시작 api 요청
     private fun initiateNavigation(curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
         val navigationApi = RestClient.createService(NavigationApi::class.java)
         val navigationRequest = NavigationRequest(
@@ -75,6 +75,7 @@ class NavigationViewModel : ViewModel() {
                 override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
                     if (response.isSuccessful) {
                         Log.d("NavigationViewModel", "Navigation API 받기 성공")
+                        // 응답 데이터 처리
                         handleNavigationResponse(response)
                     } else {
                         Log.d("NavigationViewModel", "Navigation API 받기 실패: ${response.errorBody()?.string()}")
@@ -91,42 +92,47 @@ class NavigationViewModel : ViewModel() {
     }
 
 
+    // 좌표 반올림
+    private fun roundToSix(value: Double): Double {
+        return String.format("%.6f", value).toDouble()
+    }
+
+
+    // 응답 데이터 처리
     private fun handleNavigationResponse(response: Response<NavigationResponse>) {
         response.body()?.let { navigationResponse ->
             route = navigationResponse.routeDTO.features // 경로 정보
             blinkers = navigationResponse.blinkerDTOs // 신호등 정보
 
-            // Type이 Point인 포인트 인덱스를 수집
+            // Type이 Point인 포인트 인덱스
             pointIndexList = route?.mapIndexedNotNull { index, feature ->
                 if (feature.geometry.type == "Point") index else null
             } ?: emptyList()
 
-            // 첫 번째 포인트 설명 업데이트
+            // 1. description업데이트
             updateCurrentDescription()
 
-            // 현재 인덱스에 해당하는 feature를 가져와서 신호등 정보 업데이트
-            val currentFeature = route?.getOrNull(currentIndex) // 현재 안내 중인 포인트
-            updateBlinkerInfo(currentFeature) // feature를 전달
+            // 2. currentIndex에 해당하는 feature와 index가 일치하는 신호등 정보 업데이트
+            val currentFeature = route?.getOrNull(currentIndex)
+            updateBlinkerInfo(currentFeature)
 
             // 남은 거리와 시작 시간 설정
             _navigationState.value = _navigationState.value.copy(
-                remainingDistance = navigationResponse.distance,
-                startTime = navigationResponse.time // 여기서 시작 시간을 설정합니다.
+                isNavigating = true,
+                Distance = navigationResponse.distance,
+                startTime = navigationResponse.time,
+                destinationName = navigationResponse.routeDTO.features.lastOrNull()?.properties?.name ?: "알 수 없음"
             )
 
             // 위치 업데이트 빈도 설정
             locationService?.adjustLocationRequest(
                 priority = Priority.PRIORITY_HIGH_ACCURACY,
-                interval = 500 // 0.5초마다 위치 업데이트
+                interval = 500
             )
 
             // 위치 업데이트 시작
             locationService?.startLocationUpdates { location -> updateNavigation(location) }
 
-            _navigationState.value = _navigationState.value.copy(
-                isNavigating = true,
-                destinationName = navigationResponse.routeDTO.features.lastOrNull()?.properties?.name ?: "알 수 없음"
-            )
         } ?: run {
             Log.d("NavigationViewModel", "경로 정보 받기 실패")
             _navigationState.value = NavigationState(isNavigating = false)
@@ -134,16 +140,28 @@ class NavigationViewModel : ViewModel() {
     }
 
 
-    private fun updateBlinkerInfo(feature: Feature?) {
-        feature ?: return // feature가 null인 경우 조기 리턴
+    // description 업데이트
+    private fun updateCurrentDescription() {
+        pointIndexList.getOrNull(currentIndex)?.let { index ->
+            route?.get(index)?.let { feature ->
+                if (feature.geometry.type == "Point") {
+                    _navigationState.value = _navigationState.value.copy(
+                        currentDescription = feature.properties.description ?: "안내 없음"
+                    )
+                }
+            }
+        }
+    }
 
-        // blinkersDTO에서 index를 추출
-        val blinkersIndices = blinkers?.map { it.index } ?: return
+
+    // 신호등 정보 업데이트
+    private fun updateBlinkerInfo(feature: Feature?) {
+        feature ?: return
 
         val featureIndex = feature.properties.index // 현재 feature의 인덱스
 
         // 현재 위치 인덱스보다 크거나 같은 신호등 인덱스를 찾기
-        val relevantBlinkers = blinkers?.filter { it.index >= featureIndex } // 현재 위치 인덱스보다 큰 신호등들
+        val relevantBlinkers = blinkers?.filter { it.index >= featureIndex }
 
         if (!relevantBlinkers.isNullOrEmpty()) {
             // 가장 작은 인덱스의 신호등 정보 가져오기
@@ -153,9 +171,9 @@ class NavigationViewModel : ViewModel() {
                 val (state, remainingTime) = calculateTrafficLightState(blinker)
                 // NavigationState 업데이트
                 _navigationState.value = _navigationState.value.copy(
-                    currentBlinkerInfo = blinker, // 해당 신호등 정보 저장
-                    trafficLightColor = state, // 신호등 색상
-                    trafficLightRemainingTime = remainingTime // 신호등 남은 시간
+                    currentBlinkerInfo = blinker,
+                    trafficLightColor = state,
+                    trafficLightRemainingTime = remainingTime
                 )
             }
         } else {
@@ -165,37 +183,39 @@ class NavigationViewModel : ViewModel() {
     }
 
 
+    // 신호등 현재 상태 계산
     fun calculateTrafficLightState(blinker: BlinkerDTO): Pair<String, Int> {
-        // "HH:mm:ss" 포맷의 startTime을 Date 객체로 변환
+
         val format = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         val startDate = format.parse(blinker.startTime)
 
         // 현재 시간 가져오기
         val currentTime = Date()
 
-        // 신호 주기 계산
+        // 신호 주기
         val totalDuration = blinker.greenDuration + blinker.redDuration
 
-        // startTime으로부터 경과한 시간 계산
-        val elapsedTime = (currentTime.time - startDate.time) / 1000 // 초 단위
+        // startTime으로부터 경과한 시간(초)
+        val elapsedTime = (currentTime.time - startDate.time) / 1000
 
         // 경과한 시간에 따라 현재 상태 결정
         val cycleTime = elapsedTime % totalDuration
 
         return if (cycleTime < blinker.greenDuration) {
             // 초록불 상태
-            val remainingTime = (blinker.greenDuration - cycleTime).toInt() // Int로 변환
+            val remainingTime = (blinker.greenDuration - cycleTime).toInt()
             Pair("GREEN", remainingTime)
         } else {
             // 빨간불 상태
-            val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt() // Int로 변환
+            val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt()
             Pair("RED", remainingTime)
         }
     }
 
 
+    // 길안내 추적
     private fun updateNavigation(currentLocation: Location) {
-        this.currentLocation = currentLocation // 위치 업데이트 시 저장
+        this.currentLocation = currentLocation
 
         val currentLat = currentLocation.latitude
         val currentLng = currentLocation.longitude
@@ -213,7 +233,7 @@ class NavigationViewModel : ViewModel() {
                         Log.d("NavigationViewModel", "다음 지점으로 이동: ${feature.properties.description}")
                         currentIndex++
                         updateCurrentDescription()
-                        updateBlinkerInfo(feature) // feature를 전달
+                        updateBlinkerInfo(feature)
                     }
                 }
             }
@@ -221,8 +241,7 @@ class NavigationViewModel : ViewModel() {
     }
 
 
-
-    // 두 좌표 사이의 거리를 계산
+    // 좌표 사이의 거리를 계산
     private fun calculateDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
         val location1 = Location("").apply {
             latitude = lat1
@@ -235,26 +254,13 @@ class NavigationViewModel : ViewModel() {
         return location1.distanceTo(location2).toDouble()
     }
 
-    // 현재 안내 중인 포인트의 description을 업데이트
-    private fun updateCurrentDescription() {
-        pointIndexList.getOrNull(currentIndex)?.let { index ->
-            route?.get(index)?.let { feature ->
-                if (feature.geometry.type == "Point") {
-                    _navigationState.value = _navigationState.value.copy(
-                        currentDescription = feature.properties.description ?: "안내 없음"
-                    )
-                }
-            }
-        }
-    }
-
 
     // 네비게이션 완료
     fun finishNavigation() {
         val currentState = navigationState.value
         val request = NavigationfinishRequest(
-            distance = currentState.remainingDistance ?: 0.0,
-            startTime = currentState.startTime ?: "", // 여기서 저장한 startTime을 사용
+            distance = currentState.Distance ?: 0.0,
+            startTime = currentState.startTime ?: "",
             watch = true
         )
 
@@ -292,7 +298,6 @@ class NavigationViewModel : ViewModel() {
                         Log.d("NavigationViewModel", "길안내 중단 실패: ${response.errorBody()?.string()}")
                     }
                 }
-
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     Log.d("NavigationViewModel", "길안내 중단 실패: ${t.message}")
                 }
@@ -300,11 +305,13 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
+
     // 네비게이션 상태 초기화
     fun clearNavigationState() {
         _navigationCommand.value = "clear_navigation"
         _navigationState.value = NavigationState()
     }
+
 
     // 네비게이션 상태 체크
     fun checkNavigation() {
@@ -339,6 +346,7 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
+
     // 네이게이션 정보 불러오기
     fun getNavigation() {
         _navigationCommand.value = "get_navigation"
@@ -365,11 +373,5 @@ class NavigationViewModel : ViewModel() {
                 Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${e.message}")
             }
         }
-    }
-
-
-    // 좌표 반올림
-    private fun roundToSix(value: Double): Double {
-        return String.format("%.6f", value).toDouble()
     }
 }
