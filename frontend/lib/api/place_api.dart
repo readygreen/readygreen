@@ -25,14 +25,14 @@ class PlaceApi {
     if (response.statusCode == 200) {
       print('place 장소 추천 성공');
       final decodedResponse = json.decode(utf8.decode(response.bodyBytes));
-      print('API 응답 데이터: $decodedResponse');
+      print('API 응답 데이터얌: $decodedResponse');
       return decodedResponse;
     } else {
       print('place 장소 추천 실패');
     }
   }
 
-  // nearby/all (GET)
+  // 타입없는 전체 장소 추천 (GET)
   Future<List<dynamic>> getAllNearbyPlaces({
     required double userLatitude,
     required double userLongitude,

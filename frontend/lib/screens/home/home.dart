@@ -11,6 +11,8 @@ import 'package:readygreen/widgets/modals/weather_modal.dart';
 import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
 import 'package:readygreen/widgets/place/cardbox_home.dart';
+import 'package:readygreen/widgets/place/cardbox_place.dart'; // CardBoxPlace 임포트
+import 'package:readygreen/api/place_api.dart'; // Place API 임포트
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,12 +39,16 @@ class HomePageContent extends StatefulWidget {
 
 class _HomePageContentState extends State<HomePageContent> {
   final NewMainApi api = NewMainApi();
+  final PlaceApi placeApi = PlaceApi();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
   bool isLoadingFortune = false; // 운세 로딩중
   Map<String, dynamic>? routeRecords;
   List<Map<String, dynamic>> _bookmarks = [];
+  List<Map<String, String>> nearbyPlaces = [];
+  bool isLoadingPlaces = true; // 주변 장소 로딩 상태
+
   bool _showAllBookmarks = false;
   @override
   void initState() {
@@ -52,6 +58,56 @@ class _HomePageContentState extends State<HomePageContent> {
     _storeFortune(); //  운세 데이터 로드 및 저장
     _storeWeather();
     _loadWeatherInfo();
+    _fetchNearbyPlaces();
+  }
+
+// 주변 장소 데이터 API로부터 받아오는 함수
+  Future<void> _fetchNearbyPlaces() async {
+    setState(() {
+      isLoadingPlaces = true; // 로딩 시작
+    });
+
+    // 저장된 위도와 경도를 가져오기
+    String? latitudeStr = await storage.read(key: 'latitude');
+    String? longitudeStr = await storage.read(key: 'longitude');
+
+    // String? 타입을 double로 변환
+    double userLatitude =
+        latitudeStr != null ? double.parse(latitudeStr) : 36.3551083;
+    double userLongitude =
+        longitudeStr != null ? double.parse(longitudeStr) : 127.3379517;
+
+    try {
+      // Place API 호출하여 주변 장소 가져오기
+      List<dynamic> placesData = await placeApi.getAllNearbyPlaces(
+        userLatitude: userLatitude,
+        userLongitude: userLongitude,
+      );
+
+      // 상위 3개의 장소만 가져오기
+      if (placesData.isNotEmpty) {
+        setState(() {
+          nearbyPlaces = placesData.take(3).map<Map<String, String>>((place) {
+            return {
+              'name': place['name'].toString(),
+              'address': place['address'].toString(),
+            };
+          }).toList();
+          isLoadingPlaces = false;
+        });
+      } else {
+        setState(() {
+          nearbyPlaces = [];
+          isLoadingPlaces = false;
+        });
+      }
+    } catch (error) {
+      print('Failed to load nearby places: $error');
+      setState(() {
+        nearbyPlaces = [];
+        isLoadingPlaces = false;
+      });
+    }
   }
 
   Future<void> _fetchMainDate() async {
@@ -375,7 +431,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         '자주 가는 목적지',
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.greytext,
+                          color: AppColors.black,
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -384,11 +440,21 @@ class _HomePageContentState extends State<HomePageContent> {
                             ? List.generate(
                                 _showAllBookmarks
                                     ? _bookmarks.length
-                                    : (_bookmarks.isNotEmpty
-                                        ? 1
-                                        : 0), // Show only the first item initially
+                                    : (_bookmarks.length > 1
+                                        ? 2
+                                        : _bookmarks.length),
                                 (index) {
                                   final bookmark = _bookmarks[index];
+                                  String bookmarkType = '';
+
+                                  // 북마크의 종류에 따라 텍스트 설정
+                                  if (bookmark['name'] == '집') {
+                                    bookmarkType = '집';
+                                  } else if (bookmark['name'] == '회사') {
+                                    bookmarkType = '회사';
+                                  } else {
+                                    bookmarkType = '기타';
+                                  }
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 2.0),
@@ -400,6 +466,14 @@ class _HomePageContentState extends State<HomePageContent> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              bookmarkType,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: AppColors.greytext,
+                                              ),
+                                            ),
                                             Text(
                                               formatDestinationName(
                                                   bookmark['destinationName']),
@@ -411,45 +485,51 @@ class _HomePageContentState extends State<HomePageContent> {
                                               overflow: TextOverflow
                                                   .ellipsis, // 넘치는 텍스트는 '...'로 표시
                                             ),
-                                            const SizedBox(height: 4),
                                           ],
                                         ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    MapDirectionPage(
-                                                  endLat: bookmark['latitude'],
-                                                  endLng: bookmark['longitude'],
-                                                  endPlaceName: bookmark[
-                                                      'destinationName'],
+                                        Column(
+                                          children: [
+                                            const SizedBox(height: 10), // 여백 추가
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MapDirectionPage(
+                                                      endLat:
+                                                          bookmark['latitude'],
+                                                      endLng:
+                                                          bookmark['longitude'],
+                                                      endPlaceName: bookmark[
+                                                          'destinationName'],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.blue,
+                                                backgroundColor: Colors.white,
+                                                side: const BorderSide(
+                                                  color: Colors.blue,
+                                                  width: 1.0,
+                                                ),
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.blue,
-                                            backgroundColor: Colors.white,
-                                            side: const BorderSide(
-                                              color: Colors.blue,
-                                              width: 1.0,
+                                              child: const Text(
+                                                '길찾기',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
                                             ),
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            '길찾기',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -466,18 +546,16 @@ class _HomePageContentState extends State<HomePageContent> {
                                         FontWeight.bold, // 필요한 경우, 글씨 굵기 추가
                                   ),
                                 ),
-                                // ,
                               ],
                       ),
-                      if (_bookmarks.length > 1) const SizedBox(height: 5),
-                      if (_bookmarks.length > 1)
+                      if (_bookmarks.length > 2) const SizedBox(height: 5),
+                      if (_bookmarks.length > 2)
                         const Divider(
-                          // Add this Divider to create the horizontal line
                           color: AppColors.grey, // You can adjust the color
                           thickness:
                               1, // Adjust thickness for a more prominent line
                         ),
-                      if (_bookmarks.length > 1)
+                      if (_bookmarks.length > 2)
                         Center(
                           child: GestureDetector(
                             onTap: () {
@@ -517,7 +595,7 @@ class _HomePageContentState extends State<HomePageContent> {
                     '최근 목적지',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.greytext,
+                      color: AppColors.black,
                     ),
                   ),
                   routeRecords != null && routeRecords!.isNotEmpty
@@ -571,7 +649,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                 child: const Text(
                                   '길찾기',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.green,
                                   ),
@@ -582,7 +660,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         )
                       : const Column(
                           children: [
-                            SizedBox(height: 10), // 여백 추가
+                            SizedBox(height: 12), // 여백 추가
                             Text(
                               '최근 목적지가 없습니다.',
                               style: TextStyle(
@@ -597,7 +675,18 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
 
             const SizedBox(height: 16),
-            const CardBoxHome(title: '주변 장소'),
+            // 주변 장소 출력
+            if (isLoadingPlaces)
+              const Center(child: CircularProgressIndicator())
+            else if (nearbyPlaces.isNotEmpty)
+              CardBoxPlace(
+                places: nearbyPlaces,
+                selectedCategory: '전체',
+              )
+            else
+              const Center(child: Text('주변 장소를 찾을 수 없습니다.')),
+
+            const SizedBox(height: 16),
             const SizedBox(height: 16),
             // const Row(
             //   mainAxisAlignment: MainAxisAlignment.end,

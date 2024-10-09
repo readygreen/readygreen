@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/screens/map/resultmap.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:math'; // Random을 사용하기 위해 추가
@@ -23,7 +24,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
 
   // 한글 카테고리를 영어로 매핑하는 Map
   final Map<String, String> categoryMapping = {
-    '전체': 'all',
+    '전체': 'citu=]y',
     '맛집': 'restaurant',
     '카페': 'cafe',
     '편의점': 'supermarket',
@@ -54,7 +55,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
 
   Future<String> fetchImageUrl(String category, int index) async {
     // print('category $category');
-    final String accessKey = 'Tb5m_5NwxbsmqkmYjx5_8sPmhHnXxMhfUTPN3JsH_gQ';
+    const String accessKey = 'Tb5m_5NwxbsmqkmYjx5_8sPmhHnXxMhfUTPN3JsH_gQ';
     final String url =
         'https://api.unsplash.com/search/photos?query=$category&client_id=$accessKey&page=${index + 1}';
 
@@ -75,6 +76,9 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
   @override
   void initState() {
     super.initState();
+
+    // print로 places 값을 출력
+    print('Received places 받은거! : ${widget.places}');
     loadImages();
   }
 
@@ -113,7 +117,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
+                        SizedBox(
                           width: 100,
                           height: 100,
                           child: Image.network(
@@ -144,7 +148,31 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                               const SizedBox(height: 5),
                               ElevatedButton(
                                 onPressed: () {
-                                  // 지도 보기 버튼 클릭 동작
+                                  // 위도와 경도를 double 타입으로 변환
+                                  double latitude =
+                                      double.parse(place['latitude']!);
+                                  double longitude =
+                                      double.parse(place['longitude']!);
+                                  print('위더 경도 려깃지렁 $latitude, $longitude');
+                                  print(place['name']);
+                                  print(place['address']);
+                                  print(place['id']);
+                                  // ResultMapPage로 이동하며 데이터 전달
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ResultMapPage(
+                                        lat: latitude, // 위도
+                                        lng: longitude, // 경도
+                                        placeName: place['name']!, // 장소 이름
+                                        address: place['address'] ??
+                                            '주소 정보 없음', // 주소
+                                        searchQuery:
+                                            place['name']!, // 검색 쿼리로 이름 사용
+                                        placeId: place['id']!, // 장소 ID
+                                      ),
+                                    ),
+                                  );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.white,
@@ -154,7 +182,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30),
-                                    side: BorderSide(
+                                    side: const BorderSide(
                                       color: AppColors.grey,
                                       width: 1.0,
                                     ),
