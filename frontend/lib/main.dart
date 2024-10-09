@@ -121,7 +121,7 @@ class _MainPageState extends State<MainPage> {
             MaterialPageRoute(builder: (context) => const MapDirectionPage()),
           );
         }
-      }else if(message.data['type']=='2'){
+      } else if (message.data['type'] == '2') {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const HomePage()),
@@ -145,14 +145,13 @@ class _MainPageState extends State<MainPage> {
               context,
               MaterialPageRoute(builder: (context) => const MapDirectionPage()),
             );
-          }else if(type=='2'){
+          } else if (type == '2') {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const MainPage()),
             );
           }
         }
-        
       }
       if (!mounted) return;
       RemoteNotification? notification = message.notification;
@@ -199,26 +198,71 @@ class _MainPageState extends State<MainPage> {
         selectedLabelStyle: const TextStyle(fontSize: 12),
         unselectedLabelStyle: const TextStyle(fontSize: 12),
         // elevation: 0,
-        items: const <BottomNavigationBarItem>[
+        items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Image.asset(
+              'assets/icon/nothome.png', // 선택되지 않았을 때 이미지
+              width: 20,
+              height: 20,
+            ),
+            activeIcon: Image.asset(
+              'assets/icon/home.png', // 선택되었을 때 이미지
+              width: 20,
+              height: 20,
+            ),
             label: '홈',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
+            icon: Image.asset(
+              'assets/icon/notpoint.png', // 선택되지 않았을 때 이미지
+              width: 22,
+              height: 22,
+            ),
+            activeIcon: Image.asset(
+              'assets/icon/point.png', // 선택되었을 때 이미지
+              width: 22,
+              height: 22,
+            ),
             label: '포인트',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.map),
+            icon: Image.asset(
+              'assets/icon/notmap.png', // 선택되지 않았을 때 이미지
+              width: 22,
+              height: 22,
+            ),
+            activeIcon: Image.asset(
+              'assets/icon/map.png', // 선택되었을 때 이미지
+              width: 22,
+              height: 22,
+            ),
             label: '지도',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.place),
-            label: '추천',
+            icon: Image.asset(
+              'assets/icon/notlocation.png', // 선택되지 않았을 때 이미지
+              width: 23,
+              height: 23,
+            ),
+            activeIcon: Image.asset(
+              'assets/icon/location.png', // 선택되었을 때 이미지
+              width: 23,
+              height: 23,
+            ),
+            label: '주변',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: '내정보',
+            icon: Image.asset(
+              'assets/icon/notprofile.png', // 선택되지 않았을 때 이미지
+              width: 24,
+              height: 24,
+            ),
+            activeIcon: Image.asset(
+              'assets/icon/profile.png', // 선택되었을 때 이미지
+              width: 24,
+              height: 24,
+            ),
+            label: '프로필',
           ),
         ],
       ),
