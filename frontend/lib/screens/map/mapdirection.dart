@@ -273,6 +273,7 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             .updateLocation();
         _fetchRouteData(); // 페이지가 로드될 때 API 호출
         _showCautionModal();
+        // print(object);
       });
     } else {
       print("도착지 정보가 없습니다. 다른 API 요청 실행.");
@@ -300,12 +301,16 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     final locationProvider =
         Provider.of<CurrentLocationProvider>(context, listen: false);
 
+    print('위치 상태관리 locationProvider $locationProvider');
+
     if (locationProvider.currentPosition != null) {
       // 현재 위치 정보
       double startX = locationProvider.currentPosition!.longitude;
       double startY = locationProvider.currentPosition!.latitude;
       String startName =
           locationProvider.currentPlaceName ?? 'Unknown Start Location';
+
+      print('시작 위치 $startX, $startY, $startName');
 
       // 도착지 정보는 ArriveButton에서 전달받은 값 사용
       double? endX = widget.endLng;

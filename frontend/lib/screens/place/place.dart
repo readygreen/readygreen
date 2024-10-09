@@ -101,10 +101,12 @@ class _PlacePageState extends State<PlacePage> {
       });
     } catch (error) {
       print('Failed to load places: $error');
-      setState(() {
-        places = [];
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          places = [];
+          isLoading = false;
+        });
+      }
     }
   }
 
