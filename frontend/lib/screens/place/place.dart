@@ -6,6 +6,8 @@ import 'package:readygreen/api/place_api.dart'; // API 파일 가져오기
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PlacePage extends StatefulWidget {
+  const PlacePage({super.key});
+
   @override
   _PlacePageState createState() => _PlacePageState();
 }
@@ -45,8 +47,7 @@ class _PlacePageState extends State<PlacePage> {
     '헬스장',
     '공원',
   ];
-
-  // 장소 데이터 API로부터 받아오는 함수
+// 장소 데이터 API로부터 받아오는 함수
   Future<void> _getPlace() async {
     setState(() {
       isLoading = true; // 로딩 시작
@@ -62,38 +63,42 @@ class _PlacePageState extends State<PlacePage> {
     double userLongitude =
         longitudeStr != null ? double.parse(longitudeStr) : 127.3379517;
 
-    // 선택된 카테고리에 맞는 type 설정
-    String type = categoryMapping[selectedCategory] ?? 'all';
-
-    // 로그로 카테고리 및 타입 확인
-    print('Selected Category: $selectedCategory, Type: $type');
-
     try {
-      // API 호출
-      final placeData = await placeApi.getPlaces(
-        type: type,
-        userLatitude: userLatitude,
-        userLongitude: userLongitude,
-      );
+      List<dynamic> placeData;
 
-      if (placeData != null && placeData is List) {
-        setState(() {
-          print('placeData $placeData');
-          places = placeData.map<Map<String, String>>((place) {
-            // Map<String, dynamic>을 Map<String, String>으로 변환
-            return {
-              'name': place['name'].toString(), // String 변환
-              // 'category': place['category'].toString(), // String 변환
-              'address': place['address'].toString(), // 모든 값을 String으로 변환
-              // 'latitude': place['latitude'],
-              // 'longitude': place['longitude'],
-            };
-          }).toList();
-          isLoading = false;
-        });
+      // '전체' 카테고리 선택 시 전체 장소 추천 API 호출
+      if (selectedCategory == '전체') {
+        placeData = await placeApi.getAllNearbyPlaces(
+          userLatitude: userLatitude,
+          userLongitude: userLongitude,
+        );
       } else {
-        throw Exception('Invalid data format or null response');
+        // 선택된 카테고리에 맞는 type 설정
+        String type = categoryMapping[selectedCategory] ?? 'all';
+
+        // 로그로 카테고리 및 타입 확인
+        print('Selected Category: $selectedCategory, Type: $type');
+
+        // API 호출
+        placeData = await placeApi.getPlaces(
+          type: type,
+          userLatitude: userLatitude,
+          userLongitude: userLongitude,
+        );
       }
+      setState(() {
+        print('placeData $placeData');
+        places = placeData.map<Map<String, String>>((place) {
+          return {
+            'id': place['id'].toString(), // ID 추가
+            'name': place['name'].toString(), // 이름
+            'address': place['address'].toString(), // 주소
+            'latitude': place['latitude'].toString(), // 위도
+            'longitude': place['longitude'].toString(), // 경도
+          };
+        }).toList();
+        isLoading = false;
+      });
     } catch (error) {
       print('Failed to load places: $error');
       if (mounted) {
@@ -141,7 +146,7 @@ class _PlacePageState extends State<PlacePage> {
                       height: 200,
                     ),
                     const SizedBox(height: 10),
-                    Text(
+                    const Text(
                       '지금 내 주변 핫플은?',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
@@ -201,23 +206,26 @@ class _PlacePageState extends State<PlacePage> {
               // 로딩 상태일 때는 로딩 인디케이터 표시
               if (isLoading)
                 // Center(child: CircularProgressIndicator())
-                Center(child: Text('로딩중..'))
+                const Center(child: Text('로딩중..'))
               else if (places.isEmpty)
-                Center(child: Text('해당 카테고리의 장소를 찾을 수 없습니다.'))
+                const Center(child: Text('해당 카테고리의 장소를 찾을 수 없습니다.'))
               else
                 CardBoxPlace(
                   places: places
                       .asMap()
                       .entries
                       .map((entry) => {
-                            'name': entry.value['name']!,
-                            'address': entry.value['address'] ??
-                                '주소 정보 없음', // address 추가
+                            'id': entry.value['id'] ?? '0', // ID 전달
+                            'name': entry.value['name']!, // 이름
+                            'address':
+                                entry.value['address'] ?? '주소 정보 없음', // 주소
+                            'latitude': entry.value['latitude']!, // 위도
+                            'longitude': entry.value['longitude']!, // 경도
                             'imageIndex': entry.key.toString(),
                           })
                       .toList(),
                   selectedCategory: selectedCategory, // 페이지에서 선택한 카테고리 전달
-                ),
+                )
             ],
           ),
         ),

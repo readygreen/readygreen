@@ -10,9 +10,11 @@ import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/modals/weather_modal.dart';
 import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
-import 'package:readygreen/widgets/place/cardbox_home.dart';
-import 'package:provider/provider.dart';
+// import 'package:readygreen/widgets/place/cardbox_home.dart';
+import 'package:readygreen/widgets/place/cardbox_place.dart'; // CardBoxPlace 임포트
+import 'package:readygreen/api/place_api.dart'; // Place API 임포트
 import 'package:readygreen/provider/current_location.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -39,12 +41,16 @@ class HomePageContent extends StatefulWidget {
 
 class _HomePageContentState extends State<HomePageContent> {
   final NewMainApi api = NewMainApi();
+  final PlaceApi placeApi = PlaceApi();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
   bool isLoadingFortune = false; // 운세 로딩중
   Map<String, dynamic>? routeRecords;
   List<Map<String, dynamic>> _bookmarks = [];
+  List<Map<String, String>> nearbyPlaces = [];
+  bool isLoadingPlaces = true; // 주변 장소 로딩 상태
+
   bool _showAllBookmarks = false;
   @override
   void initState() {
@@ -54,6 +60,56 @@ class _HomePageContentState extends State<HomePageContent> {
     _storeFortune(); //  운세 데이터 로드 및 저장
     _storeWeather();
     _loadWeatherInfo();
+    _fetchNearbyPlaces();
+  }
+
+// 주변 장소 데이터 API로부터 받아오는 함수
+  Future<void> _fetchNearbyPlaces() async {
+    setState(() {
+      isLoadingPlaces = true; // 로딩 시작
+    });
+
+    // 저장된 위도와 경도를 가져오기
+    String? latitudeStr = await storage.read(key: 'latitude');
+    String? longitudeStr = await storage.read(key: 'longitude');
+
+    // String? 타입을 double로 변환
+    double userLatitude =
+        latitudeStr != null ? double.parse(latitudeStr) : 36.3551083;
+    double userLongitude =
+        longitudeStr != null ? double.parse(longitudeStr) : 127.3379517;
+
+    try {
+      // Place API 호출하여 주변 장소 가져오기
+      List<dynamic> placesData = await placeApi.getAllNearbyPlaces(
+        userLatitude: userLatitude,
+        userLongitude: userLongitude,
+      );
+
+      // 상위 3개의 장소만 가져오기
+      if (placesData.isNotEmpty) {
+        setState(() {
+          nearbyPlaces = placesData.take(3).map<Map<String, String>>((place) {
+            return {
+              'name': place['name'].toString(),
+              'address': place['address'].toString(),
+            };
+          }).toList();
+          isLoadingPlaces = false;
+        });
+      } else {
+        setState(() {
+          nearbyPlaces = [];
+          isLoadingPlaces = false;
+        });
+      }
+    } catch (error) {
+      print('Failed to load nearby places: $error');
+      setState(() {
+        nearbyPlaces = [];
+        isLoadingPlaces = false;
+      });
+    }
   }
 
   Future<void> _fetchMainDate() async {
@@ -103,6 +159,10 @@ class _HomePageContentState extends State<HomePageContent> {
     // 위치 정보를 스토리지에 저장
     await storage.write(key: 'latitude', value: location.latitude.toString());
     await storage.write(key: 'longitude', value: location.longitude.toString());
+
+    // 위치 정보를 Provider에 저장 (Provider의 updateLocation 호출)
+    await Provider.of<CurrentLocationProvider>(context, listen: false)
+        .updateLocation();
 
     // 위치 정보를 Provider에 저장 (Provider의 updateLocation 호출)
     await Provider.of<CurrentLocationProvider>(context, listen: false)
@@ -215,11 +275,12 @@ class _HomePageContentState extends State<HomePageContent> {
       int index = destinationName.indexOf('대한민국 대전광역시');
       destinationName =
           destinationName.substring(index + '대한민국 대전광역시'.length).trim();
+      destinationName.substring(index + '대한민국 대전광역시'.length).trim();
     }
 
     // Trim long text to a maximum of 20 characters (example) and add "..." at the end
     if (destinationName.length > 16) {
-      destinationName = destinationName.substring(0, 16) + '...';
+      destinationName = '${destinationName.substring(0, 16)}...';
     }
 
     return destinationName;
@@ -396,6 +457,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                         : _bookmarks.length),
                                 (index) {
                                   final bookmark = _bookmarks[index];
+
                                   String bookmarkType = '';
 
                                   // 북마크의 종류에 따라 텍스트 설정
@@ -417,6 +479,14 @@ class _HomePageContentState extends State<HomePageContent> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              bookmarkType,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: AppColors.greytext,
+                                              ),
+                                            ),
                                             const SizedBox(height: 5),
                                             Text(
                                               bookmarkType,
@@ -452,10 +522,8 @@ class _HomePageContentState extends State<HomePageContent> {
                                                           bookmark['latitude'],
                                                       endLng:
                                                           bookmark['longitude'],
-                                                      endPlaceName:
-                                                          formatDestinationName(
-                                                              bookmark[
-                                                                  'destinationName']),
+                                                      endPlaceName: bookmark[
+                                                          'destinationName'],
                                                     ),
                                                   ),
                                                 );
@@ -503,28 +571,31 @@ class _HomePageContentState extends State<HomePageContent> {
                       ),
                       if (_bookmarks.length > 2) const SizedBox(height: 5),
                       if (_bookmarks.length > 2)
+                        if (_bookmarks.length > 2) const SizedBox(height: 5),
+                      if (_bookmarks.length > 2)
                         const Divider(
                           color: AppColors.grey, // You can adjust the color
                           thickness:
                               1, // Adjust thickness for a more prominent line
                         ),
                       if (_bookmarks.length > 2)
-                        Center(
-                          child: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _showAllBookmarks = !_showAllBookmarks;
-                              });
-                            },
-                            child: Text(
-                              _showAllBookmarks ? '접기' : '더보기',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppColors.greytext,
+                        if (_bookmarks.length > 2)
+                          Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _showAllBookmarks = !_showAllBookmarks;
+                                });
+                              },
+                              child: Text(
+                                _showAllBookmarks ? '접기' : '더보기',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppColors.greytext,
+                                ),
                               ),
                             ),
                           ),
-                        ),
                     ],
                   ),
                 ),
@@ -560,7 +631,8 @@ class _HomePageContentState extends State<HomePageContent> {
                               // 텍스트를 Flexible로 감싸서 공간 확보
                               Flexible(
                                 child: Text(
-                                  '${formatDestinationName(routeRecords?['endName'])}',
+                                  formatDestinationName(
+                                      routeRecords?['endName']),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -573,6 +645,8 @@ class _HomePageContentState extends State<HomePageContent> {
                               ElevatedButton(
                                 onPressed: () {
                                   print('routeRecords');
+                                  print(formatDestinationName(
+                                      routeRecords?['endName']));
                                   print(formatDestinationName(
                                       routeRecords?['endName']));
                                   print(routeRecords?['endLatitude']);
@@ -613,9 +687,9 @@ class _HomePageContentState extends State<HomePageContent> {
                             ],
                           ),
                         )
-                      : Column(
-                          children: const [
-                            SizedBox(height: 12), // 여백 추가
+                      : const Column(
+                          children: [
+                            SizedBox(height: 10), // 여백 추가
                             Text(
                               '최근 목적지가 없습니다.',
                               style: TextStyle(
@@ -630,7 +704,18 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
 
             const SizedBox(height: 16),
-            const CardBoxHome(title: '주변 장소'),
+            // 주변 장소 출력
+            if (isLoadingPlaces)
+              const Center(child: CircularProgressIndicator())
+            else if (nearbyPlaces.isNotEmpty)
+              CardBoxPlace(
+                places: nearbyPlaces,
+                selectedCategory: '전체',
+              )
+            else
+              const Center(child: Text('주변 장소를 찾을 수 없습니다.')),
+
+            const SizedBox(height: 16),
             const SizedBox(height: 16),
             // const Row(
             //   mainAxisAlignment: MainAxisAlignment.end,
