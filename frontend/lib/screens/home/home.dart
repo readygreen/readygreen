@@ -10,9 +10,11 @@ import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/modals/weather_modal.dart';
 import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
-import 'package:readygreen/widgets/place/cardbox_home.dart';
+// import 'package:readygreen/widgets/place/cardbox_home.dart';
 import 'package:readygreen/widgets/place/cardbox_place.dart'; // CardBoxPlace 임포트
 import 'package:readygreen/api/place_api.dart'; // Place API 임포트
+import 'package:readygreen/provider/current_location.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -157,6 +159,11 @@ class _HomePageContentState extends State<HomePageContent> {
     // 위치 정보를 스토리지에 저장
     await storage.write(key: 'latitude', value: location.latitude.toString());
     await storage.write(key: 'longitude', value: location.longitude.toString());
+
+    // 위치 정보를 Provider에 저장 (Provider의 updateLocation 호출)
+    await Provider.of<CurrentLocationProvider>(context, listen: false)
+        .updateLocation();
+
     print('위치 저장 완료: ${location.latitude}, ${location.longitude}');
   }
 
@@ -261,9 +268,9 @@ class _HomePageContentState extends State<HomePageContent> {
     // Check if "대전광역시" is present in the string
     if (destinationName.contains('대전광역시')) {
       // Find the position of "대전광역시" and return the substring starting after it
-      int index = destinationName.indexOf('대전광역시');
+      int index = destinationName.indexOf('대한민국 대전광역시');
       destinationName =
-          destinationName.substring(index + '대전광역시'.length).trim();
+          destinationName.substring(index + '대한민국 대전광역시'.length).trim();
     }
 
     // Trim long text to a maximum of 20 characters (example) and add "..." at the end
@@ -445,6 +452,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                         : _bookmarks.length),
                                 (index) {
                                   final bookmark = _bookmarks[index];
+
                                   String bookmarkType = '';
 
                                   // 북마크의 종류에 따라 텍스트 설정
@@ -607,7 +615,8 @@ class _HomePageContentState extends State<HomePageContent> {
                               // 텍스트를 Flexible로 감싸서 공간 확보
                               Flexible(
                                 child: Text(
-                                  '${routeRecords?['endName']}',
+                                  formatDestinationName(
+                                      routeRecords?['endName']),
                                   style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -620,7 +629,8 @@ class _HomePageContentState extends State<HomePageContent> {
                               ElevatedButton(
                                 onPressed: () {
                                   print('routeRecords');
-                                  print(routeRecords?['endName']);
+                                  print(formatDestinationName(
+                                      routeRecords?['endName']));
                                   print(routeRecords?['endLatitude']);
                                   print(routeRecords?['endLongitude']);
                                   Navigator.push(
@@ -629,7 +639,8 @@ class _HomePageContentState extends State<HomePageContent> {
                                       builder: (context) => MapDirectionPage(
                                         endLat: routeRecords?['endLatitude'],
                                         endLng: routeRecords?['endLongitude'],
-                                        endPlaceName: routeRecords?['endName'],
+                                        endPlaceName: formatDestinationName(
+                                            routeRecords?['endName']),
                                       ),
                                     ),
                                   );
@@ -660,7 +671,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         )
                       : const Column(
                           children: [
-                            SizedBox(height: 12), // 여백 추가
+                            SizedBox(height: 10), // 여백 추가
                             Text(
                               '최근 목적지가 없습니다.',
                               style: TextStyle(
