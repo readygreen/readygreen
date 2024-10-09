@@ -103,27 +103,27 @@ public class ReportService {
         LocalTime middleTime = reportBlinkerRequestDTO.getMiddleTime();
         LocalTime endTime = reportBlinkerRequestDTO.getEndTime();
 
-        // startTime과 middleTime의 차이를 초 단위로 계산
-        long startToMiddleInSeconds = Duration.between(startTime, middleTime).getSeconds();
+        // startTime과 middleTime의 차이를 초 단위로 계산 (녹색 신호 시간)
+        long greenDurationInSeconds = Duration.between(startTime, middleTime).getSeconds();
 
-        // middleTime과 endTime의 차이를 초 단위로 계산
-        long middleToEndInSeconds = Duration.between(middleTime, endTime).getSeconds();
+        // middleTime과 endTime의 차이를 초 단위로 계산 (적색 신호 시간)
+        long redDurationInSeconds = Duration.between(middleTime, endTime).getSeconds();
 
+        long totalCycleInSeconds = greenDurationInSeconds + redDurationInSeconds;
+        LocalTime midnight = LocalTime.of(0, 0, 0); // 00:00:00 생성
+        long remainTime = Duration.between(midnight,startTime).getSeconds();
+        remainTime = remainTime %totalCycleInSeconds;
+        startTime = midnight.plusSeconds(remainTime);
         // 데이터베이스 업데이트 로직 예시
         // 예시로 신호등 정보가 Blinker라는 엔티티에 저장된다고 가정하고, 해당 값을 업데이트
         Blinker blinker1 = blinkerRepository.findById(reportBlinkerRequestDTO.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 신호등이 존재하지 않습니다."));
-//        Blinker blinker2 = blinkerRepository.findById(reportBlinkerRequestDTO.getId2())
-//                .orElseThrow(() -> new IllegalArgumentException("해당 신호등이 존재하지 않습니다."));
         // 새로운 기간을 업데이트
         blinker1.setStartTime(startTime);
-        blinker1.setGreenDuration((int) startToMiddleInSeconds); // 초 단위로 업데이트
-        blinker1.setRedDuration((int) middleToEndInSeconds);
-//        blinker2.setGreenDuration((int) startToMiddleInSeconds); // 초 단위로 업데이트
-//        blinker2.setRedDuration((int) middleToEndInSeconds);  // 초 단위로 업데이트
+        blinker1.setGreenDuration((int) greenDurationInSeconds); // 초 단위로 업데이트
+        blinker1.setRedDuration((int) redDurationInSeconds);
         // 변경된 값 저장
         blinkerRepository.save(blinker1);
-//        blinkerRepository.save(blinker2);
     }
 
 
