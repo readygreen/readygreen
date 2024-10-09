@@ -70,10 +70,9 @@ data class Properties(
     val pointType: String // 포인트 타입 (예: SP, GP 등)
 )
 
-// 신호등 정보 클래스
 data class BlinkerDTO(
     val id: Int, // 신호등 ID
-    val lastAccessTime: String, // 마지막 갱신 시간 (Time 객체로 변경)
+    val startTime: String, // 시작 시간
     val greenDuration: Int, // 초록불 지속 시간 (초)
     val redDuration: Int, // 빨간불 지속 시간 (초)
     val currentState: String, // 현재 신호 상태 ("GREEN" 또는 "RED")
@@ -82,6 +81,7 @@ data class BlinkerDTO(
     val longitude: Double, // 신호등의 경도
     val index: Int // 인덱스
 )
+
 
 // 신호등 시간 데이터 클래스
 data class Time(

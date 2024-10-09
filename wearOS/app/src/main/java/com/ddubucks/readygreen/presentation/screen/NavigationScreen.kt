@@ -96,8 +96,7 @@ fun NavigationScreen(
 @Composable
 fun NavigationInfo(navigationState: NavigationState) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
@@ -106,13 +105,14 @@ fun NavigationInfo(navigationState: NavigationState) {
             color = White
         )
         Spacer(modifier = Modifier.height(10.dp))
+
         Icon(
             painter = painterResource(id = when (navigationState.nextDirection) {
-                11 -> R.drawable.arrow_straight                // 직진
-                12, 16, 17 -> R.drawable.arrow_left            // 좌회전 및 관련 좌회전
-                13, 18, 19 -> R.drawable.arrow_right           // 우회전 및 관련 우회전
-                14 -> R.drawable.arrow_back                    // 유턴
-                else -> R.drawable.arrow_straight              // 나머지 값은 안내 없음 처리
+                11 -> R.drawable.arrow_straight
+                12, 16, 17 -> R.drawable.arrow_left
+                13, 18, 19 -> R.drawable.arrow_right
+                14 -> R.drawable.arrow_back
+                else -> R.drawable.arrow_straight
             }),
             contentDescription = "방향",
             tint = Color.Unspecified,
@@ -131,6 +131,26 @@ fun NavigationInfo(navigationState: NavigationState) {
 
         Text(
             text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) + " 미터" } ?: "정보 없음"}",
+            style = pStyle,
+            color = White
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // 신호등 정보 표시
+        navigationState.currentBlinkerInfo?.let { blinker ->
+            val remainingTimeColor = when (blinker.currentState) {
+                "RED" -> Red
+                "GREEN" -> Green
+                else -> Gray
+            }
+            Text(
+                text = "남은 시간: ${blinker.remainingTime} 초",
+                style = secStyle,
+                color = remainingTimeColor // 상태에 따라 색상 변경
+            )
+        } ?: Text(
+            text = "신호등 없음",
             style = pStyle,
             color = White
         )

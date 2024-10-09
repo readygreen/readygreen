@@ -35,6 +35,7 @@ class NavigationViewModel : ViewModel() {
     private var currentLocation: Location? = null
     private var currentIndex = 0 // 현재 안내 중인 경로 포인트 인덱스
     private var pointIndexList: List<Int> = emptyList() // Type이 Point인 인덱스 리스트
+    private var blinkerInfoMap = mutableMapOf<Int, BlinkerDTO>()
 
     // 네비게이션 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
@@ -90,10 +91,10 @@ class NavigationViewModel : ViewModel() {
     }
 
 
-    // 길안내 시작 후 응답 처리
     private fun handleNavigationResponse(response: Response<NavigationResponse>) {
         response.body()?.let { navigationResponse ->
             route = navigationResponse.routeDTO.features // 경로 정보
+            blinkers = navigationResponse.blinkerDTOs // 신호등 정보
 
             // Type이 Point인 포인트 인덱스를 수집
             pointIndexList = route?.mapIndexedNotNull { index, feature ->
@@ -102,6 +103,9 @@ class NavigationViewModel : ViewModel() {
 
             // 첫 번째 포인트 설명 업데이트
             updateCurrentDescription()
+
+            // 신호등 정보 업데이트
+            updateBlinkerInfo()
 
             // 위치 업데이트 빈도 설정
             locationService?.adjustLocationRequest(
@@ -122,6 +126,23 @@ class NavigationViewModel : ViewModel() {
         }
     }
 
+    // 신호등 정보를 업데이트하는 함수
+    private fun updateBlinkerInfo() {
+        blinkers?.forEach { blinker ->
+            // route의 properties와 blinker의 index를 비교
+            route?.forEach { feature ->
+                if (feature.properties.index == blinker.index) {
+                    Log.d("BlinkerInfo", "신호등 ID: ${blinker.id}, 남은 시간: ${blinker.remainingTime}, 시작 시간: ${blinker.startTime}, 빨간불 지속 시간: ${blinker.redDuration}, 초록불 지속 시간: ${blinker.greenDuration}")
+
+                    // 여기에 UI 업데이트 로직 추가 (예: LiveData로 UI에 전달)
+                    _navigationState.value = _navigationState.value.copy(currentBlinkerInfo = blinker)
+                }
+            }
+        }
+    }
+
+
+
     private fun updateNavigation(currentLocation: Location) {
         this.currentLocation = currentLocation // 위치 업데이트 시 저장
 
@@ -130,22 +151,29 @@ class NavigationViewModel : ViewModel() {
 
         // 다음 안내 중인 포인트가 있는지 확인
         if (currentIndex + 1 < pointIndexList.size) {
-            val nextFeature = route?.get(pointIndexList[currentIndex + 1]) // 다음 Point 타입의 Feature 가져오기
+            val nextFeature =
+                route?.get(pointIndexList[currentIndex + 1]) // 다음 Point 타입의 Feature 가져오기
             nextFeature?.let { feature ->
                 val coordinates = feature.geometry.getCoordinatesAsDoubleArray()
                 coordinates?.let {
                     val distance = calculateDistance(currentLat, currentLng, it[1], it[0])
 
-                    // 현재 위치가 다음 포인트 반경 10미터 이내인지 확인
+                    // 현재 위치가 다음 포인트 반경 15미터 이내인지 확인
                     if (distance < 15.0) {
                         // 포인트의 description 확인
                         if (feature.properties.description == "도착") {
                             Log.d("NavigationViewModel", "목적지에 도착했습니다!")
                             finishNavigation() // 길안내 종료
                         } else {
-                            Log.d("NavigationViewModel", "다음 지점으로 이동: ${feature.properties.description}")
+                            Log.d(
+                                "NavigationViewModel",
+                                "다음 지점으로 이동: ${feature.properties.description}"
+                            )
                             currentIndex++ // 다음 포인트로 이동
                             updateCurrentDescription() // 다음 포인트의 설명 업데이트
+
+                            // 신호등 정보 업데이트
+                            updateBlinkerInfo()
                         }
                     }
                 }
