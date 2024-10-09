@@ -149,4 +149,11 @@ public class SwaggerConfig {
                 .pathsToMatch("/question/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi placeApi() {
+        return GroupedOpenApi.builder()
+                .group("장소 추천")
+                .pathsToMatch("/place/**")
+                .build();
+    }
 }

@@ -24,28 +24,55 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot Starter Dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Logback (기본 로깅)
+    implementation 'ch.qos.logback:logback-classic:1.5.7'
+
+    // JSON Parsing 및 Validation
     implementation 'org.json:json:20230227'
+
+    // OpenAPI Documentation
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+
+    // OAuth2 and JWT
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'io.jsonwebtoken:jjwt:0.12.5'
+
+    // Location 관련 처리
     implementation 'org.locationtech.jts:jts-core:1.19.0'
-    implementation 'io.github.flashvayne:chatgpt-spring-boot-starter:1.0.4'
     implementation 'org.hibernate:hibernate-spatial:6.5.2.Final'
+
+    // Firebase Admin SDK
     implementation 'com.google.firebase:firebase-admin:9.1.1'
+    implementation 'io.github.flashvayne:chatgpt-spring-boot-starter:1.0.4'
+
+    // Redis, MongoDB 관련 Dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
+    // Apache Spark
+    implementation 'org.apache.spark:spark-core_2.12:3.4.0'
+    implementation 'org.apache.spark:spark-sql_2.12:3.4.0'
+
+    // Mongo-Spark Connector
+    implementation 'org.mongodb.spark:mongo-spark-connector_2.12:10.3.0'
+
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Development Tools
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Database Runtime Dependencies
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
-    annotationProcessor 'org.projectlombok:lombok'
+    // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
