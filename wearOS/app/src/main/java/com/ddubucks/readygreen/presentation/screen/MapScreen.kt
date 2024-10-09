@@ -2,31 +2,88 @@ package com.ddubucks.readygreen.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.wear.compose.material.Text
+import androidx.compose.ui.platform.LocalContext
+import com.ddubucks.readygreen.core.service.LocationService
+import com.ddubucks.readygreen.presentation.components.createTrafficlightBitmap
 import com.ddubucks.readygreen.presentation.theme.Black
-import h3Style
-
+import com.ddubucks.readygreen.presentation.viewmodel.MapViewModel
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun MapScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "지도",
-            color = Color.Yellow,
-            style = h3Style,
-            modifier = Modifier.padding(bottom = 10.dp, top = 16.dp)
-        )
+fun MapScreen(
+    locationService: LocationService,
+    mapViewModel: MapViewModel
+) {
+    var latitude by remember { mutableStateOf<Double?>(null) }
+    var longitude by remember { mutableStateOf<Double?>(null) }
+    val context = LocalContext.current
+    val mapData by mapViewModel.mapData.collectAsState()
 
+    LaunchedEffect(Unit) {
+        locationService.getLastLocation { location ->
+            latitude = location?.latitude
+            longitude = location?.longitude
+        }
+    }
+
+    LaunchedEffect(latitude, longitude) {
+        if (latitude != null && longitude != null) {
+            mapViewModel.getMap(context, latitude!!, longitude!!)
+            mapViewModel.startCountdown()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mapViewModel.stopCountdown()
+        }
+    }
+
+    if (latitude == null || longitude == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+    } else {
+        val locationState = LatLng(latitude!!, longitude!!)
+        val cameraPositionState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(locationState, 16f)
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Black),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(myLocationButtonEnabled = true)
+            ) {
+                mapData?.blinkerDTOs?.forEach { blinkerDTO ->
+                    Marker(
+                        state = MarkerState(position = LatLng(blinkerDTO.latitude, blinkerDTO.longitude)),
+                        title = blinkerDTO.currentState,
+                        snippet = "남은 시간: ${blinkerDTO.remainingTime}",
+                        icon = BitmapDescriptorFactory.fromBitmap(createTrafficlightBitmap(blinkerDTO))
+                    )
+                }
+            }
+        }
     }
 }

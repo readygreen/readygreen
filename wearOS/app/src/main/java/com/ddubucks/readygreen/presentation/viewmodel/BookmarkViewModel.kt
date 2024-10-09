@@ -3,30 +3,39 @@ package com.ddubucks.readygreen.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ddubucks.readygreen.data.model.BookmarkModel
-import com.ddubucks.readygreen.data.repository.BookmarkRepository
+import com.ddubucks.readygreen.presentation.retrofit.RestClient
+import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkApi
+import com.ddubucks.readygreen.presentation.retrofit.bookmark.BookmarkResponse
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import retrofit2.awaitResponse
 
 class BookmarkViewModel : ViewModel() {
 
-    private val repository = BookmarkRepository()
+    private val _bookmark = MutableStateFlow<List<BookmarkResponse>>(emptyList())
+    val bookmark: StateFlow<List<BookmarkResponse>> = _bookmark
 
-    private val _bookMark = MutableStateFlow<List<BookmarkModel>>(emptyList())
-    val bookmark: StateFlow<List<BookmarkModel>> get() = _bookMark
+    fun getBookmarks() {
+        val bookmarkApi = RestClient.createService(BookmarkApi::class.java)
 
-    init {
-        fetchBookmark()  // ViewModel 초기화 시점에 데이터 로드
-    }
-
-    private fun fetchBookmark() {
         viewModelScope.launch {
             try {
-                val locations = repository.getBookmark()
-                _bookMark.value = locations
+                val response = withContext(Dispatchers.IO) {
+                    bookmarkApi.getBookmarks().awaitResponse()
+                }
+
+                if (response.isSuccessful) {
+                    _bookmark.value = response.body()?.bookmarkDTOs ?: emptyList()
+                } else {
+                    Log.e("BookmarkViewModel", "북마크 요청 실패: ${response.code()} - ${response.message()}")
+                    _bookmark.value = emptyList()
+                }
             } catch (e: Exception) {
-                Log.e("BookmarkViewModel", "Failed to fetch bookmarks", e)
+                Log.e("BookmarkViewModel", "북마크 요청 중 오류 발생: ${e.localizedMessage}", e)
+                _bookmark.value = emptyList()
             }
         }
     }
