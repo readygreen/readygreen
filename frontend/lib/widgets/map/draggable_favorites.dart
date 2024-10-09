@@ -55,8 +55,8 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.04,
-      minChildSize: 0.04, // 최소 높이
+      initialChildSize: 0.055,
+      minChildSize: 0.055, // 최소 높이
       maxChildSize: 0.80, // 최대 높이
       builder: (BuildContext context, ScrollController scrollController) {
         return Container(

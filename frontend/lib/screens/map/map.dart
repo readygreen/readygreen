@@ -259,7 +259,6 @@ class _MapPageState extends State<MapPage> {
             child: LocationButton(
               onTap: () async {
                 print('위치 버튼 클릭됨');
-
                 // 위치 업데이트
                 await locationProvider.updateLocation();
 

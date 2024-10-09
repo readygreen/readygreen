@@ -137,6 +137,7 @@ flutter:
   assets:
     - assets/lottie/  # lottie 폴더 내 모든 파일 포함
     - assets/images/
+    - assets/icon/
 
   fonts:
     - family: CustomFont
