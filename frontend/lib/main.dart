@@ -202,39 +202,39 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icon/nothome.png', // 선택되지 않았을 때 이미지
-              width: 20,
-              height: 20,
+              width: 21,
+              height: 21,
             ),
             activeIcon: Image.asset(
               'assets/icon/home.png', // 선택되었을 때 이미지
-              width: 20,
-              height: 20,
+              width: 21,
+              height: 21,
             ),
             label: '홈',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icon/notpoint.png', // 선택되지 않았을 때 이미지
-              width: 22,
-              height: 22,
+              width: 23,
+              height: 23,
             ),
             activeIcon: Image.asset(
               'assets/icon/point.png', // 선택되었을 때 이미지
-              width: 22,
-              height: 22,
+              width: 23,
+              height: 23,
             ),
             label: '포인트',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icon/notmap.png', // 선택되지 않았을 때 이미지
-              width: 22,
-              height: 22,
+              width: 21,
+              height: 21,
             ),
             activeIcon: Image.asset(
               'assets/icon/map.png', // 선택되었을 때 이미지
-              width: 22,
-              height: 22,
+              width: 21,
+              height: 21,
             ),
             label: '지도',
           ),
@@ -254,13 +254,13 @@ class _MainPageState extends State<MainPage> {
           BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icon/notprofile.png', // 선택되지 않았을 때 이미지
-              width: 24,
-              height: 24,
+              width: 23,
+              height: 23,
             ),
             activeIcon: Image.asset(
               'assets/icon/profile.png', // 선택되었을 때 이미지
-              width: 24,
-              height: 24,
+              width: 23,
+              height: 23,
             ),
             label: '프로필',
           ),
