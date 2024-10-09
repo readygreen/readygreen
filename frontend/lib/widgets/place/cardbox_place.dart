@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert'; // JSON 파싱을 위한 패키지
+import 'dart:convert';
+import 'dart:math'; // Random을 사용하기 위해 추가
 
 class CardBoxPlace extends StatefulWidget {
-  final List<Map<String, String>> places; // 장소 리스트
+  final List<Map<String, String>> places;
+  final String selectedCategory;
 
   const CardBoxPlace({
     super.key,
-    required this.places, // 필수 입력값으로 변경
+    required this.places,
+    required this.selectedCategory,
   });
 
   @override
@@ -16,29 +19,70 @@ class CardBoxPlace extends StatefulWidget {
 }
 
 class _CardBoxPlaceState extends State<CardBoxPlace> {
-  // Unsplash API로 카테고리별 랜덤 이미지 URL 생성 함수
+  final Map<int, String> imageCache = {};
+
+  // 한글 카테고리를 영어로 매핑하는 Map
+  final Map<String, String> categoryMapping = {
+    '전체': 'all',
+    '맛집': 'restaurant',
+    '카페': 'cafe',
+    '편의점': 'supermarket',
+    '은행': 'bank',
+    '병원': 'hospital',
+    '약국': 'pharmacy',
+    '영화관': 'cinema',
+    '놀거리': 'entertainment',
+    '헬스장': 'gym',
+    '공원': 'park',
+  };
+
+  Future<void> loadImages() async {
+    String category =
+        categoryMapping[widget.selectedCategory] ?? 'all'; // 한글 카테고리를 영어로 변환
+
+    for (var i = 0; i < widget.places.length; i++) {
+      String imageUrl = await fetchImageUrl(category, i); // 영어로 변환된 카테고리 사용
+
+      // setState() 호출 전에 mounted 상태 확인
+      if (mounted) {
+        setState(() {
+          imageCache[i] = imageUrl;
+        });
+      }
+    }
+  }
+
   Future<String> fetchImageUrl(String category, int index) async {
-    final String accessKey =
-        'Tb5m_5NwxbsmqkmYjx5_8sPmhHnXxMhfUTPN3JsH_gQ'; // Unsplash API access key
-    // 요청에 index를 추가하여 각 장소마다 고유한 이미지 요청
+    // print('category $category');
+    final String accessKey = 'Tb5m_5NwxbsmqkmYjx5_8sPmhHnXxMhfUTPN3JsH_gQ';
     final String url =
         'https://api.unsplash.com/search/photos?query=$category&client_id=$accessKey&page=${index + 1}';
 
-    final response = await http.get(Uri.parse(url));
+    // print('url $url');
 
+    final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data['results'].isNotEmpty) {
-        return data['results'][0]['urls']['small']; // 첫 번째 이미지의 URL 반환
+        // 랜덤 인덱스를 선택하기 위해 Random 클래스 사용
+        final randomIndex = Random().nextInt(data['results'].length);
+        return data['results'][randomIndex]['urls']['small'];
       }
     }
-    return 'https://via.placeholder.com/150'; // 기본 이미지 URL 반환
+    return 'https://picsum.photos/150/150';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    loadImages();
   }
 
   @override
   Widget build(BuildContext context) {
     final deviceWidth = MediaQuery.of(context).size.width;
     final deviceHeight = MediaQuery.of(context).size.height;
+
     return SingleChildScrollView(
       child: Container(
         width: deviceWidth,
@@ -56,105 +100,83 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
             horizontal: 18,
           ),
           child: Column(
-            children: widget.places.map((place) {
-              final index = widget.places.indexOf(place);
-              final String category = place['category']!;
+            children: widget.places.asMap().entries.map((entry) {
+              final int index = entry.key;
+              final Map<String, String> place = entry.value;
+              final String imageUrl =
+                  imageCache[index] ?? 'https://via.placeholder.com/150';
 
-              return FutureBuilder<String>(
-                future: fetchImageUrl(category, index), // 이미지 URL 비동기 호출
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator(); // 로딩 상태
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    final String imageUrl = snapshot.data ??
-                        'https://via.placeholder.com/150'; // 이미지 URL
-
-                    return Column(
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 카드 내용
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Row(
+                        Container(
+                          width: 100,
+                          height: 100,
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // 왼쪽 이미지 부분
-                              Container(
-                                width: 100,
-                                height: 100,
-                                child: Image.network(
-                                  imageUrl, // Unsplash 이미지 URL 적용
-                                  fit: BoxFit.cover,
+                              Text(
+                                place['name'] ?? '이름 없음',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              // 오른쪽 텍스트 설명 부분
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      place['name']!,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              const SizedBox(height: 5),
+                              Text(
+                                place['address'] ?? '주소 정보 없음',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              ElevatedButton(
+                                onPressed: () {
+                                  // 지도 보기 버튼 클릭 동작
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.white,
+                                  foregroundColor: Colors.grey,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 15, vertical: 5),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    side: BorderSide(
+                                      color: AppColors.grey,
+                                      width: 1.0,
                                     ),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                      place['description']!,
-                                      style: const TextStyle(fontSize: 14),
-                                    ),
-                                    const SizedBox(height: 5),
-                                    // 지도보기 버튼을 아래에 배치
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        // 지도 보기 버튼 클릭 동작
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            AppColors.white, // 버튼 배경색
-                                        foregroundColor:
-                                            Colors.grey, // 버튼 텍스트 색상
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 15, vertical: 5), // 패딩
-                                        elevation: 0,
-                                        shape: RoundedRectangleBorder(
-                                          // 모서리 둥글게
-                                          borderRadius: BorderRadius.circular(
-                                              30), // 모서리 둥근 정도
-                                          side: BorderSide(
-                                            color: AppColors.grey, // 테두리 색상
-                                            width: 1.0, // 테두리 두께
-                                          ),
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        '지도보기',
-                                        style: TextStyle(
-                                          fontSize: 13, // 텍스트 크기
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
+                                ),
+                                child: const Text(
+                                  '지도보기',
+                                  style: TextStyle(fontSize: 13),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        // 구분선: 마지막 아이템이 아니면 구분선 추가
-                        if (index != widget.places.length - 1)
-                          const Divider(
-                            color: AppColors.grey, // 구분 선 색상
-                            thickness: 1, // 구분 선 두께
-                            indent: 0, // 왼쪽 여백
-                            endIndent: 0, // 오른쪽 여백
-                          ),
                       ],
-                    );
-                  }
-                },
+                    ),
+                  ),
+                  if (index != widget.places.length - 1)
+                    const Divider(
+                      color: AppColors.grey,
+                      thickness: 1,
+                    ),
+                ],
               );
             }).toList(),
           ),
