@@ -54,6 +54,7 @@ class TrafficLightService {
 
   // 신호등 정보를 받아와 마커로 지도에 표시하는 함수
   Future<void> addTrafficLightsToMap({
+    required BuildContext context,
     required double latitude,
     required double longitude,
     required Set<Marker> markers,
@@ -92,10 +93,15 @@ class TrafficLightService {
           markerId: MarkerId(trafficLight['id'].toString()),
           position: LatLng(lat, lng),
           icon: customMarker, // 커스텀 마커 사용
-          infoWindow: InfoWindow(
-            title: '신호등 상태: $currentState',
-            snippet: '남은 시간: $remainingTime초',
-          ),
+          // infoWindow: InfoWindow(
+          //   title: '신호등 상태: $currentState',
+          //   snippet: '남은 시간: $remainingTime초',
+          // ),
+          onTap: () {
+            // 마커 클릭 시 모달 띄우기
+            print("마커 클릭해서 뜸");
+            _showTrafficLightModal(context, trafficLight['id']);
+          },
         );
 
         // 마커 업데이트 세트에 추가
@@ -117,7 +123,7 @@ class TrafficLightService {
 
       // 전역 타이머가 실행 중이지 않다면 타이머 시작
       if (_globalTimer == null || !_globalTimer!.isActive) {
-        _startGlobalTimer(onMarkersUpdated);
+        _startGlobalTimer(context, onMarkersUpdated);
       }
     } else {
       print('신호등 정보를 가져오지 못했습니다.');
@@ -125,7 +131,7 @@ class TrafficLightService {
   }
 
   // 모든 신호등을 관리하는 전역 타이머 시작
-  void _startGlobalTimer(Function(Set<Marker>) onMarkersUpdated) {
+  void _startGlobalTimer(BuildContext context,Function(Set<Marker>) onMarkersUpdated) {
     print("타이머 시작");
     _globalTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       Set<Marker> updatedMarkers = {};
@@ -165,10 +171,16 @@ class TrafficLightService {
           markerId: MarkerId(trafficLightId),
           position: LatLng(lat, lng),
           icon: customMarker,
-          infoWindow: InfoWindow(
-            title: '신호등 상태: $currentState',
-            snippet: '남은 시간: $remainingTime초',
-          ),
+          // infoWindow: InfoWindow(
+          //   title: '신호등 상태: $currentState',
+          //   snippet: '남은 시간: $remainingTime초11',
+          // ),
+          onTap: () {
+            // 마커 클릭 시 모달 띄우기
+            print("마커 클릭해서 창 뜸");
+            print(trafficLightId);
+            _showTrafficLightModal(context, trafficLightId);
+          },
         );
 
         // 업데이트된 마커 저장
@@ -232,7 +244,7 @@ class TrafficLightService {
           icon: customMarker, // 커스텀 마커 사용
           infoWindow: InfoWindow(
             title: '신호등 상태: $currentState',
-            snippet: '남은 시간: $remainingTime초',
+            snippet: '남은 시간: $remainingTime초22',
           ),
         );
 
@@ -272,5 +284,185 @@ class TrafficLightService {
     },
   );
 }
+// 모달을 띄우는 함수
+  void _showTrafficLightModal(BuildContext context, String trafficLightId) {
+    final TextEditingController blueTimeController = TextEditingController();
+    final TextEditingController redTimeController = TextEditingController();
+    final TextEditingController secondBlueTimeController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '신호등 ID: $trafficLightId',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '파란불 시각을 입력하세요 (hhmmss)',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  TextField(
+                    controller: blueTimeController,
+                    decoration: const InputDecoration(
+                      labelText: '파란불 시각',
+                      hintText: 'hhmmss',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.datetime,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '빨간불 시각을 입력하세요 (hhmmss)',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  TextField(
+                    controller: redTimeController,
+                    decoration: const InputDecoration(
+                      labelText: '빨간불 시각',
+                      hintText: 'hhmmss',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.datetime,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '두번째 파란불 시각을 입력하세요 (hhmmss)',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  TextField(
+                    controller: secondBlueTimeController,
+                    decoration: const InputDecoration(
+                      labelText: '두번째 파란불 시각',
+                      hintText: 'hhmmss',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.datetime,
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.green,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () async {
+                          // 입력된 값 가져오기
+                          String blueTime = blueTimeController.text;
+                          String redTime = redTimeController.text;
+                          String secondBlueTime = secondBlueTimeController.text;
+
+                          // 입력값을 사용하여 API 호출
+                          bool success = await api.updateBlinkerWithTimes(
+                            id: trafficLightId,
+                            startTime: blueTime,
+                            middleTime: redTime,
+                            endTime: secondBlueTime,
+                          );
+
+                          // 제보 성공 시 성공 모달 띄우기
+                          if (success) {
+                            Navigator.pop(context);
+                            _showSuccessModal(context);
+                          }else{
+                            Navigator.pop(context);
+                          }
+
+                          // 모달 닫기
+                        },
+                        child: const Text('제보하기', style: TextStyle(fontSize: 16, color: Colors.white)),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[400],
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context); // 모달 닫기
+                        },
+                        child: const Text('닫기', style: TextStyle(fontSize: 16, color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // 성공 모달을 보여주는 함수
+  void _showSuccessModal(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.check_circle_outline, color: Colors.green, size: 80),
+                const SizedBox(height: 20),
+                const Text(
+                  '성공!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  '포인트 300점을 얻었습니다!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 30),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.green,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context); // 성공 모달 닫기
+                  },
+                  child: const Text('확인', style: TextStyle(fontSize: 16, color: Colors.white)),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
 }
