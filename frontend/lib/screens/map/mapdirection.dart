@@ -13,6 +13,7 @@ import 'package:readygreen/api/map_api.dart';
 import 'package:provider/provider.dart';
 import 'package:readygreen/provider/current_location.dart';
 import 'package:readygreen/widgets/map/trafficlight.dart';
+import 'package:readygreen/widgets/map/cautionmodal.dart';
 
 class MapDirectionPage extends StatefulWidget {
   final double? endLat; // 도착지 위도
@@ -271,11 +272,27 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
         Provider.of<CurrentLocationProvider>(context, listen: false)
             .updateLocation();
         _fetchRouteData(); // 페이지가 로드될 때 API 호출
+        _showCautionModal();
       });
     } else {
       print("도착지 정보가 없습니다. 다른 API 요청 실행.");
       _fetchDefaultRouteData();
     }
+  }
+
+// 경고 모달을 띄우는 함수
+  void _showCautionModal() {
+    Future.delayed(Duration.zero, () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const CautionModal(
+            cautionMessage: '실제 교통 정보와 다를 수 있으니 \n보행시 주의하세요.',
+            cautionImage: 'assets/images/caution.png', // 경고 이미지 경로
+          );
+        },
+      );
+    });
   }
 
   // 경로 요청을 위한 함수

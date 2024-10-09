@@ -368,6 +368,7 @@ class TrafficLightService {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
+          backgroundColor: Colors.white,
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
