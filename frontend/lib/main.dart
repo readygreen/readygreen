@@ -198,71 +198,26 @@ class _MainPageState extends State<MainPage> {
         selectedLabelStyle: const TextStyle(fontSize: 12),
         unselectedLabelStyle: const TextStyle(fontSize: 12),
         // elevation: 0,
-        items: <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/nothome.png', // 선택되지 않았을 때 이미지
-              width: 21,
-              height: 21,
-            ),
-            activeIcon: Image.asset(
-              'assets/icon/home.png', // 선택되었을 때 이미지
-              width: 21,
-              height: 21,
-            ),
+            icon: Icon(Icons.home),
             label: '홈',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/notpoint.png', // 선택되지 않았을 때 이미지
-              width: 23,
-              height: 23,
-            ),
-            activeIcon: Image.asset(
-              'assets/icon/point.png', // 선택되었을 때 이미지
-              width: 23,
-              height: 23,
-            ),
+            icon: Icon(Icons.attach_money),
             label: '포인트',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/notmap.png', // 선택되지 않았을 때 이미지
-              width: 21,
-              height: 21,
-            ),
-            activeIcon: Image.asset(
-              'assets/icon/map.png', // 선택되었을 때 이미지
-              width: 21,
-              height: 21,
-            ),
+            icon: Icon(Icons.map),
             label: '지도',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/notlocation.png', // 선택되지 않았을 때 이미지
-              width: 23,
-              height: 23,
-            ),
-            activeIcon: Image.asset(
-              'assets/icon/location.png', // 선택되었을 때 이미지
-              width: 23,
-              height: 23,
-            ),
-            label: '주변',
+            icon: Icon(Icons.place),
+            label: '추천',
           ),
           BottomNavigationBarItem(
-            icon: Image.asset(
-              'assets/icon/notprofile.png', // 선택되지 않았을 때 이미지
-              width: 23,
-              height: 23,
-            ),
-            activeIcon: Image.asset(
-              'assets/icon/profile.png', // 선택되었을 때 이미지
-              width: 23,
-              height: 23,
-            ),
-            label: '프로필',
+            icon: Icon(Icons.person),
+            label: '내정보',
           ),
         ],
       ),
