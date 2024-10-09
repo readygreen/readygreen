@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:readygreen/constants/appcolors.dart'; // AppColors 사용을 위해 import
+import 'package:readygreen/constants/appcolors.dart';
 
-class RouteFinishModal extends StatelessWidget {
-  final VoidCallback onConfirm;
+class CautionModal extends StatelessWidget {
+  final String cautionMessage; // 경고 메시지
+  final String cautionImage; // 경고 이미지 경로
 
-  const RouteFinishModal({
+  const CautionModal({
     super.key,
-    required this.onConfirm,
+    required this.cautionMessage,
+    required this.cautionImage,
   });
 
   @override
@@ -25,17 +27,23 @@ class RouteFinishModal extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  '길안내 종료',
+                  '주의!',
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       fontFamily: "LogoFont"),
                 ),
-                const SizedBox(height: 20),
-                const Text(
-                  '목적지에 도착하여 길안내를 종료합니다.',
+                const SizedBox(height: 5),
+                Image.asset(
+                  cautionImage, // 전달받은 이미지 경로
+                  width: 50,
+                  height: 50,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  cautionMessage, // 전달받은 경고 메시지
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
@@ -47,10 +55,7 @@ class RouteFinishModal extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context); // 모달 닫기
-                    onConfirm(); // onConfirm 콜백 실행 (페이지 이동)
-                  },
+                  onPressed: () => Navigator.pop(context), // 모달 닫기
                   child: const Text(
                     '확인',
                     style: TextStyle(fontSize: 16, color: AppColors.white),
