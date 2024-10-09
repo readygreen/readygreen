@@ -35,54 +35,55 @@ class NewMainApi {
       return null;
     }
   }
+
   Future<Map<String, dynamic>?> getMainData() async {
-  String? accessToken = await storage.read(key: 'accessToken');
-  print('Main data accessToken');
-  print(accessToken);
+    String? accessToken = await storage.read(key: 'accessToken');
+    print('Main data accessToken');
+    print(accessToken);
 
-  try {
-    // Construct the URI with query parameters
-    final uri = Uri.parse('$baseUrl/main');
+    try {
+      // Construct the URI with query parameters
+      final uri = Uri.parse('$baseUrl/main');
 
-    // Send the GET request with the authorization header
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $accessToken',
-        'accept': '*/*',
-      },
-    );
+      // Send the GET request with the authorization header
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+          'accept': '*/*',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      String utf8Body = utf8.decode(response.bodyBytes);
-      Map<String, dynamic> data = jsonDecode(utf8Body);
+      if (response.statusCode == 200) {
+        String utf8Body = utf8.decode(response.bodyBytes);
+        Map<String, dynamic> data = jsonDecode(utf8Body);
 
-      List<Map<String, dynamic>>? bookmarks = 
-          (data['bookmarkResponseDTO']?['bookmarkDTOs'] as List?)?.map((e) => e as Map<String, dynamic>).toList() ?? [];
+        List<Map<String, dynamic>>? bookmarks =
+            (data['bookmarkResponseDTO']?['bookmarkDTOs'] as List?)
+                    ?.map((e) => e as Map<String, dynamic>)
+                    .toList() ??
+                [];
 
-      Map<String, dynamic>? routeRecord = data['routeRecordDTO'] ?? {};
+        Map<String, dynamic>? routeRecord = data['routeRecordDTO'] ?? {};
 
-      // Log the data for debugging
-      print('Bookmark data: $bookmarks');
-      print('Route record data: $routeRecord');
+        // Log the data for debugging
+        print('Bookmark data: $bookmarks');
+        print('Route record data: $routeRecord');
 
-      return {
-        'bookmarkDTOs': bookmarks,
-        'routeRecordDTO': routeRecord,
-        'weatherResponseDTO': data['weatherResponseDTO'],
-      }; // Return the relevant data
-    } else {
-      print('Failed to load main data ${response.statusCode}');
+        return {
+          'bookmarkDTOs': bookmarks,
+          'routeRecordDTO': routeRecord,
+          'weatherResponseDTO': data['weatherResponseDTO'],
+        }; // Return the relevant data
+      } else {
+        print('Failed to load main data ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error loading main data: $e');
       return null;
     }
-  } catch (e) {
-    print('Error loading main data: $e');
-    return null;
   }
-}
-
-
-
 
   // 날씨 API 요청
   Future<List<Map<String, dynamic>>?> getWeather(
@@ -102,7 +103,6 @@ class NewMainApi {
       );
 
       if (response.statusCode == 200) {
-        print('${response}');
         // JSON 응답을 List로 파싱
         List<dynamic> decodedResponse = json.decode(response.body);
 

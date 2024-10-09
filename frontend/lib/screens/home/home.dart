@@ -56,7 +56,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
   Future<void> _fetchMainDate() async {
     final data = await api.getMainData();
-    print("data");
+    print("_fetchMainDate data");
     setState(() {
       _bookmarks = data?['bookmarkDTOs'];
 
@@ -172,23 +172,12 @@ class _HomePageContentState extends State<HomePageContent> {
     }
   }
 
-  // 현재 시간 가져오기
-  String _getCurrentHour() {
-    final DateTime now = DateTime.now();
-    final DateFormat formatter = DateFormat('yyyy-MM-dd HH');
-    return formatter.format(now);
-  }
-
   // 날씨 요청
   List<Map<String, dynamic>> weatherData = []; // 날씨 정보를 저장하는 리스트
-  String currentWeatherStatus = '맑음'; // 기본 날씨 상태
-  String currentWeatherImage = 'assets/images/w-sun.png'; // 기본 날씨 아이콘
+  String currentWeatherStatus = ''; // 기본 날씨 상태
+  String currentWeatherImage = 'assets/images/w-default.png'; // 기본 날씨 아이콘
 
   Future<void> _storeWeather() async {
-    // 현재 시간 비교
-    final String currentHour = _getCurrentHour();
-    final String? storedHour = await storage.read(key: 'weatherHour');
-
     // 스토리지에서 저장된 위도와 경도 읽기
     String? lat = await storage.read(key: 'latitude');
     String? long = await storage.read(key: 'longitude');
@@ -197,19 +186,17 @@ class _HomePageContentState extends State<HomePageContent> {
       String latitude = lat.substring(0, 2);
       String longitude = long.substring(0, 3);
 
-      if (storedHour != currentHour) {
-        var weatherResponse = await api.getWeather(latitude, longitude);
+      var weatherResponse = await api.getWeather(latitude, longitude);
 
-        if (weatherResponse != null) {
-          if (mounted) {
-            setState(() {
-              weatherData = List<Map<String, dynamic>>.from(weatherResponse);
-            });
-          }
-          String weatherJson = jsonEncode(weatherData);
-          await storage.write(key: 'weather', value: weatherJson);
-          await storage.write(key: 'weatherHour', value: currentHour);
+      if (weatherResponse != null) {
+        if (mounted) {
+          setState(() {
+            weatherData = List<Map<String, dynamic>>.from(weatherResponse);
+          });
         }
+        String weatherJson = jsonEncode(weatherData);
+        print('날씨 데이터 $weatherJson');
+        await storage.write(key: 'weather', value: weatherJson);
       }
     }
   }
@@ -554,6 +541,7 @@ class _HomePageContentState extends State<HomePageContent> {
                               ),
                               ElevatedButton(
                                 onPressed: () {
+                                  print('routeRecords');
                                   print(routeRecords?['endName']);
                                   print(routeRecords?['endLatitude']);
                                   print(routeRecords?['endLongitude']);
