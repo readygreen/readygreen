@@ -154,10 +154,10 @@ class TrafficLightService {
           // 시간이 0이 되면 상태 변경
           if (currentState == "RED") {
             currentState = "GREEN";
-            remainingTime = greenDuration - 1; // 녹색 신호 시간으로 재설정
+            remainingTime = greenDuration; // 녹색 신호 시간으로 재설정
           } else if (currentState == "GREEN") {
             currentState = "RED";
-            remainingTime = redDuration - 1; // 적색 신호 시간으로 재설정
+            remainingTime = redDuration; // 적색 신호 시간으로 재설정
           }
         }
 
@@ -287,10 +287,10 @@ class TrafficLightService {
           // 시간이 0이 되면 상태 전환
           if (currentState == "GREEN") {
             currentState = "RED";
-            remainingTime = redDuration; // 빨간불 주기로 변경
+            remainingTime = redDuration - 1; // 빨간불 주기로 변경
           } else {
             currentState = "GREEN";
-            remainingTime = greenDuration; // 초록불 주기로 변경
+            remainingTime = greenDuration - 1; // 초록불 주기로 변경
           }
         }
 

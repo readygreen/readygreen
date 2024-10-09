@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/constants/appcolors.dart';
 
 class SquareCardMypage extends StatelessWidget {
   final String title;
@@ -18,7 +19,7 @@ class SquareCardMypage extends StatelessWidget {
     this.textColor = Colors.black,
     this.imageUrl,
     this.subtitle,
-    this.subtitleColor = Colors.black,
+    this.subtitleColor = AppColors.greytext,
     this.child,
   });
 
@@ -28,7 +29,7 @@ class SquareCardMypage extends StatelessWidget {
 
     return Container(
       width: deviceWidth / 2.5,
-      height: deviceWidth / 2.4,
+      height: deviceWidth / 2.3,
       clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         gradient: backgroundGradient,
@@ -52,6 +53,7 @@ class SquareCardMypage extends StatelessWidget {
                 color: textColor,
               ),
             ),
+            const SizedBox(height: 3),
             if (imageUrl != null)
               Padding(
                 padding: const EdgeInsets.only(top: 1.2),
@@ -65,6 +67,7 @@ class SquareCardMypage extends StatelessWidget {
                   ),
                 ),
               ),
+            const SizedBox(height: 5),
             if (subtitle != null)
               Padding(
                 padding: const EdgeInsets.only(top: 3.0),
