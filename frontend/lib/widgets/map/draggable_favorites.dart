@@ -1,16 +1,63 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/api/map_api.dart';
+import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/screens/map/map.dart';
+import 'package:readygreen/screens/map/mapdirection.dart';
+import 'package:readygreen/widgets/common/textbutton.dart';
 
-class DraggableFavorites extends StatelessWidget {
+class DraggableFavorites extends StatefulWidget {
   final ScrollController scrollController;
-
   const DraggableFavorites({super.key, required this.scrollController});
+
+  @override
+  _DraggableFavoritesState createState() => _DraggableFavoritesState();
+}
+
+class _DraggableFavoritesState extends State<DraggableFavorites> {
+  List<BookmarkDTO> _bookmarks = [];
+  final MapStartAPI mapStartAPI = MapStartAPI();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBookmarks();
+  }
+
+  Future<void> _fetchBookmarks() async {
+    final bookmarksData = await mapStartAPI.fetchBookmarks();
+
+    if (bookmarksData != null) {
+      print("데이터");
+      // 북마크 데이터를 BookmarkDTO 리스트로 변환
+      List<BookmarkDTO> fetchedBookmarks =
+          bookmarksData.map<BookmarkDTO>((bookmark) {
+        return BookmarkDTO(
+          id: bookmark['id'],
+          name: bookmark['name'],
+          destinationName: bookmark['destinationName'],
+          latitude: bookmark['latitude'],
+          longitude: bookmark['longitude'],
+          placeId: bookmark['placeId'],
+        );
+      }).toList();
+
+      // 변환한 데이터를 상태에 저장
+      if (mounted) {
+        setState(() {
+          _bookmarks = fetchedBookmarks;
+        });
+      }
+    } else {
+      print('북마크 데이터를 불러오지 못했습니다.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       initialChildSize: 0.04,
       minChildSize: 0.04, // 최소 높이
-      maxChildSize: 0.85, // 최대 높이
+      maxChildSize: 0.80, // 최대 높이
       builder: (BuildContext context, ScrollController scrollController) {
         return Container(
           decoration: BoxDecoration(
@@ -39,33 +86,47 @@ class DraggableFavorites extends StatelessWidget {
               const SizedBox(height: 10),
               // 즐겨찾기 목록
               Expanded(
-                child: ListView(
-                  controller: scrollController, // 리스트가 스크롤 가능하도록 설정
-                  children: const [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: ListView.builder(
+                controller: scrollController, // 스크롤 가능 설정
+                itemCount: _bookmarks.isNotEmpty ? _bookmarks.length : 1,
+                itemBuilder: (context, index) {
+                  if (_bookmarks.isEmpty) {
+                    // 즐겨찾기가 없을 때에도 스크롤 가능하게 빈 항목을 반환
+                    return const Center(
                       child: Text(
-                        '자주 가는 목적지',
+                        '즐겨찾기가 없습니다.',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 17, // 글자 크기 증가
+                          color: AppColors.black, // 글자 색상
                         ),
                       ),
-                    ),
-                    ListTile(
-                      // 임시로 데이터 입력해서 출력함
-                      leading: Icon(Icons.business),
-                      title: Text('삼성화재 유성 연수원'),
-                      subtitle: Text('대전 유성구 동서대로 98-39'),
-                      trailing: ElevatedButton(
-                        onPressed: null, // 길찾기 기능 추가 가능
-                        child: Text('길찾기'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                    );
+                  } else {
+                    final bookmark = _bookmarks[index];
+                    return ListTile(
+                        leading: const Icon(Icons.place),
+                        title: Text(bookmark.destinationName),
+                        trailing: const CustomButton(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapDirectionPage(
+                                endLat: bookmark.latitude,
+                                endLng: bookmark.longitude,
+                                endPlaceName: bookmark.destinationName,
+                              ),
+                            ),
+                          );
+                          // 클릭 시 수행할 작업
+                          print('${bookmark.destinationName} 클릭됨');
+                          print('${bookmark.latitude}');
+                          print('${bookmark.longitude}');
+                          // 예: 클릭 시 배경색 변경 등
+                        });
+                  }
+                },
+              )),
             ],
           ),
         );

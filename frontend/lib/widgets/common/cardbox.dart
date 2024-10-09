@@ -5,6 +5,8 @@ class CardBox extends StatelessWidget {
   final double height;
   final Color backgroundColor;
   final Color textColor;
+  final Widget? child;
+  final Widget? children;
 
   const CardBox({
     super.key,
@@ -12,6 +14,8 @@ class CardBox extends StatelessWidget {
     this.height = 150,
     this.backgroundColor = Colors.white,
     this.textColor = Colors.black,
+    this.child,
+    this.children,
   });
 
   @override
@@ -25,8 +29,8 @@ class CardBox extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
-          vertical: 20,
-          horizontal: 25,
+          vertical: 15,
+          horizontal: 18,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -37,14 +41,15 @@ class CardBox extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
+                if (child != null) child!,
               ],
             ),
           ],

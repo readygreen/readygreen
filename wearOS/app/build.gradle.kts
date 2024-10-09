@@ -1,6 +1,13 @@
+import java.util.Properties
+
+val properties = Properties()
+properties.load(project.rootProject.file("local.properties").inputStream())
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.gms.google-services")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -17,6 +24,9 @@ android {
             useSupportLibrary = true
         }
 
+        // Google Maps API
+        manifestPlaceholders["MAPS_API_KEY"] = properties.getProperty("MAPS_API_KEY")
+        buildConfigField("String", "MAPS_API_KEY", "\"${properties.getProperty("MAPS_API_KEY")}\"")
     }
 
     buildTypes {
@@ -37,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -49,7 +60,7 @@ android {
 }
 
 dependencies {
-
+    // Wearable
     implementation(libs.play.services.wearable)
     implementation(platform(libs.compose.bom))
     implementation(libs.ui)
@@ -64,30 +75,48 @@ dependencies {
     implementation(libs.horologist.tiles)
     implementation(libs.watchface.complications.data.source.ktx)
     implementation(libs.navigation.compose)
+    implementation(libs.material3.android)
+    implementation(libs.firebase.messaging.ktx) // Firebase 메시징(KTX)
+    implementation(libs.runtime.livedata)
 
+    // Compose BOM
     val composeBom = platform("androidx.compose:compose-bom:2024.06.00")
     implementation(composeBom)
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
 
-    // TODO flutter build.gradle에 추가
-    // Data Layer (모바일 연결)
+    // Wear OS에서 데이터 레이어 (모바일 연결)
     implementation("com.google.android.gms:play-services-wearable:18.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0")
 
-    // wearOS
+    // Wear OS 관련 Jetpack Compose
     implementation("androidx.wear.compose:compose-material:1.1.0")
     implementation("androidx.wear.compose:compose-foundation:1.1.0")
     implementation("androidx.wear.compose:compose-navigation:1.1.0")
 
-    // Retrofit
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+
+    // 네트워크 통신 (Retrofit 사용)
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")  // JSON 파싱을 위한 GSON
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")  // 로그 인터셉터 (디버깅용)
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
     // Lottie
     implementation("com.airbnb.android:lottie-compose:6.0.0")
 
+    // Google Maps API
+    implementation("com.google.maps.android:maps-compose:4.4.1")
+    implementation("com.google.maps.android:maps-compose-utils:4.3.3")
+    implementation("com.google.maps.android:maps-compose-widgets:4.3.3")
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // Android 테스트
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
     debugImplementation(libs.ui.tooling)
