@@ -132,7 +132,8 @@ class TrafficLightService {
   }
 
   // 모든 신호등을 관리하는 전역 타이머 시작
-  void _startGlobalTimer(BuildContext context,Function(Set<Marker>) onMarkersUpdated) {
+  void _startGlobalTimer(
+      BuildContext context, Function(Set<Marker>) onMarkersUpdated) {
     print("타이머 시작");
     _globalTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       Set<Marker> updatedMarkers = {};
@@ -153,10 +154,10 @@ class TrafficLightService {
           // 시간이 0이 되면 상태 변경
           if (currentState == "RED") {
             currentState = "GREEN";
-            remainingTime = greenDuration; // 녹색 신호 시간으로 재설정
+            remainingTime = greenDuration - 1; // 녹색 신호 시간으로 재설정
           } else if (currentState == "GREEN") {
             currentState = "RED";
-            remainingTime = redDuration; // 적색 신호 시간으로 재설정
+            remainingTime = redDuration - 1; // 적색 신호 시간으로 재설정
           }
         }
 
@@ -253,10 +254,10 @@ class TrafficLightService {
       int remainingTime;
       if (remainder < greenDuration) {
         currentState = "GREEN";
-        remainingTime = greenDuration - remainder;
+        remainingTime = greenDuration - remainder - 1;
       } else {
         currentState = "RED";
-        remainingTime = totalDuration - remainder;
+        remainingTime = totalDuration - remainder - 1;
       }
 
       // 상태에 따른 색상 설정
@@ -280,7 +281,7 @@ class TrafficLightService {
 
       // 타이머로 신호등 상태 업데이트
       Timer timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
-        if (remainingTime > 0) {
+        if (remainingTime > 1) {
           remainingTime--; // 남은 시간 감소
         } else {
           // 시간이 0이 되면 상태 전환
@@ -328,35 +329,37 @@ class TrafficLightService {
   }
 
   Future<void> showCustomBottomSheet(
-    BuildContext context, String currentState, int remainingTime) {
-  return showModalBottomSheet(
-    context: context, // 여기에서 context를 받아 사용
-    builder: (BuildContext context) {
-      return Container(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text('신호등 상태: $currentState'),
-            Text('남은 시간: $remainingTime초'),
-            ElevatedButton(
-              onPressed: () {
-                print('Button clicked!');
-                Navigator.pop(context); // Bottom sheet 닫기
-              },
-              child: const Text('상세 정보 보기'),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
+      BuildContext context, String currentState, int remainingTime) {
+    return showModalBottomSheet(
+      context: context, // 여기에서 context를 받아 사용
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text('신호등 상태: $currentState'),
+              Text('남은 시간: $remainingTime초'),
+              ElevatedButton(
+                onPressed: () {
+                  print('Button clicked!');
+                  Navigator.pop(context); // Bottom sheet 닫기
+                },
+                child: const Text('상세 정보 보기'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 // 모달을 띄우는 함수
   void _showTrafficLightModal(BuildContext context, String trafficLightId) {
     final TextEditingController blueTimeController = TextEditingController();
     final TextEditingController redTimeController = TextEditingController();
-    final TextEditingController secondBlueTimeController = TextEditingController();
+    final TextEditingController secondBlueTimeController =
+        TextEditingController();
 
     showDialog(
       context: context,
@@ -374,7 +377,8 @@ class TrafficLightService {
                 children: [
                   Text(
                     '신호등 ID: $trafficLightId',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -425,7 +429,8 @@ class TrafficLightService {
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.green,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -448,18 +453,21 @@ class TrafficLightService {
                           if (success) {
                             Navigator.pop(context);
                             _showSuccessModal(context);
-                          }else{
+                          } else {
                             Navigator.pop(context);
                           }
 
                           // 모달 닫기
                         },
-                        child: const Text('제보하기', style: TextStyle(fontSize: 16, color: Colors.white)),
+                        child: const Text('제보하기',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.white)),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey[400],
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -467,7 +475,9 @@ class TrafficLightService {
                         onPressed: () {
                           Navigator.pop(context); // 모달 닫기
                         },
-                        child: const Text('닫기', style: TextStyle(fontSize: 16, color: Colors.white)),
+                        child: const Text('닫기',
+                            style:
+                                TextStyle(fontSize: 16, color: Colors.white)),
                       ),
                     ],
                   ),
@@ -494,7 +504,8 @@ class TrafficLightService {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.check_circle_outline, color: Colors.green, size: 80),
+                const Icon(Icons.check_circle_outline,
+                    color: Colors.green, size: 80),
                 const SizedBox(height: 20),
                 const Text(
                   '성공!',
@@ -515,7 +526,8 @@ class TrafficLightService {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.green,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -523,7 +535,8 @@ class TrafficLightService {
                   onPressed: () {
                     Navigator.pop(context); // 성공 모달 닫기
                   },
-                  child: const Text('확인', style: TextStyle(fontSize: 16, color: Colors.white)),
+                  child: const Text('확인',
+                      style: TextStyle(fontSize: 16, color: Colors.white)),
                 ),
               ],
             ),
@@ -532,5 +545,4 @@ class TrafficLightService {
       },
     );
   }
-
 }
