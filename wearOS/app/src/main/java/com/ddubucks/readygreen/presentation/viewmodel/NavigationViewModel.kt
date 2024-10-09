@@ -106,7 +106,7 @@ class NavigationViewModel : ViewModel() {
             // 위치 업데이트 빈도 설정
             locationService?.adjustLocationRequest(
                 priority = Priority.PRIORITY_HIGH_ACCURACY,
-                interval = 1000 // 1초마다 위치 업데이트
+                interval = 500 // 0.5초마다 위치 업데이트
             )
 
             // 위치 업데이트 시작
@@ -137,7 +137,7 @@ class NavigationViewModel : ViewModel() {
                     val distance = calculateDistance(currentLat, currentLng, it[1], it[0])
 
                     // 현재 위치가 다음 포인트 반경 10미터 이내인지 확인
-                    if (distance < 10.0) {
+                    if (distance < 15.0) {
                         // 포인트의 description 확인
                         if (feature.properties.description == "도착") {
                             Log.d("NavigationViewModel", "목적지에 도착했습니다!")
