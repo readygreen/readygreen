@@ -6,6 +6,7 @@ import com.ddubucks.readygreen.exception.UnauthorizedAccessException;
 import com.ddubucks.readygreen.model.Blinker;
 import com.ddubucks.readygreen.model.RouteRecord;
 import com.ddubucks.readygreen.model.bookmark.Bookmark;
+import com.ddubucks.readygreen.model.bookmark.BookmarkType;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.repository.*;
 import com.nimbusds.jose.shaded.gson.Gson;
@@ -13,8 +14,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -33,6 +32,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -52,19 +52,52 @@ public class MapService {
     @Value("${MAP_SERVICE_KEY}")
     private String mapKey;
 
+    class Node {
+        RouteDTO routeDTO;
+        int totalSecond;
+        List<BlinkerDTO> blinkerDTOs;
+
+        Node() {
+            blinkerDTOs = new ArrayList<>();
+        }
+    }
+
     public MapResponseDTO getDestinationGuide(RouteRequestDTO routeRequestDTO, String email) {
+        // 현재 시간
+        LocalTime nowTime = LocalTime.now();
 
-        // 경로 요청
-        RouteDTO routeDto = route(routeRequestDTO);
+        Node[] routeTotalSecond = new Node[4];
 
-        // 경로 내 신호등 위치
-        List<Point> coordinates = getBlinkerCoordinate(routeDto);
+        for (int i = 0; i < 4; i++) {
+            routeTotalSecond[i] = new Node();
+        }
 
-        // 해당 좌표의 신호등 정보
-        List<Blinker> blinkers = blinkerJDBCRepository.findAllByCoordinatesWithinRadius(coordinates, RADIUS);
+        // 추천 경로 요청
+        routeRequestDTO.searchReco();
+        routeTotalSecond[0].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[0].totalSecond = getRouteTotalSecond(routeTotalSecond[0].routeDTO, routeTotalSecond[0].blinkerDTOs, nowTime);
 
-        // 신호등의 상태 정보
-        List<BlinkerDTO> blinkerDTOs = toBlinkerDTOs(blinkers);
+        // 추천 경로 + 대로
+        routeRequestDTO.searchRecoAndMainRoad();
+        routeTotalSecond[1].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[1].totalSecond = getRouteTotalSecond(routeTotalSecond[1].routeDTO, routeTotalSecond[1].blinkerDTOs, nowTime);
+
+        // 최단 경로
+        routeRequestDTO.searchShort();
+        routeTotalSecond[2].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[2].totalSecond = getRouteTotalSecond(routeTotalSecond[2].routeDTO, routeTotalSecond[2].blinkerDTOs, nowTime);
+
+        // 최단 경로 + 계단 없음
+        routeRequestDTO.searchShortAndNonStair();
+        routeTotalSecond[3].routeDTO = route(routeRequestDTO);
+        routeTotalSecond[3].totalSecond = getRouteTotalSecond(routeTotalSecond[3].routeDTO, routeTotalSecond[3].blinkerDTOs, nowTime);
+
+        int minSecondIndex = 0;
+        for (int i = 1; i < 4; i++) {
+            if (routeTotalSecond[minSecondIndex].totalSecond > routeTotalSecond[i].totalSecond) {
+                minSecondIndex = i;
+            }
+        }
 
         Member member = memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -81,8 +114,79 @@ public class MapService {
         );
 
         return MapResponseDTO.builder()
-                .routeDTO(routeDto)
-                .blinkerDTOs(blinkerDTOs)
+                .routeDTO(routeTotalSecond[minSecondIndex].routeDTO)
+                .blinkerDTOs(routeTotalSecond[minSecondIndex].blinkerDTOs)
+                .build();
+    }
+
+    private int getRouteTotalSecond(RouteDTO routeDTO, List<BlinkerDTO> blinkerDTOs, LocalTime nowTime) {
+
+        int currentSecond = 0;
+
+        for (FeatureDTO featureDTO : routeDTO.getFeatures()) {
+            if (TYPE.equals(featureDTO.getGeometry().getType()) && isValidTurnType(featureDTO.getProperties().getTurnType())) {
+                List<Double> c = (List<Double>) featureDTO.getGeometry().getCoordinates();
+
+                //신호등의 현재 시간과 지금까지 걸린 도착 r시간에서 계산
+                System.out.println(c.get(0) + " " + c.get(1));
+                Blinker blinker = blinkerRepository.findBlinkerNearByCoordinate(c.get(0), c.get(1));
+
+                blinkerDTOs.add(toBlinkerDTOs(blinker, nowTime, featureDTO.getProperties().getIndex()));
+
+                System.out.println(blinker.getCoordinate().getX() + " " + blinker.getCoordinate().getY());
+
+
+                // 걸리는 시간getBlinkerTime
+                int remainTime = getBlinkerTime(blinker.getStartTime(), nowTime.plusSeconds(currentSecond), blinker.getGreenDuration(), blinker.getRedDuration());
+
+                String status = getBlinkerState(blinker.getStartTime(), nowTime.plusSeconds(currentSecond), blinker.getGreenDuration(), blinker.getRedDuration());
+
+                // 남은 시간이 초록불의 1/3 보다 작으면 다음 빨간불 초 + 파란불 초 값
+                if ("GREEN".equals(status) && remainTime < (blinker.getGreenDuration() / 3)) {
+                    currentSecond += remainTime + blinker.getRedDuration();
+                }
+
+                // 빨간불이면 빨간 불 대기 시간
+                else if ("RED".equals(status)) {
+                    currentSecond += remainTime;
+                }
+            }
+            if ("LineString".equals(featureDTO.getGeometry().getType())) {
+                currentSecond += featureDTO.getProperties().getTime();
+            }
+
+        }
+
+        return currentSecond;
+    }
+
+    private BlinkerDTO toBlinkerDTOs(Blinker blinker, LocalTime nowTime, int index) {
+
+        // 경로 내 신호등 데이터
+        return BlinkerDTO.builder()
+                .id(blinker.getId())
+                .startTime(blinker.getStartTime())
+                .greenDuration(blinker.getGreenDuration())
+                .redDuration(blinker.getRedDuration())
+                .currentState(
+                        getBlinkerState(
+                                blinker.getStartTime(),
+                                nowTime,
+                                blinker.getGreenDuration(),
+                                blinker.getRedDuration()
+                        )
+                )
+                .remainingTime(
+                        getBlinkerTime(
+                                blinker.getStartTime(),
+                                nowTime,
+                                blinker.getGreenDuration(),
+                                blinker.getRedDuration()
+                        )
+                )
+                .latitude(blinker.getCoordinate().getY())
+                .longitude(blinker.getCoordinate().getX())
+                .index(index)
                 .build();
     }
 
@@ -95,7 +199,7 @@ public class MapService {
             blinkerDTOs.add(
                     BlinkerDTO.builder()
                             .id(blinker.getId())
-                            .lastAccessTime(nowTime)
+                            .startTime(nowTime)
                             .greenDuration(blinker.getGreenDuration())
                             .redDuration(blinker.getRedDuration())
                             .currentState(
@@ -238,7 +342,7 @@ public class MapService {
     }
 
     public BookmarkResponseDTO getBookmark(String email) {
-        List<Bookmark> bookmarks = bookmarkRepository.findAllByEmail(email);
+        List<Bookmark> bookmarks = bookmarkRepository.findAllByEmailOrderByType(email);
 
         List<BookmarkDTO> bookmarkDTOs = new ArrayList<>();
         for (Bookmark bookmark : bookmarks) {
@@ -251,6 +355,7 @@ public class MapService {
                             .latitude(bookmark.getDestinationCoordinate().getY())
                             .longitude(bookmark.getDestinationCoordinate().getX())
                             .alertTime(bookmark.getAlertTime())
+                            .placeId(bookmark.getPlaceId())
                             .build()
             );
         }
@@ -270,6 +375,7 @@ public class MapService {
                         .destinationCoordinate(
                                 getPoint(bookmarkRequestDTO.getLongitude(), bookmarkRequestDTO.getLatitude())
                         )
+                        .placeId(bookmarkRequestDTO.getPlaceId())
                         .alertTime(bookmarkRequestDTO.getAlertTime())
                         .type(bookmarkRequestDTO.getType())
                         .member(member)
@@ -280,12 +386,14 @@ public class MapService {
 
     @SneakyThrows
     @Transactional
-    public void deleteBookmark(List<Integer> bookmarkIDs, String email) {
-        int count = bookmarkRepository.countByIdIn(bookmarkIDs, email);
-        if (count != bookmarkIDs.size()) {
+    public void deleteBookmark(String placeId, String email) {
+        System.out.println(placeId+" "+email);
+        boolean exists = bookmarkRepository.existsByPlaceIdAndMemberEmail(placeId, email);
+        System.out.println(exists);
+        if (!exists) {
             throw new UnauthorizedAccessException("Unauthorized Access");
         }
-        bookmarkRepository.deleteAllById(bookmarkIDs);
+        bookmarkRepository.deleteByPlaceIdAndMemberEmail(placeId, email);
     }
 
     public RouteRecordResponseDTO getRouteRecord(String email) {
@@ -329,6 +437,34 @@ public class MapService {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double distance = R * c; // 거리를 미터로 계산
         return distance;
+    }
+
+    @Transactional
+    public void updateBookmark(BookmarkEditDTO bookmarkEditDTO, String username) {
+        Member member = memberRepository.findMemberByEmail(username)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+
+        Bookmark bookmarkToUpdate = bookmarkRepository.findByIdAndMember(bookmarkEditDTO.getId(), member)
+                .orElseThrow(() -> new IllegalArgumentException("해당 북마크가 존재하지 않습니다."));
+
+        BookmarkType newType = bookmarkEditDTO.getType();
+
+        // 'HOME'이나 'COMPANY'로 변경하려고 할 때, 기존에 해당 타입이 이미 존재하면 ETC로 변경
+        if (newType == BookmarkType.HOME || newType == BookmarkType.COMPANY) {
+            Optional<Bookmark> existingBookmark = bookmarkRepository.findByTypeAndMember(newType, member);
+
+            if (existingBookmark.isPresent() && existingBookmark.get().getId() != bookmarkToUpdate.getId()) {
+                Bookmark existing = existingBookmark.get();
+                existing.setName("기타");
+                existing.setType(BookmarkType.ETC); // 기존 집이나 회사 북마크를 'ETC'로 변경
+                bookmarkRepository.save(existing);
+            }
+        }
+
+        // 선택한 북마크의 타입을 새로운 타입으로 변경
+        bookmarkToUpdate.setType(newType);
+        bookmarkToUpdate.setName(newType.getTitle());
+        bookmarkRepository.save(bookmarkToUpdate);
     }
 
 }

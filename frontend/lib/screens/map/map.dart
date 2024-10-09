@@ -121,6 +121,7 @@ class _MapPageState extends State<MapPage> {
   // 신호등 정보를 업데이트하는 함수
   Future<void> _updateTrafficLights(double latitude, double longitude) async {
     await _trafficLightService.addTrafficLightsToMap(
+      context: context,
       latitude: latitude,
       longitude: longitude,
       markers: _trafficLightMarkers,

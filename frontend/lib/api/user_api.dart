@@ -346,4 +346,34 @@ class NewUserApi {
       return false;
     }
   }
+
+  Future<int> getBadgeTitle() async {
+    print("Badge title GET 요청");
+
+    String? accessToken = await storage.read(key: 'accessToken'); // 액세스 토큰 불러오기
+
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/auth/badge'),
+        headers: {
+          'accept': '*/*',
+          'Authorization': 'Bearer $accessToken', // 액세스 토큰 추가
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // response.body를 JSON으로 파싱
+        // final int responseData = jsonDecode(response.body);
+        print(jsonDecode(response.body));
+        return jsonDecode(response.body);
+      } else {
+        print('Badge title GET 요청 실패. 상태 코드: ${response.statusCode}');
+        return 0;
+      }
+    } catch (e) {
+      print('Badge title GET 요청 에러: $e');
+      return 0;
+    }
+  }
+
 }

@@ -121,6 +121,21 @@ public class SwaggerConfig {
                 .build();
     }
     @Bean
+    public GroupedOpenApi BadgeApi(){
+        return GroupedOpenApi.builder()
+                .group("badge")
+                .pathsToMatch("/badge/**")
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi ReportApi(){
+        return GroupedOpenApi.builder()
+                .group("제보")
+                .pathsToMatch("/report/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi PlaceApi(){
         return GroupedOpenApi.builder()
                 .group("장소")

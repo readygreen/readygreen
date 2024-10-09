@@ -22,16 +22,18 @@ class MyPage extends StatefulWidget {
   _MyPageState createState() => _MyPageState();
 }
 
-class _MyPageState extends State<MyPage> {
+class _MyPageState extends State<MyPage>{
   final NewUserApi userApi = NewUserApi();
   final storage = const FlutterSecureStorage();
   Map<String, dynamic>? profileData;
   bool isLoading = true;
+  int title = 0;
 
   @override
   void initState() {
     super.initState();
     _getProfile();
+    _getTitleBadge();
   }
 
   Future<void> _getProfile() async {
@@ -44,6 +46,17 @@ class _MyPageState extends State<MyPage> {
       });
     }
   }
+
+  Future<void> _getTitleBadge() async {
+    final data = await userApi.getBadgeTitle();
+    if (mounted) {
+      setState(() {
+        title = data;
+      });
+    }
+  }
+
+  
 
   Future<void> _handleLogout(BuildContext context) async {
     // 저장된 토큰 삭제
@@ -71,6 +84,21 @@ class _MyPageState extends State<MyPage> {
       await _getProfile();
     }
   }
+
+  String _getBadge(int title) {
+    if (title == 0) {
+      return "assets/images/signupcong.png";
+    } else if (title == 1) {
+      return "assets/images/badge.png";
+    } else if (title == 2) {
+      return "assets/images/trophy.png";
+    } else if (title == 3) {
+      return "assets/images/coinpig.png";
+    } else {
+      return "assets/images/default.png"; // 예외적인 경우 기본 이미지를 반환
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -118,18 +146,24 @@ class _MyPageState extends State<MyPage> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               // 페이지 이동을 위한 네비게이션
-                              Navigator.push(
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => BadgePage(), // 이동할 페이지
                                 ),
                               );
+                              if(result!=null){
+                                  print(result);
+                                setState(() {
+                                  title = result;
+                                });
+                              }
                             },
                             child: SquareCardMypage(
                               title: '내 배지',
-                              imageUrl: 'assets/images/badge.png',
+                              imageUrl: _getBadge(title),
                               subtitle: '설정하기',
                             ),
                           ),

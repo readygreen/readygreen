@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum BookmarkType {
     HOME("집"),
-    COMPANY("일반 사용자"),
+    COMPANY("회사"),
     ETC("기타");
 
     private final String title;

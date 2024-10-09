@@ -21,7 +21,7 @@ public class RouteRequestDTO {
     private Double startY; //출발지 Y좌표
 
     @JsonIgnore
-    private Integer speed = 45; //진행속도(Km/h)
+    private Integer speed = 4; //진행속도(Km/h)
 
     @NotNull(message = "endX cannot null")
     private Double endX; //목적지 X좌표
@@ -44,8 +44,24 @@ public class RouteRequestDTO {
     */
 
     @JsonIgnore
-    private Integer searchOption = 0;
+    private Integer searchOption;
 
     @NotNull
     private boolean isWatch;
+
+    public void searchReco() {
+        this.searchOption = 0;
+    }
+
+    public void searchRecoAndMainRoad() {
+        this.searchOption = 4;
+    }
+
+    public void searchShort() {
+        this.searchOption = 10;
+    }
+
+    public void searchShortAndNonStair() {
+        this.searchOption = 30;
+    }
 }
