@@ -375,7 +375,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         '자주 가는 목적지',
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.greytext,
+                          color: AppColors.black,
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -384,11 +384,21 @@ class _HomePageContentState extends State<HomePageContent> {
                             ? List.generate(
                                 _showAllBookmarks
                                     ? _bookmarks.length
-                                    : (_bookmarks.length > 0
-                                        ? 1
-                                        : 0), // Show only the first item initially
+                                    : (_bookmarks.length > 1
+                                        ? 2
+                                        : _bookmarks.length),
                                 (index) {
                                   final bookmark = _bookmarks[index];
+                                  String bookmarkType = '';
+
+                                  // 북마크의 종류에 따라 텍스트 설정
+                                  if (bookmark['name'] == '집') {
+                                    bookmarkType = '집';
+                                  } else if (bookmark['name'] == '회사') {
+                                    bookmarkType = '회사';
+                                  } else {
+                                    bookmarkType = '기타';
+                                  }
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 2.0),
@@ -400,6 +410,14 @@ class _HomePageContentState extends State<HomePageContent> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              bookmarkType,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: AppColors.greytext,
+                                              ),
+                                            ),
                                             Text(
                                               formatDestinationName(
                                                   bookmark['destinationName']),
@@ -411,45 +429,51 @@ class _HomePageContentState extends State<HomePageContent> {
                                               overflow: TextOverflow
                                                   .ellipsis, // 넘치는 텍스트는 '...'로 표시
                                             ),
-                                            const SizedBox(height: 4),
                                           ],
                                         ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    MapDirectionPage(
-                                                  endLat: bookmark['latitude'],
-                                                  endLng: bookmark['longitude'],
-                                                  endPlaceName: bookmark[
-                                                      'destinationName'],
+                                        Column(
+                                          children: [
+                                            const SizedBox(height: 10), // 여백 추가
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MapDirectionPage(
+                                                      endLat:
+                                                          bookmark['latitude'],
+                                                      endLng:
+                                                          bookmark['longitude'],
+                                                      endPlaceName: bookmark[
+                                                          'destinationName'],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.blue,
+                                                backgroundColor: Colors.white,
+                                                side: const BorderSide(
+                                                  color: Colors.blue,
+                                                  width: 1.0,
+                                                ),
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.blue,
-                                            backgroundColor: Colors.white,
-                                            side: const BorderSide(
-                                              color: Colors.blue,
-                                              width: 1.0,
+                                              child: const Text(
+                                                '길찾기',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
                                             ),
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            '길찾기',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -466,18 +490,16 @@ class _HomePageContentState extends State<HomePageContent> {
                                         FontWeight.bold, // 필요한 경우, 글씨 굵기 추가
                                   ),
                                 ),
-                                // ,
                               ],
                       ),
-                      if (_bookmarks.length > 1) const SizedBox(height: 5),
-                      if (_bookmarks.length > 1)
+                      if (_bookmarks.length > 2) const SizedBox(height: 5),
+                      if (_bookmarks.length > 2)
                         const Divider(
-                          // Add this Divider to create the horizontal line
                           color: AppColors.grey, // You can adjust the color
                           thickness:
                               1, // Adjust thickness for a more prominent line
                         ),
-                      if (_bookmarks.length > 1)
+                      if (_bookmarks.length > 2)
                         Center(
                           child: GestureDetector(
                             onTap: () {
@@ -517,7 +539,7 @@ class _HomePageContentState extends State<HomePageContent> {
                     '최근 목적지',
                     style: TextStyle(
                       fontSize: 14,
-                      color: AppColors.greytext,
+                      color: AppColors.black,
                     ),
                   ),
                   routeRecords != null && routeRecords!.isNotEmpty
@@ -571,7 +593,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                 child: const Text(
                                   '길찾기',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                     color: AppColors.green,
                                   ),
@@ -582,7 +604,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         )
                       : Column(
                           children: const [
-                            SizedBox(height: 10), // 여백 추가
+                            SizedBox(height: 12), // 여백 추가
                             Text(
                               '최근 목적지가 없습니다.',
                               style: TextStyle(
