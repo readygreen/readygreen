@@ -19,7 +19,7 @@ public class RouteDTO {
     @AllArgsConstructor
     @Getter
     @Setter
-    public class FeatureDTO {
+    public static class FeatureDTO {  // static으로 변경
         private String type;
         private GeometryDTO geometry;
         private PropertiesDTO properties;
@@ -29,7 +29,7 @@ public class RouteDTO {
     @AllArgsConstructor
     @Getter
     @Setter
-    public class GeometryDTO {
+    public static class GeometryDTO {  // static으로 변경
         private String type;
         private Object coordinates;
     }
@@ -38,7 +38,7 @@ public class RouteDTO {
     @AllArgsConstructor
     @Getter
     @Setter
-    public class PropertiesDTO {
+    public static class PropertiesDTO {  // static으로 변경
         private int index;
         private int pointIndex;
         private String name;
@@ -50,6 +50,10 @@ public class RouteDTO {
         private String nearPoiX;
         private String nearPoiY;
         private String crossName;
+        private int totalDistance;
+        private int totalTime;
+        private int distance;   // m
+        private int time;   // 초
         private int turnType;
         private String pointType;
     }

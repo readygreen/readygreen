@@ -16,4 +16,5 @@ public class BookmarkDTO {
     private double latitude;
     private double longitude;
     private LocalTime alertTime;
+    private String placeId;
 }
