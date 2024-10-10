@@ -24,7 +24,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
 
   // 한글 카테고리를 영어로 매핑하는 Map
   final Map<String, String> categoryMapping = {
-    '전체': 'citu=]y',
+    '전체': 'place',
     '맛집': 'restaurant',
     '카페': 'cafe',
     '편의점': 'supermarket',
@@ -108,7 +108,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
               final int index = entry.key;
               final Map<String, String> place = entry.value;
               final String imageUrl =
-                  imageCache[index] ?? 'https://via.placeholder.com/150';
+                  imageCache[index] ?? 'https://picsum.photos/150/150';
 
               return Column(
                 children: [

@@ -30,19 +30,16 @@ class PlaceCard extends StatelessWidget {
   final VoidCallback onTap;
   final dynamic placeId;
   final bool checked;
-  
 
-  const PlaceCard({
-    super.key,
-    required this.placeName,
-    required this.address,
-    required this.lat, // 위도 받기
-    required this.lng, // 경도 받기
-    required this.onTap,
-    required this.placeId,
-    required this.checked
-  });
-  
+  const PlaceCard(
+      {super.key,
+      required this.placeName,
+      required this.address,
+      required this.lat, // 위도 받기
+      required this.lng, // 경도 받기
+      required this.onTap,
+      required this.placeId,
+      required this.checked});
 
   @override
   Widget build(BuildContext context) {
@@ -69,18 +66,17 @@ class PlaceCard extends StatelessWidget {
             ArriveButton(
               lat: lat,
               lng: lng,
-              placeName: placeName, 
+              placeName: placeName,
               placeId: placeId,
             ),
             const SizedBox(width: 8),
             // BookmarkButton에 위도, 경도, 장소 이름 전달
             BookmarkButton(
-              destinationName: address, // 장소 이름
-              latitude: lat, // 위도
-              longitude: lng, // 경도
-              placeId: placeId,
-              checked: checked
-            ),
+                destinationName: address, // 장소 이름
+                latitude: lat, // 위도
+                longitude: lng, // 경도
+                placeId: placeId,
+                checked: checked),
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:readygreen/api/main_api.dart';
+import 'package:readygreen/background/background_service.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/common/bgcontainer_home.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
@@ -105,10 +106,12 @@ class _HomePageContentState extends State<HomePageContent> {
       }
     } catch (error) {
       print('Failed to load nearby places: $error');
-      setState(() {
-        nearbyPlaces = [];
-        isLoadingPlaces = false;
-      });
+      if (mounted) {
+        setState(() {
+          nearbyPlaces = [];
+          isLoadingPlaces = false;
+        });
+      }
     }
   }
 
@@ -154,15 +157,17 @@ class _HomePageContentState extends State<HomePageContent> {
 
     // 현재 위치 가져오기
     Position location = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.bestForNavigation);
 
     // 위치 정보를 스토리지에 저장
     await storage.write(key: 'latitude', value: location.latitude.toString());
     await storage.write(key: 'longitude', value: location.longitude.toString());
 
     // 위치 정보를 Provider에 저장 (Provider의 updateLocation 호출)
-    await Provider.of<CurrentLocationProvider>(context, listen: false)
-        .updateLocation();
+    if (mounted) {
+      await Provider.of<CurrentLocationProvider>(context, listen: false)
+          .updateLocation();
+    }
 
     print('위치 저장 완료: ${location.latitude}, ${location.longitude}');
   }
