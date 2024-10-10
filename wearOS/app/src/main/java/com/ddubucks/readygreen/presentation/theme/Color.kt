@@ -2,7 +2,7 @@ package com.ddubucks.readygreen.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Red = Color(0xFFFF5857)
+val Red = Color(0xFFFC4A49)
 val Green = Color(0xFF00D26A)
 val Primary = Color(0xFF9AFF2D)
 val Secondary = Color(0xFFD4FF70)
