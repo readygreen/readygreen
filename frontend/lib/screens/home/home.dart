@@ -164,10 +164,6 @@ class _HomePageContentState extends State<HomePageContent> {
     await Provider.of<CurrentLocationProvider>(context, listen: false)
         .updateLocation();
 
-    // 위치 정보를 Provider에 저장 (Provider의 updateLocation 호출)
-    await Provider.of<CurrentLocationProvider>(context, listen: false)
-        .updateLocation();
-
     print('위치 저장 완료: ${location.latitude}, ${location.longitude}');
   }
 
@@ -487,14 +483,6 @@ class _HomePageContentState extends State<HomePageContent> {
                                                 color: AppColors.greytext,
                                               ),
                                             ),
-                                            const SizedBox(height: 5),
-                                            Text(
-                                              bookmarkType,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                color: AppColors.greytext,
-                                              ),
-                                            ),
                                             Text(
                                               formatDestinationName(
                                                   bookmark['destinationName']),
@@ -571,31 +559,28 @@ class _HomePageContentState extends State<HomePageContent> {
                       ),
                       if (_bookmarks.length > 2) const SizedBox(height: 5),
                       if (_bookmarks.length > 2)
-                        if (_bookmarks.length > 2) const SizedBox(height: 5),
-                      if (_bookmarks.length > 2)
                         const Divider(
                           color: AppColors.grey, // You can adjust the color
                           thickness:
                               1, // Adjust thickness for a more prominent line
                         ),
                       if (_bookmarks.length > 2)
-                        if (_bookmarks.length > 2)
-                          Center(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _showAllBookmarks = !_showAllBookmarks;
-                                });
-                              },
-                              child: Text(
-                                _showAllBookmarks ? '접기' : '더보기',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.greytext,
-                                ),
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showAllBookmarks = !_showAllBookmarks;
+                              });
+                            },
+                            child: Text(
+                              _showAllBookmarks ? '접기' : '더보기',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: AppColors.greytext,
                               ),
                             ),
                           ),
+                        ),
                     ],
                   ),
                 ),
