@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/loading/start_loading.dart';
 import 'package:readygreen/screens/login/login.dart';
@@ -16,6 +21,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 // import 'firebase_options.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 // import '../../firebase_options.dart';
@@ -26,8 +32,17 @@ import 'package:flutter/services.dart'; // SystemNavigator를 사용하기 위�
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
 }
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
-void initializeNotification() async {
+Future<void> initializeNotification() async {
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'high_importance_channel', // 알림 채널 ID
+    'High Importance Notifications', // 채널 이름
+    importance: Importance.max,
+    playSound: true,
+  );
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
@@ -36,6 +51,19 @@ void initializeNotification() async {
       ?.createNotificationChannel(const AndroidNotificationChannel(
           'high_importance_channel', 'high_importance_notification',
           importance: Importance.max));
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+
   await flutterLocalNotificationsPlugin.initialize(const InitializationSettings(
     android: AndroidInitializationSettings("@mipmap/ic_launcher"),
   ));
@@ -45,17 +73,145 @@ void initializeNotification() async {
     sound: true,
   );
 }
+Future<void> initializeService() async {
+  final service = FlutterBackgroundService();
+
+  await service.configure(
+    iosConfiguration: IosConfiguration(
+      autoStart: true,
+      onForeground: onStart,
+      onBackground: onIosBackground,
+    ),
+    androidConfiguration: AndroidConfiguration(
+      onStart: onStart,
+      autoStart: true,
+      isForegroundMode: true,
+    ),
+  );
+
+  service.startService();
+}
+
+@pragma('vm:entry-point')
+Future<bool> onIosBackground(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
+  return true;
+}
 
 Future<void> main() async {
+  await dotenv.load(fileName: 'config/.env');
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   initializeNotification();
   KakaoSdk.init(
-    nativeAppKey: 'cf5488929a2ad2db61f895c42f6926cc',
-    javaScriptAppKey: 'dc542207fe96b123abf798c0113bd537',
+    nativeAppKey: dotenv.env['KAKAO_LOGIN_NATIVE_KEY'],
+    javaScriptAppKey: dotenv.env['KAKAO_LOGIN_JS_KEY'],
+  );
+  runApp(const App());
+}
+
+@pragma('vm:entry-point')
+void onStart(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
+
+  if (service is AndroidServiceInstance) {
+    // 포그라운드 알림 설정
+    service.setAsForegroundService();
+
+    // Foreground 알림 업데이트
+    service.setForegroundNotificationInfo(
+      title: "Foreground Service",
+      content: "Background service is running...",
+    );
+  }
+
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
+
+  
+
+  Timer.periodic(const Duration(seconds: 1), (timer) async {
+    double targetLatitude = 37.7749;
+    double targetLongitude = -122.4194;
+    int greenDuration = 40; // 초록불 지속 시간 (초)
+    int redDuration = 110; // 빨간불 지속 시간 (초)
+    int totalDuration = greenDuration + redDuration; // 총 주기 (초)
+    String startTimeString = "00:01:23"; // hh:mm:ss
+    List<String> startTimeParts = startTimeString.split(':');
+    DateTime startTime = DateTime.now().copyWith(
+      hour: int.parse(startTimeParts[0]),
+      minute: int.parse(startTimeParts[1]),
+      second: int.parse(startTimeParts[2]),
+    );
+  Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    double latitude = position.latitude;
+    double longitude = position.longitude;
+    double distance = Geolocator.distanceBetween(
+      latitude,
+      longitude,
+      targetLatitude,
+      targetLongitude,
+    );
+    if (distance <= 15) {
+      DateTime now = DateTime.now();
+      int secondsSinceStart = now.difference(startTime).inSeconds % totalDuration;
+
+      // 파란불 켜지기 5초 전이면
+      if (secondsSinceStart >= (redDuration - 5) && secondsSinceStart < redDuration) {
+        await showNotification(); // 알림 전송
+      }
+    }
+  });
+
+  // 주기적인 작업 수행
+  // Timer.periodic(const Duration(seconds: 5), (timer) async {
+  //   if (service is AndroidServiceInstance) {
+  //     if (await service.isForegroundService()) {
+  //       // 포그라운드 알림을 주기적으로 업데이트
+  //       flutterLocalNotificationsPlugin.show(
+  //         0,
+  //         '포그라운드 서비스',
+  //         '서비스가 실행 중입니다: ${DateTime.now()}',
+  //         const NotificationDetails(
+  //           android: AndroidNotificationDetails(
+  //             'high_importance_channel',
+  //             '포그라운드 알림',
+  //             importance: Importance.max,
+  //             priority: Priority.high,
+  //             ongoing: true,
+  //           ),
+  //         ),
+  //       );
+  //     }
+  //   }
+  //   print('Background Service: Running at ${DateTime.now()}');
+  //   service.invoke('update');
+  // });
+}
+Future<void> showNotification() async {
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'channel_id', // 채널 ID
+    'channel_name', // 채널 이름
+    importance: Importance.max,
+    priority: Priority.high,
+    playSound: true,
+    enableVibration: true,
+    ticker: 'ticker',
   );
 
-  runApp(const App());
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidDetails,
+  );
+
+  await flutterLocalNotificationsPlugin.show(
+    0, // 알림 ID
+    '알림', // 알림 제목
+    '파란불이 곧 켜집니다.', // 알림 내용
+    platformChannelSpecifics,
+    payload: '파란불 알림', // 선택사항: 알림 클릭 시 전달할 데이터
+  );
 }
 
 class App extends StatelessWidget {
