@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Icon
@@ -36,6 +37,9 @@ fun NavigationScreen(
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
     val (showArrivalDialog, setShowArrivalDialog) = remember { mutableStateOf(false) }
 
+    // 타이머 활성 상태 관리 (길 안내가 진행 중일 때만 활성화)
+    var isTimerActive by remember { mutableStateOf(navigationState.isNavigating) }
+
     val context = LocalContext.current
     val ttsViewModel = remember { TTSViewModel(context) }
 
@@ -58,6 +62,11 @@ fun NavigationScreen(
         }
     }
 
+    // 길 안내 상태가 변경될 때마다 타이머 상태를 업데이트
+    LaunchedEffect(navigationState.isNavigating) {
+        isTimerActive = navigationState.isNavigating
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -74,7 +83,7 @@ fun NavigationScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         if (navigationState.isNavigating) {
-            NavigationInfo(navigationState)
+            NavigationInfo(navigationState, isTimerActive)
         } else {
             Text(
                 text = "길안내 중이 아닙니다.",
@@ -90,6 +99,7 @@ fun NavigationScreen(
             message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
             onConfirm = {
                 navigationViewModel.stopNavigation()
+                isTimerActive = false
                 setShowExitDialog(false)
                 navController.popBackStack()
             },
@@ -106,6 +116,7 @@ fun NavigationScreen(
             message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
             onConfirm = {
                 navigationViewModel.finishNavigation()
+                isTimerActive = false
                 setShowArrivalDialog(false)
                 navController.popBackStack()
             },
@@ -117,10 +128,28 @@ fun NavigationScreen(
 }
 
 @Composable
-fun NavigationInfo(navigationState: NavigationState) {
-    val (remainingTime, setRemainingTime) = remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
-    val (currentBlinkerState, setCurrentBlinkerState) = remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
-    val isNavigating = navigationState.isNavigating
+fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
+    var remainingTime by remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
+    var currentBlinkerState by remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
+
+
+    LaunchedEffect(remainingTime, isTimerActive) {
+        if (isTimerActive) {
+            if (remainingTime > 0) {
+                delay(1000L) // 1초 대기
+                remainingTime--
+            } else {
+                // 남은 시간이 0이 되었을 때 신호등 상태 변경
+                if (currentBlinkerState == "RED") {
+                    remainingTime = navigationState.currentBlinkerInfo?.greenDuration ?: 0
+                    currentBlinkerState = "GREEN"
+                } else {
+                    remainingTime = navigationState.currentBlinkerInfo?.redDuration ?: 0
+                    currentBlinkerState = "RED"
+                }
+            }
+        }
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -129,7 +158,9 @@ fun NavigationInfo(navigationState: NavigationState) {
         Text(
             text = navigationState.destinationName ?: "목적지 정보 없음",
             style = pStyle,
-            color = White
+            color = White,
+            maxLines = 1,  // 최대 한 줄만 표시
+            overflow = TextOverflow.Ellipsis // 넘치면 ... 표시
         )
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -156,14 +187,22 @@ fun NavigationInfo(navigationState: NavigationState) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(
-            text = "${remainingTime}초",
-            style = secStyle,
-            color = when (currentBlinkerState) {
-                "RED" -> Red
-                "GREEN" -> Green
-                else -> Gray
-            }
-        )
+        if (navigationState.currentBlinkerInfo == null) {
+            Text(
+                text = "신호등 없음",
+                style = pStyle,
+                color = White
+            )
+        } else {
+            Text(
+                text = "${remainingTime}초",
+                style = secStyle,
+                color = when (currentBlinkerState) {
+                    "RED" -> Red
+                    "GREEN" -> Green
+                    else -> Gray
+                }
+            )
+        }
     }
 }

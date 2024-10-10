@@ -366,11 +366,11 @@ class NavigationViewModel : ViewModel() {
                     }
 
                     override fun onFailure(call: Call<NavigationResponse>, t: Throwable) {
-                        Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${t.message}")
+                        Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${t}")
                     }
                 })
             } catch (e: Exception) {
-                Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${e.message}")
+                Log.e("NavigationViewModel", "길안내 정보 불러오기 실패: ${e}")
             }
         }
     }
