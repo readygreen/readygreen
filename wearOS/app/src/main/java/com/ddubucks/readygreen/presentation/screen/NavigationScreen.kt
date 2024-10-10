@@ -36,10 +36,7 @@ fun NavigationScreen(
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
     val (showArrivalDialog, setShowArrivalDialog) = remember { mutableStateOf(false) }
-
-    // 타이머 활성 상태 관리 (길 안내가 진행 중일 때만 활성화)
     var isTimerActive by remember { mutableStateOf(navigationState.isNavigating) }
-
     val context = LocalContext.current
     val ttsViewModel = remember { TTSViewModel(context) }
 
@@ -62,7 +59,6 @@ fun NavigationScreen(
         }
     }
 
-    // 길 안내 상태가 변경될 때마다 타이머 상태를 업데이트
     LaunchedEffect(navigationState.isNavigating) {
         isTimerActive = navigationState.isNavigating
     }
@@ -132,14 +128,12 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
     var remainingTime by remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
     var currentBlinkerState by remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
 
-
     LaunchedEffect(remainingTime, isTimerActive) {
         if (isTimerActive) {
             if (remainingTime > 0) {
-                delay(1000L) // 1초 대기
+                delay(1000L)
                 remainingTime--
             } else {
-                // 남은 시간이 0이 되었을 때 신호등 상태 변경
                 if (currentBlinkerState == "RED") {
                     remainingTime = navigationState.currentBlinkerInfo?.greenDuration ?: 0
                     currentBlinkerState = "GREEN"
@@ -152,16 +146,22 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = navigationState.destinationName ?: "목적지 정보 없음",
             style = pStyle,
             color = White,
-            maxLines = 1,  // 최대 한 줄만 표시
-            overflow = TextOverflow.Ellipsis // 넘치면 ... 표시
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .wrapContentHeight(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
+
         Spacer(modifier = Modifier.height(10.dp))
 
         Icon(
@@ -174,7 +174,9 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             }),
             contentDescription = "방향",
             tint = Color.Unspecified,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.CenterHorizontally)
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -182,7 +184,12 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
         Text(
             text = navigationState.currentDescription ?: "안내 없음",
             style = pStyle,
-            color = White
+            color = White,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .wrapContentHeight(),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -191,7 +198,8 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             Text(
                 text = "신호등 없음",
                 style = pStyle,
-                color = White
+                color = White,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         } else {
             Text(
@@ -201,7 +209,8 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
                     "RED" -> Red
                     "GREEN" -> Green
                     else -> Gray
-                }
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }

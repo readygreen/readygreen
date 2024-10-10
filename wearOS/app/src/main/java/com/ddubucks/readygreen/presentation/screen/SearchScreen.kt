@@ -43,14 +43,10 @@ fun SearchScreen(
     val context = LocalContext.current
     val locationService = remember { LocationService(context) }
 
-    // TTS 인스턴스 생성
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
-
-    // 음성 인식 실행 상태 변수
     var startSpeechRecognition by remember { mutableStateOf(false) }
 
-    // 음성 인식 결과 추가
     val speechLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -63,7 +59,6 @@ fun SearchScreen(
         }
     }
 
-    // 음성인식 시작
     fun startSpeechRecognition() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -72,14 +67,12 @@ fun SearchScreen(
         speechLauncher.launch(intent)
     }
 
-    // TTS 초기화
     LaunchedEffect(Unit) {
         tts = TextToSpeech(context) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 tts?.language = Locale.KOREAN
                 ttsReady = true
 
-                // TTS 음성 출력 완료 시 콜백 설정
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(utteranceId: String?) {
                         // 음성 출력 시작 시

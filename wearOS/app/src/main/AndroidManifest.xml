@@ -50,11 +50,6 @@
         </service>
 
         <service
-            android:name=".core.service.LocationService"
-            android:foregroundServiceType="location">
-        </service>
-
-        <service
             android:name=".core.service.FirebaseMessagingService"
             android:exported="false">
             <intent-filter>
