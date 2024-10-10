@@ -6,6 +6,7 @@ import 'dart:convert'; // JSON 파싱을 위해 필요
 class PlaceApi {
   final storage = const FlutterSecureStorage();
 
+  // 카테고리 장소
   Future<dynamic> getPlaces({
     required String type,
     required double userLatitude,
@@ -23,12 +24,12 @@ class PlaceApi {
     );
 
     if (response.statusCode == 200) {
-      print('place 장소 추천 성공');
+      print('카테고리 place 장소 추천 성공');
       final decodedResponse = json.decode(utf8.decode(response.bodyBytes));
-      print('API 응답 데이터얌: $decodedResponse');
+      print('카테고리 별 API 응답 데이터: $decodedResponse');
       return decodedResponse;
     } else {
-      print('place 장소 추천 실패');
+      print('카테고리 place 장소 추천 실패');
     }
   }
 
@@ -51,7 +52,7 @@ class PlaceApi {
     if (response.statusCode == 200) {
       print('전체 장소 추천 성공');
       final decodedResponse = json.decode(utf8.decode(response.bodyBytes));
-      print('API 응답 데이터: $decodedResponse');
+      print('전체 장소 API 응답 데이터: $decodedResponse');
       return decodedResponse;
     } else {
       print('전체 장소 추천 실패');
