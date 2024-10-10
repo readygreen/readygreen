@@ -22,6 +22,7 @@ import com.ddubucks.readygreen.presentation.theme.*
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.text.style.TextAlign
 import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
 import kotlinx.coroutines.delay
 import h3Style
@@ -160,7 +161,8 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
                 .align(Alignment.CenterHorizontally)
                 .wrapContentHeight(),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -191,8 +193,10 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
                 .align(Alignment.CenterHorizontally)
                 .wrapContentHeight(),
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
+
 
         Spacer(modifier = Modifier.height(10.dp))
 
