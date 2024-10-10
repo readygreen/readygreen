@@ -42,7 +42,6 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
     var showModal by remember { mutableStateOf(false) }
     var locationPermissionGranted by remember { mutableStateOf(false) }
 
-    // 위치 권한 요청
     val locationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -52,7 +51,6 @@ fun MainScreen(navController: NavHostController, locationService: LocationServic
         }
     }
 
-    // 권한 확인 및 요청
     LaunchedEffect(Unit) {
         if (locationService.hasLocationPermission()) {
             locationPermissionGranted = true

@@ -45,34 +45,4 @@ class FcmViewModel : ViewModel() {
             }
         }
     }
-
-//    fun sendFcmMessage(context: Context, message: String, distEmail: String, messageType: Int, watch: Boolean) {
-//
-//        val fcmRequest = JSONObject(
-//            mapOf(
-//                "messageType" to messageType,
-//                "message" to message,
-//                "distEmail" to distEmail,
-//                "watch" to watch
-//            )
-//        ).toString()
-//
-//        val fcmApi = RestClient.createService(FcmApi::class.java)
-//        val body = fcmRequest.toRequestBody("application/json".toMediaTypeOrNull())
-//
-//        viewModelScope.launch {
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    fcmApi.sendFcmMessage(body).awaitResponse()
-//                }
-//                if (response.isSuccessful) {
-//                    Log.d("FcmViewModel", "FCM 메시지 전송 성공")
-//                } else {
-//                    Log.e("FcmViewModel", "FCM 메시지 전송 실패: ${response.code()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("FcmViewModel", "FCM 메시지 전송 중 오류 발생", e)
-//            }
-//        }
-//    }
 }
