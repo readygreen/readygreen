@@ -1,4 +1,7 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.ddubucks.readygreen">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ddubucks.readygreen">
+
+    <!-- 권한 설정 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -14,19 +17,32 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
+
     <application
         android:label="언제그린"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true">
+
+        <!-- Background Service 정의 -->
         <service
-        android:name="com.example.flutter_background_service.BackgroundService"
-        android:permission="android.permission.BIND_JOB_SERVICE"
-        android:foregroundServiceType="location" />
+            android:name="com.ddubucks.readygreen.BackgroundService"
+            android:permission="android.permission.FOREGROUND_SERVICE"
+            android:foregroundServiceType="location"/> <!-- 외부에서 호출되지 않도록 설정 -->
+        <service
+            android:name="id.flutter.flutter_background_service.BackgroundService"
+            android:foregroundServiceType="remoteMessaging"
+        />
+        <!-- Google API Key -->
         <meta-data 
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M"/>
+
+        <!-- Flutter Embedding 관련 메타데이터 -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
+
+        <!-- Kakao 로그인 설정 -->
         <activity 
             android:name="com.kakao.sdk.flutter.AuthCodeCustomTabsActivity"
             android:exported="true">
@@ -34,12 +50,11 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
-                <!-- "kakao${YOUR_NATIVE_APP_KEY}://oauth" 형식의 앱 실행 스킴 설정 -->
-                <!-- 카카오 로그인 Redirect URI -->
                 <data android:scheme="kakaocf5488929a2ad2db61f895c42f6926cc" android:host="oauth"/>
             </intent-filter>
         </activity>
+
+        <!-- MainActivity 설정 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -51,40 +66,38 @@
             android:enableOnBackInvokedCallback="true"
             android:windowSoftInputMode="adjustResize"
             android:showWhenLocked="true"
-            android:turnScreenOn="true"
-            >
-            <!-- Specifies an Android theme to apply to this Activity as soon as
-                 the Android process has started. This theme is visible to the user
-                 while the Flutter UI initializes. After that, this theme continues
-                 to determine the Window background behind the Flutter UI. -->
+            android:turnScreenOn="true">
+
+            <!-- Flutter 테마 설정 -->
             <meta-data
               android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+              android:resource="@style/NormalTheme"/>
+              
+            <!-- Firebase 메시징 기본 채널 설정 -->
             <meta-data
               android:name="com.google.firebase.messaging.default_notification_channel_id"
               android:value="high_importance_channel"/>
+              
+            <!-- Flutter Notification 클릭 시 동작 -->
             <intent-filter>
               <action android:name="FLUTTER_NOTIFICATION_CLICK" />
               <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
+            <!-- 앱 시작 필터 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!-- Don't delete the meta-data below.
-             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+
+        <!-- Flutter에서 사용되는 메타데이터 (자동 생성) -->
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    <!-- Required to query activities that can process text, see:
-         https://developer.android.com/training/package-visibility and
-         https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
 
-         In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
+    <!-- 프로세스 텍스트 관련 쿼리 -->
     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
