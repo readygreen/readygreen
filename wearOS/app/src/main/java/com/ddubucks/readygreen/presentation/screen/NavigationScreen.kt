@@ -156,6 +156,7 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             style = pStyle,
             color = White,
             modifier = Modifier
+                .fillMaxWidth(0.8f)
                 .align(Alignment.CenterHorizontally)
                 .wrapContentHeight(),
             maxLines = 1,
@@ -186,6 +187,7 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             style = pStyle,
             color = White,
             modifier = Modifier
+                .fillMaxWidth(0.8f)
                 .align(Alignment.CenterHorizontally)
                 .wrapContentHeight(),
             maxLines = 2,
@@ -210,7 +212,8 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
                     "GREEN" -> Green
                     else -> Gray
                 },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
             )
         }
     }
