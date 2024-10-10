@@ -8,15 +8,38 @@ import 'package:readygreen/api/map_api.dart';
 
 // 동그라미 모양 마커를 텍스트와 함께 생성하는 함수
 Future<BitmapDescriptor> createCircleMarker(
-    String text, Color circleColor) async {
+    String text, Color circleColor, String trafficLightId) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
   const Size size = Size(70, 70); // 마커 크기 설정
 
-  // 동그라미 배경
+  // 기본 배경 색상 (circleColor)
   Paint paint = Paint()..color = circleColor;
-  canvas.drawCircle(
-      Offset(size.width / 2, size.height / 2), size.width / 2, paint);
+
+  // 특정 trafficLightId에 대해 색상 반전 처리
+  if (trafficLightId == '15512' ||
+      trafficLightId == '15517' ||
+      trafficLightId == '15501' ||
+      trafficLightId == '15504') {
+    // 테두리를 circleColor로 하고 내부는 회색으로 채우기
+    paint.color = Colors.grey; // 내부 색상은 회색으로 설정
+    canvas.drawCircle(
+        Offset(size.width / 2, size.height / 2), size.width / 2, paint);
+
+    // 테두리는 circleColor로 설정
+    Paint borderPaint = Paint()
+      ..color = circleColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5; // 테두리 두께
+
+    // 테두리 그리기
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2),
+        size.width / 2 - 2.5, borderPaint); // 테두리 안쪽으로
+  } else {
+    // 기본 동그라미 배경 (circleColor)
+    canvas.drawCircle(
+        Offset(size.width / 2, size.height / 2), size.width / 2, paint);
+  }
 
   // 텍스트 스타일
   TextPainter painter = TextPainter(
@@ -36,8 +59,10 @@ Future<BitmapDescriptor> createCircleMarker(
   painter.layout();
 
   // 텍스트를 동그라미 안에 넣기
-  painter.paint(
-      canvas, Offset(size.width * 0.23, size.height * 0.25)); // 텍스트 위치 조정
+  final double xCenter = (size.width - painter.width) / 2;
+  final double yCenter = (size.height - painter.height) / 2;
+
+  painter.paint(canvas, Offset(xCenter, yCenter)); // 텍스트 위치 조정
 
   final img = await pictureRecorder.endRecording().toImage(
         size.width.toInt(),
@@ -80,28 +105,28 @@ class TrafficLightService {
         int remainingTime = trafficLight['remainingTime'];
         int greenDuration = trafficLight['greenDuration'];
         int redDuration = trafficLight['redDuration'];
+        String trafficLightId = trafficLight['id'].toString();
 
         // 상태에 따른 색상 설정
         Color circleColor =
             currentState == "RED" ? AppColors.red : AppColors.green;
 
         // 커스텀 마커 생성 및 초기 표시
-        BitmapDescriptor customMarker =
-            await createCircleMarker('$remainingTime', circleColor);
+        BitmapDescriptor customMarker = await createCircleMarker(
+          '$remainingTime',
+          circleColor,
+          trafficLightId, // trafficLightId 전달
+        );
 
         // 신호등의 Marker 추가
         Marker trafficMarker = Marker(
-          markerId: MarkerId(trafficLight['id'].toString()),
+          markerId: MarkerId(trafficLightId),
           position: LatLng(lat, lng),
           icon: customMarker, // 커스텀 마커 사용
-          // infoWindow: InfoWindow(
-          //   title: '신호등 상태: $currentState',
-          //   snippet: '남은 시간: $remainingTime초',
-          // ),
           onTap: () {
             // 마커 클릭 시 모달 띄우기
             print("마커 클릭해서 뜸");
-            _showTrafficLightModal(context, trafficLight['id']);
+            _showTrafficLightModal(context, trafficLightId);
           },
         );
 
@@ -109,7 +134,7 @@ class TrafficLightService {
         newMarkers.add(trafficMarker);
 
         // 신호등 데이터를 Map에 저장
-        _trafficLightData[trafficLight['id'].toString()] = {
+        _trafficLightData[trafficLightId] = {
           'currentState': currentState,
           'remainingTime': remainingTime,
           'greenDuration': greenDuration,
@@ -133,8 +158,9 @@ class TrafficLightService {
 
   // 모든 신호등을 관리하는 전역 타이머 시작
   void _startGlobalTimer(
-      BuildContext context, Function(Set<Marker>) onMarkersUpdated) {
-    print("타이머 시작");
+    BuildContext context,
+    Function(Set<Marker>) onMarkersUpdated,
+  ) {
     _globalTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
       Set<Marker> updatedMarkers = {};
 
@@ -166,21 +192,19 @@ class TrafficLightService {
             currentState == "RED" ? AppColors.red : AppColors.green;
 
         // 커스텀 마커 생성 및 업데이트
-        BitmapDescriptor customMarker =
-            await createCircleMarker('$remainingTime', circleColor);
+        BitmapDescriptor customMarker = await createCircleMarker(
+          '$remainingTime',
+          circleColor,
+          trafficLightId, // trafficLightId 전달
+        );
 
         Marker updatedMarker = Marker(
           markerId: MarkerId(trafficLightId),
           position: LatLng(lat, lng),
           icon: customMarker,
-          // infoWindow: InfoWindow(
-          //   title: '신호등 상태: $currentState',
-          //   snippet: '남은 시간: $remainingTime초11',
-          // ),
           onTap: () {
             // 마커 클릭 시 모달 띄우기
             print("마커 클릭해서 창 뜸");
-            print(trafficLightId);
             _showTrafficLightModal(context, trafficLightId);
           },
         );
@@ -262,8 +286,11 @@ class TrafficLightService {
       // 상태에 따른 색상 설정
       Color circleColor =
           currentState == "RED" ? AppColors.red : AppColors.green;
-      BitmapDescriptor customMarker =
-          await createCircleMarker('$remainingTime', circleColor);
+      BitmapDescriptor customMarker = await createCircleMarker(
+        '$remainingTime',
+        circleColor,
+        trafficLight['id'].toString(), // trafficLightId 전달
+      );
 
       // 마커 추가
       Marker trafficMarker = Marker(
@@ -297,7 +324,11 @@ class TrafficLightService {
         circleColor = currentState == "RED" ? AppColors.red : AppColors.green;
 
         // 새로운 커스텀 마커 생성
-        customMarker = await createCircleMarker('$remainingTime', circleColor);
+        customMarker = await createCircleMarker(
+          '$remainingTime',
+          circleColor,
+          trafficLight['id'].toString(), // trafficLightId 전달
+        );
 
         // 업데이트된 마커 생성
         Marker updatedMarker = Marker(
@@ -370,59 +401,113 @@ class TrafficLightService {
           backgroundColor: Colors.white,
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(20.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Center(
+                    child: Text(
+                      '신호등 제보',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'LogoFont',
+                        color: AppColors.green,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
                   Text(
-                    '신호등 ID: $trafficLightId',
+                    '신호등 번호 $trafficLightId',
                     style: const TextStyle(
                         fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 24),
                   const Text(
-                    '파란불 시각을 입력하세요 (hhmmss)',
+                    '파란불 시각을 입력하세요',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: blueTimeController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '파란불 시각',
                       hintText: 'hhmmss',
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.5),
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.9),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                        borderSide: BorderSide(
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
                     ),
                     keyboardType: TextInputType.datetime,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 24),
                   const Text(
-                    '빨간불 시각을 입력하세요 (hhmmss)',
+                    '빨간불 시각을 입력하세요',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: redTimeController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '빨간불 시각',
                       hintText: 'hhmmss',
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.5),
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.9),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                        borderSide: BorderSide(
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
                     ),
                     keyboardType: TextInputType.datetime,
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 24),
                   const Text(
-                    '두번째 파란불 시각을 입력하세요 (hhmmss)',
+                    '두번째 파란불 시각을 입력하세요',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
+                  const SizedBox(height: 10),
                   TextField(
                     controller: secondBlueTimeController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '두번째 파란불 시각',
                       hintText: 'hhmmss',
-                      border: OutlineInputBorder(),
+                      hintStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.5),
+                      ),
+                      labelStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.9),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(12.0),
+                        ),
+                        borderSide: BorderSide(
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                      ),
                     ),
                     keyboardType: TextInputType.datetime,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
