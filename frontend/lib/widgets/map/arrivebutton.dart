@@ -37,21 +37,31 @@ class _ArriveButtonState extends State<ArriveButton> {
   Future<void> _selectPlace(String placeId) async {
     GoogleMapsPlaces places =
         GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
-    final response = await places.getDetailsByPlaceId(placeId, language: 'ko');
 
-    if (response.isOkay) {
-      final result = response.result;
-      if (mounted) {
+    try {
+      final response =
+          await places.getDetailsByPlaceId(placeId, language: 'ko');
+
+      if (response.isOkay) {
+        // null 체크 추가
+        final result = response.result;
+        if (mounted) {
+          setState(() {
+            _lat = result.geometry?.location.lat ?? 0.0; // Null 처리
+            _lng = result.geometry?.location.lng ?? 0.0; // Null 처리
+            _isLoading = false; // 로딩 완료 상태로 변경
+          });
+        }
+      } else {
+        print('장소 선택 실패: ${response.errorMessage}');
         setState(() {
-          _lat = result.geometry?.location.lat; // null check 추가
-          _lng = result.geometry?.location.lng; // null check 추가
-          _isLoading = false; // 비동기 작업 완료
+          _isLoading = false;
         });
       }
-    } else {
-      print('장소 선택 실패: ${response.errorMessage}');
+    } catch (e) {
+      print('Error fetching place details: $e');
       setState(() {
-        _isLoading = false; // 비동기 작업 완료
+        _isLoading = false;
       });
     }
   }

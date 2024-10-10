@@ -122,6 +122,10 @@ class _ResultMapPageState extends State<ResultMapPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    if (widget.placeId == null) {
+      return const Center(
+          child: Text('잘못된 장소 정보')); // 추가: 위도, 경도, placeId가 없을 때
+    }
 
     return Scaffold(
       body: Stack(
