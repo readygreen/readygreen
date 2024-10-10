@@ -203,11 +203,11 @@ class NavigationViewModel : ViewModel() {
 
         return if (cycleTime < blinker.greenDuration) {
             // 초록불 상태
-            val remainingTime = (blinker.greenDuration - cycleTime).toInt()
+            val remainingTime = (blinker.greenDuration - cycleTime).toInt() - 2
             Pair("GREEN", remainingTime)
         } else {
             // 빨간불 상태
-            val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt()
+            val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt() - 2
             Pair("RED", remainingTime)
         }
     }
@@ -310,15 +310,12 @@ class NavigationViewModel : ViewModel() {
     fun clearNavigationState() {
         _navigationCommand.value = "clear_navigation"
         _navigationState.value = NavigationState()
-
-        // 경로 안내 관련 변수 초기화
         route = null
         blinkers = null
         currentLocation = null
         currentIndex = 0
         pointIndexList = emptyList()
     }
-
 
 
     // 네비게이션 상태 체크

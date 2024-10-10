@@ -6,44 +6,44 @@ import kotlin.Int
 import kotlin.collections.List
 
 data class NavigationResponse(
-    val routeDTO: RouteDTO, // 경로 정보
-    val blinkerDTOs: List<BlinkerDTO>, // 신호등 정보
-    val distance: Double, // 남은 거리
-    val time: String // 응답 시간
+    val routeDTO: RouteDTO,
+    val blinkerDTOs: List<BlinkerDTO>,
+    val distance: Double,
+    val time: String
 )
 
 // 경로 정보 클래스
 data class RouteDTO(
-    val type: String, // FeatureCollection (GeoJSON 형식)
-    val features: List<Feature> // 경로에 포함된 포인트 또는 선 요소 리스트
+    val type: String,
+    val features: List<Feature>
 )
 
 // 경로의 개별 요소 (포인트 또는 선)
 data class Feature(
-    val type: String, // Feature
-    val geometry: Geometry, // 좌표 정보 (점 또는 선의 좌표)
+    val type: String,
+    val geometry: Geometry, // 좌표 정보
     val properties: Properties // 세부 속성 정보 (경로 설명, 방향 등)
 )
 
 // 좌표 정보 클래스 (Point 또는 LineString)
 data class Geometry(
-    val type: String, // Point 또는 LineString (경로 유형)
-    val coordinates: Any // 좌표 데이터 (Point: Double 리스트, LineString: 리스트 내 리스트)
+    val type: String, // Point 또는 LineString
+    val coordinates: Any // 좌표 데이터
 ) {
-    // Point인 경우 Double 리스트로 변환
+    // Point
     fun getCoordinatesAsDoubleArray(): List<Double>? {
         return if (type == "Point") {
             (coordinates as? List<*>)
-                ?.filterIsInstance<Double>() // 모든 요소가 Double인지 확인
+                ?.filterIsInstance<Double>()
         } else null
     }
 
-    // LineString인 경우 리스트 내 리스트로 변환
+    // LineString
     fun getCoordinatesAsLineString(): List<List<Double>>? {
         return if (type == "LineString") {
             (coordinates as? List<*>)
                 ?.filterIsInstance<List<*>>()
-                ?.map { it.filterIsInstance<Double>() } // 내부 리스트의 모든 요소가 Double인지 확인
+                ?.map { it.filterIsInstance<Double>() }
         } else null
     }
 }
@@ -70,22 +70,22 @@ data class Properties(
 )
 
 data class BlinkerDTO(
-    val id: Int, // 신호등 ID
+    val id: Int,
     val startTime: String, // 시작 시간
     val greenDuration: Int, // 초록불 지속 시간 (초)
     val redDuration: Int, // 빨간불 지속 시간 (초)
-    val currentState: String, // 현재 신호 상태 ("GREEN" 또는 "RED")
-    val remainingTime: Int, // 남은 시간 (초 단위)
-    val latitude: Double, // 신호등의 위도
-    val longitude: Double, // 신호등의 경도
-    val index: Int // 인덱스
+    val currentState: String, // 신호 상태
+    val remainingTime: Int, // 남은 시간
+    val latitude: Double,
+    val longitude: Double,
+    val index: Int
 )
 
 
-// 신호등 시간 데이터 클래스
+// 신호등 시간
 data class Time(
-    val hour: Int, // 시
-    val minute: Int, // 분
-    val second: Int, // 초
-    val nano: Int // 나노초
+    val hour: Int,
+    val minute: Int,
+    val second: Int,
+    val nano: Int
 )

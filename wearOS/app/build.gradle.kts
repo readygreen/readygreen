@@ -29,6 +29,17 @@ android {
         buildConfigField("String", "MAPS_API_KEY", "\"${properties.getProperty("MAPS_API_KEY")}\"")
     }
 
+    applicationVariants.configureEach {
+        val appName = "readygreen"
+        this.outputs.configureEach {
+            buildOutputs.forEach {
+                val archivesBaseName = "${appName}.apk"
+                val variantOutputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                variantOutputImpl.outputFileName =  archivesBaseName
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
