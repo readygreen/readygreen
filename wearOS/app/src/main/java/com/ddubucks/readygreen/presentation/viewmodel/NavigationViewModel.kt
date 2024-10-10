@@ -31,9 +31,7 @@ class NavigationViewModel : ViewModel() {
     val navigationState: StateFlow<NavigationState> = _navigationState
     private var route: List<Feature>? = null
     private var blinkers: List<BlinkerDTO>? = null
-
-    // 현재 위치
-    private var currentLocation: Location? = null
+    private var currentLocation: Location? = null // 현재 위치
     private var currentIndex = 0 // 현재 안내 중인 경로 포인트 인덱스
     private var pointIndexList: List<Int> = emptyList() // Type이 Point인 인덱스 리스트
 
@@ -54,6 +52,7 @@ class NavigationViewModel : ViewModel() {
             }
         }
     }
+
 
     // 길안내 시작 api 요청
     private fun initiateNavigation(context: Context, curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
@@ -89,7 +88,6 @@ class NavigationViewModel : ViewModel() {
             })
         }
     }
-
 
 
     // 좌표 반올림
@@ -205,7 +203,7 @@ class NavigationViewModel : ViewModel() {
         val format = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
         val startDate = format.parse(blinker.startTime)
 
-        // 현재 시간 가져오기
+        // 현재 시간
         val currentTime = Date()
 
         // 신호 주기
@@ -219,11 +217,11 @@ class NavigationViewModel : ViewModel() {
 
         return if (cycleTime < blinker.greenDuration) {
             // 초록불 상태
-            val remainingTime = (blinker.greenDuration - cycleTime).toInt() - 2
+            val remainingTime = (blinker.greenDuration - cycleTime).toInt()
             Pair("GREEN", remainingTime)
         } else {
             // 빨간불 상태
-            val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt() - 2
+            val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt()
             Pair("RED", remainingTime)
         }
     }
@@ -238,7 +236,9 @@ class NavigationViewModel : ViewModel() {
 
         // 다음 안내 중인 포인트가 있는지 확인
         if (currentIndex + 1 < pointIndexList.size) {
-            val nextFeature = route?.get(pointIndexList[currentIndex + 1]) // 다음 Point 타입의 Feature 가져오기
+
+            val nextFeature = route?.get(pointIndexList[currentIndex + 1])
+
             nextFeature?.let { feature ->
                 val coordinates = feature.geometry.getCoordinatesAsDoubleArray()
                 coordinates?.let {
@@ -346,7 +346,6 @@ class NavigationViewModel : ViewModel() {
                         when (response.code()) {
                             200 -> {
                                 Log.d("NavigationViewModel", "길안내 중입니다.")
-                                // 길안내 중일 때 getNavigation 호출
                                 getNavigation(context)
                             }
                             204 -> {
@@ -369,7 +368,6 @@ class NavigationViewModel : ViewModel() {
     }
 
 
-
     // 네비게이션 정보 불러오기
     fun getNavigation(context: Context) {
         _navigationCommand.value = "get_navigation"
@@ -378,11 +376,11 @@ class NavigationViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = navigationApi.getNavigation()
+
                 response.enqueue(object : Callback<NavigationResponse> {
                     override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
                         if (response.isSuccessful) {
                             Log.d("NavigationViewModel", "길안내 정보 받기 성공: $response")
-                            // 응답 데이터 처리 - context 전달
                             handleNavigationResponse(response, context)
                         } else {
                             Log.d("NavigationViewModel", "길안내 정보 불러오기 실패: ${response.errorBody()?.string()}")

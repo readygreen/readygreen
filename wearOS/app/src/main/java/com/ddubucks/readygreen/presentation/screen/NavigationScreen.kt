@@ -128,7 +128,6 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
     var remainingTime by remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
     var currentBlinkerState by remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
 
-
     LaunchedEffect(remainingTime, isTimerActive) {
         if (isTimerActive) {
             if (remainingTime > 0) {
