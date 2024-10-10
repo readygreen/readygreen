@@ -30,9 +30,9 @@
 - 장소 검색 제공
 - 웨어러블 기기 연동
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/27f88c23-d9ce-4299-af4e-5da3d800650b" width="30%">
-  <img src="https://github.com/user-attachments/assets/ab57242c-fb50-4754-a209-fc20b93c8975" width="30%">
-  <img src="https://github.com/user-attachments/assets/130f6497-90e6-4ef5-802f-b00179871371" width="20%">
+  <img src="https://github.com/user-attachments/assets/27f88c23-d9ce-4299-af4e-5da3d800650b" width="20%">
+  <img src="https://github.com/user-attachments/assets/ab57242c-fb50-4754-a209-fc20b93c8975" width="20%">
+  <img src="https://github.com/user-attachments/assets/130f6497-90e6-4ef5-802f-b00179871371" width="10%">
 </div>
 
 
@@ -41,12 +41,12 @@
 - 목적지 길안내 제공
 - 웨어러블 기기 연동
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/7c2ace1f-88cf-4cf7-aab2-57aac93754df" width="30%">
-  <img src="https://github.com/user-attachments/assets/482aea7f-2f0c-47a6-8da9-92cc06314b93" width="30%">
-  <img src="https://github.com/user-attachments/assets/1a570796-09a3-49db-8c70-776c76462702" width="30%">
-    <img src="https://github.com/user-attachments/assets/15e9406c-8ada-4b90-81e2-a159fe434d5a" width="20%">
-        <img src="https://github.com/user-attachments/assets/4c830ac4-2482-49cc-aef4-728101c662c2" width="20%">
-            <img src="https://github.com/user-attachments/assets/6158e134-5864-499f-97b1-58126e1286be" width="20%">
+  <img src="https://github.com/user-attachments/assets/7c2ace1f-88cf-4cf7-aab2-57aac93754df" width="20%">
+  <img src="https://github.com/user-attachments/assets/482aea7f-2f0c-47a6-8da9-92cc06314b93" width="20%">
+  <img src="https://github.com/user-attachments/assets/1a570796-09a3-49db-8c70-776c76462702" width="20%">
+    <img src="https://github.com/user-attachments/assets/15e9406c-8ada-4b90-81e2-a159fe434d5a" width="10%">
+        <img src="https://github.com/user-attachments/assets/4c830ac4-2482-49cc-aef4-728101c662c2" width="10%">
+            <img src="https://github.com/user-attachments/assets/6158e134-5864-499f-97b1-58126e1286be" width="10%">
                 
 </div>
 
@@ -54,7 +54,7 @@
 - 주변 장소 데이터 `분산 처리`
 
 <div>
-  <img src="https://github.com/user-attachments/assets/3d94ddd5-19f1-4cc9-940f-dea8f8f33338" width="30%">
+  <img src="https://github.com/user-attachments/assets/3d94ddd5-19f1-4cc9-940f-dea8f8f33338" width="20%">
 </div>
 
 ### 메인화면
@@ -62,16 +62,16 @@
 - 자주가는 목적지와 최근 목적지 바로 길찾기 제공
 
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/a65581f6-8664-4e9d-a774-50d2a1647881" width="30%">
-  <img src="https://github.com/user-attachments/assets/b1d62a36-06b9-4a70-a46c-403ba0869442" width="30%">
-  <img src="https://github.com/user-attachments/assets/f308e00e-e9d0-4fbd-bd39-48f6ffbca36c" width="30%">
-  <img src="https://github.com/user-attachments/assets/51f4eb3e-1685-4dfa-86f4-943fa9e71661" width="20%">
+  <img src="https://github.com/user-attachments/assets/a65581f6-8664-4e9d-a774-50d2a1647881" width="20%">
+  <img src="https://github.com/user-attachments/assets/b1d62a36-06b9-4a70-a46c-403ba0869442" width="20%">
+  <img src="https://github.com/user-attachments/assets/f308e00e-e9d0-4fbd-bd39-48f6ffbca36c" width="20%">
+  <img src="https://github.com/user-attachments/assets/51f4eb3e-1685-4dfa-86f4-943fa9e71661" width="10%">
 </div>
 
 ### 로그인
 - `카카오 소셜` 로그인
 <div margin: 10px>
-<img src="https://github.com/user-attachments/assets/5ddf3767-e3f7-4b62-a6ca-f82fa2153aaf" width="30%">
+<img src="https://github.com/user-attachments/assets/5ddf3767-e3f7-4b62-a6ca-f82fa2153aaf" width="20%">
 </div>
   
 ### 마이페이지
@@ -79,9 +79,9 @@
 - `생일 등록 및 변경`
 - `자주가는 목적지` 등록 및 수정
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/c9194c23-d7b2-4528-afd7-0f1120eed7ec" width="30%">
-  <img src="https://github.com/user-attachments/assets/c9c01386-dad6-4add-b786-c78fa7fbbdde" width="30%">
-  <img src="https://github.com/user-attachments/assets/7b4126aa-f154-49bf-82ae-edad71311f31" width="30%">
+  <img src="https://github.com/user-attachments/assets/c9194c23-d7b2-4528-afd7-0f1120eed7ec" width="20%">
+  <img src="https://github.com/user-attachments/assets/c9c01386-dad6-4add-b786-c78fa7fbbdde" width="20%">
+  <img src="https://github.com/user-attachments/assets/7b4126aa-f154-49bf-82ae-edad71311f31" width="20%">
 </div>
 
 
@@ -91,8 +91,8 @@
 - `총 포인트`, `포인트 상세 내역` 조회
 - `걸음 수`, `운세`, `제보`에 대한 포인트 부여
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/79e1d1da-3b98-4094-9771-665e297f8422" width="30%">
-  <img src="https://github.com/user-attachments/assets/4379dd0f-a9f4-41bd-b333-864928248483" width="30%">
+  <img src="https://github.com/user-attachments/assets/79e1d1da-3b98-4094-9771-665e297f8422" width="20%">
+  <img src="https://github.com/user-attachments/assets/4379dd0f-a9f4-41bd-b333-864928248483" width="20%">
 </div>
 
 
@@ -101,9 +101,9 @@
 - 사용자의 `건의사항들`을 조회
 - `잘못된 데이터`를 제보하는 건의 등록
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/f154afc2-883e-4e36-aae2-5cc6033081db" width="30%">
-  <img src="https://github.com/user-attachments/assets/91d419a6-13fe-4f42-8fd9-b345d75a3c1d" width="30%">
-  <img src="https://github.com/user-attachments/assets/9f4cc153-da88-4861-aa21-375c00f85518" width="30%">
+  <img src="https://github.com/user-attachments/assets/f154afc2-883e-4e36-aae2-5cc6033081db" width="20%">
+  <img src="https://github.com/user-attachments/assets/91d419a6-13fe-4f42-8fd9-b345d75a3c1d" width="20%">
+  <img src="https://github.com/user-attachments/assets/9f4cc153-da88-4861-aa21-375c00f85518" width="20%">
 </div>
 
   
@@ -111,9 +111,9 @@
 - `웨어러블` 연결
 - 이메일과 모바일에서 제공하는 `인증번호` 입력시 연동
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/40794819-58d4-42e2-a3dd-6ac40aac3a52" width="30%"/>
-  <img src="https://github.com/user-attachments/assets/dc3edb0f-9d09-4dc2-91de-90cb26fc530e" width="20%"/>
-  <img src="https://github.com/user-attachments/assets/1a610dd0-2afb-445c-9ac2-916fe20828ee" width="20%"/>
+  <img src="https://github.com/user-attachments/assets/40794819-58d4-42e2-a3dd-6ac40aac3a52" width="20%"/>
+  <img src="https://github.com/user-attachments/assets/dc3edb0f-9d09-4dc2-91de-90cb26fc530e" width="10%"/>
+  <img src="https://github.com/user-attachments/assets/1a610dd0-2afb-445c-9ac2-916fe20828ee" width="10%"/>
 </div>
 
 
