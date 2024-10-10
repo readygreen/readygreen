@@ -105,10 +105,12 @@ class _HomePageContentState extends State<HomePageContent> {
       }
     } catch (error) {
       print('Failed to load nearby places: $error');
-      setState(() {
-        nearbyPlaces = [];
-        isLoadingPlaces = false;
-      });
+      if (mounted) {
+        setState(() {
+          nearbyPlaces = [];
+          isLoadingPlaces = false;
+        });
+      }
     }
   }
 
