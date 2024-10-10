@@ -310,7 +310,15 @@ class NavigationViewModel : ViewModel() {
     fun clearNavigationState() {
         _navigationCommand.value = "clear_navigation"
         _navigationState.value = NavigationState()
+
+        // 경로 안내 관련 변수 초기화
+        route = null
+        blinkers = null
+        currentLocation = null
+        currentIndex = 0
+        pointIndexList = emptyList()
     }
+
 
 
     // 네비게이션 상태 체크

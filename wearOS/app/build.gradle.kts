@@ -76,7 +76,7 @@ dependencies {
     implementation(libs.watchface.complications.data.source.ktx)
     implementation(libs.navigation.compose)
     implementation(libs.material3.android)
-    implementation(libs.firebase.messaging.ktx) // Firebase 메시징(KTX)
+    implementation(libs.firebase.messaging.ktx)
     implementation(libs.runtime.livedata)
 
     // Compose BOM
