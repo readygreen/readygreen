@@ -46,8 +46,7 @@
 - 장소 데이터 분산 데이터 처리
 
 <div>
-  <img src="point.gif" width="75%">
-  <img src="point.gif" width="20%">
+  <img src="https://github.com/user-attachments/assets/3d94ddd5-19f1-4cc9-940f-dea8f8f33338" width="30%">
 </div>
 
 ### 메인화면
@@ -59,11 +58,10 @@
 <img src="point.gif" width="20%">
 </div>
 
-### 회원가입 & 로그인 & 로그아웃
-- `카카오 소셜 로그인/회원가입
+### 로그인
+- `카카오 소셜 로그인
 <div>
-<img src="point.gif" width="75%">
-<img src="point.gif" width="20%">
+<img src="https://github.com/user-attachments/assets/5ddf3767-e3f7-4b62-a6ca-f82fa2153aaf" width="30%">
 </div>
   
 ### 마이페이지
@@ -71,10 +69,9 @@
 - `생일 등록 및 변경`
 - `자주가는 목적지` 등록 및 수정
 <div>
-  <img src="https://github.com/user-attachments/assets/f4dbfdb0-cf8e-4bcd-90c6-76e98586ddbb" width="20%">
-  <img src="https://github.com/user-attachments/assets/7b6df2ec-8c50-45d9-aa49-2a2f0d88f4d1" width="20%">
-  <img src="https://github.com/user-attachments/assets/044ba92f-435e-4f73-ade2-cae75e3f389a" width="20%">
-  <img src="https://github.com/user-attachments/assets/68e27f34-f53b-4afc-a302-836ed05cfac4" width="20%">
+  <img src="https://github.com/user-attachments/assets/c9194c23-d7b2-4528-afd7-0f1120eed7ec" width="30%">
+  <img src="https://github.com/user-attachments/assets/c9c01386-dad6-4add-b786-c78fa7fbbdde" width="30%">
+  <img src="https://github.com/user-attachments/assets/7b4126aa-f154-49bf-82ae-edad71311f31" width="30%">
 </div>
 
 
@@ -84,33 +81,31 @@
 - `총 포인트`, `포인트 상세 내역` 조회
 - `걸음 수`, `운세`, `제보`에 대한 포인트 부여
 <div>
-  <img src="https://github.com/user-attachments/assets/877df1d9-5995-45ff-b180-c69eeae0e199" width="20%">
-  <img src="https://github.com/user-attachments/assets/89f3e8bd-b58d-4046-a1e4-d2c72a20aa4d" width="20%">
+  <img src="https://github.com/user-attachments/assets/79e1d1da-3b98-4094-9771-665e297f8422" width="30%">
+  <img src="https://github.com/user-attachments/assets/4379dd0f-a9f4-41bd-b333-864928248483" width="30%">
 </div>
 
 
-### 공지사항
+### 고객지원
 - 공지사항
 - 내건의함
 - 건의하기
 <div>
-  <img src="https://github.com/user-attachments/assets/ec5f9e45-c0d0-48a5-8eb7-9b41c54182ce" width="20%">
-  <img src="https://github.com/user-attachments/assets/e48f43da-0bbc-4739-a145-5897a522840d" width="20%">
-  <img src="https://github.com/user-attachments/assets/1807bb38-1ffa-466f-8305-168303e47179" width="20%">
+  <img src="https://github.com/user-attachments/assets/f154afc2-883e-4e36-aae2-5cc6033081db" width="30%">
+  <img src="https://github.com/user-attachments/assets/91d419a6-13fe-4f42-8fd9-b345d75a3c1d" width="30%">
+  <img src="https://github.com/user-attachments/assets/9f4cc153-da88-4861-aa21-375c00f85518" width="30%">
 </div>
 
   
-### 갤럭시 워치
+### 워치 연동
 - 웨어러블 연결
-- 음성 검색
-- 메인 페이지
-- 자주가는 목적지
-<div>
-<img src="https://github.com/user-attachments/assets/ec34945d-ff8b-4cb1-885e-306f3a9e5429" width="20%"/>
-  <img src="https://github.com/user-attachments/assets/ec34945d-ff8b-4cb1-885e-306f3a9e5429" width="20%"/>
-  <img src="https://github.com/user-attachments/assets/ec34945d-ff8b-4cb1-885e-306f3a9e5429" width="20%"/>
-  <img src="https://github.com/user-attachments/assets/ec34945d-ff8b-4cb1-885e-306f3a9e5429" width="20%"/>
+- 이메일과 모바일에서 제공하는 인증번호 입력시 연동
+<div >
+  <img src="https://github.com/user-attachments/assets/40794819-58d4-42e2-a3dd-6ac40aac3a52" width="30%"/>
+  <img src="https://github.com/user-attachments/assets/dc3edb0f-9d09-4dc2-91de-90cb26fc530e" width="20%"/>
+  <img src="https://github.com/user-attachments/assets/1a610dd0-2afb-445c-9ac2-916fe20828ee" width="20%"/>
 </div>
+
 
 ## ✨ 주요 기능
 
@@ -234,9 +229,10 @@ sdk: flutter
 
 <img width="100%" alt="기능 명세" src="https://github.com/user-attachments/assets/4913b826-8ebe-49e1-81ae-76b7463548a2"><br>
 
-### [🎨 화면 설계서](https://www.figma.com/design/P73jaKuUZsdERNRuDRBdtm/%EC%96%B8%EC%A0%9C%EA%B7%B8%EB%A6%B0?node-id=0-1&t=cTjzOCfPTE8c1GE1-1)
+### [🎨 화면 설계서](https://www.figma.com/design/P73jaKuUZsdERNRuDRBdtm/%EC%96%B8%EC%A0%9C%EA%B7%B8%EB%A6%B0?node-id=301-1535&node-type=canvas&t=tXJLJwuCp1h2XQ3D-0)
 
-<img width="100%" alt="화면설계서" src="https://github.com/user-attachments/assets/89a31ee3-366b-4915-a4e2-7f97bb1ce747"><br>
+
+<img width="100%" alt="화면설계서" src="https://github.com/user-attachments/assets/1c31c32a-8187-42c8-8f9e-624bf4da41b3"><br>
 
 ### [✨ ER Diagram](https://www.erdcloud.com/d/57wJHqjZPLPw7w2ve)
 
