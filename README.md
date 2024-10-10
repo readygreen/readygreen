@@ -143,90 +143,73 @@
 
 ## 🖥️ 개발 환경
 
-**Management Tool**
-- 형상 관리 : Gitlab
-- 이슈 관리 : Jira
-- 커뮤니케이션 : Mattermost, Discord, Notion
-- 디자인 : Figma
-
 **🐳 Backend**
 - Java `17`
-- Ubutu '20.1.0'
+- Ubutu `20.1.0`
 - SpringBoot `3.3.3`
 - Gradle `7.5`
 - Swagger
-- Spring Security `2.4.5`
-- spark `3.2.1`
+- Spring Security
+- spark `3.4.0`
 
 **🦊 Frontend**
-- lang: HTML5, CSS3, JAVASCRIPT, Node.js `16.16.0`
-- framework: react `16.13.1`
-- style : Sass
-- http: axios
-- formatter : eslint + prettier
-- router : react-router-dom `6.3.0`
-- state management tool : react-redux `8.0.2`
-- Libary
-	```javascript
-	"@fortawesome/fontawesome-svg-core": "^6.2.0",
-	"@fortawesome/free-regular-svg-icons": "^6.2.0",
-	"@fortawesome/free-solid-svg-icons": "^6.2.0",
-	"@fortawesome/react-fontawesome": "^0.2.0",
-	"@nivo/pie": "^0.80.0",
-	"@testing-library/jest-dom": "^5.16.5",
-	"@testing-library/react": "^10.0.0",
-	"@testing-library/user-event": "^13.5.0",
-	"aos": "^2.3.4",
-	"axios": "^0.27.2",
-	"install": "^0.13.0",
-	"moment": "^2.29.4",
-	"node-sass": "^7.0.1",
-	"npm": "^8.19.2",
-	"pageable": "^0.6.8",
-	"rc-slider": "^9.3.0",
-	"react": "^16.13.1",
-	"react-calendar": "^3.9.0",
-	"react-dom": "^16.13.1",
-	"react-globe": "^5.0.2",
-	"react-redux": "^8.0.2",
-	"react-responsive": "^9.0.0-beta.10",
-	"react-router-dom": "^6.3.0",
-	"react-scripts": "5.0.1",
-	"react-wordcloud": "^1.2.7",
-	"redux": "^4.2.0",
-	"redux-persist": "^6.0.0",
-	"redux-promise": "^0.6.0",
-	"redux-thunk": "^2.4.1",
-	"sass-loader": "^13.0.2",
-	"three": "^0.122.0",
-	"web-vitals": "^2.1.4"
-   ```
-- API
-    - [react-globe](https://react-globe.netlify.app/)
-    - [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API)   
-    - [react-wordcloud](https://react-wordcloud.netlify.app/)
-    - [Chart](https://nivo.rocks/about/)
+- lang: dart `16.16.0`
+- framework: flutter `3.24.3`
+- 상태관리 : provider `6.1.2`
+
+```
+sdk: flutter
+  cupertino_icons: ^1.0.8
+  permission_handler: ^8.3.0
+  google_maps_flutter: ^2.9.0
+  flutter_google_places: ^0.3.0
+  google_maps_webservice: ^0.0.19
+  location: ^6.0.2
+  geolocator: ^13.0.1
+  geocoding: ^3.0.0
+  provider: ^6.1.2
+  http: ^0.13.6
+  speech_to_text: ^7.0.0
+  flutter_secure_storage: ^9.2.2
+  kakao_flutter_sdk_user: ^1.9.6
+  intl: ^0.17.0
+  firebase_messaging: ^15.1.2
+  googleapis_auth: ^1.4.1
+  flutter_local_notifications: ^17.2.3
+  lottie: ^2.2.0
+  confetti: ^0.8.0
+```
+ 
+**🦊WearOS**
+- Kotlin `1.8`
+- Retrofit `2.9.0`
+- Google Maps `4.4.1`
+- Lottie ` 6.0.0`
+- Firebase Messaging
+ 
 
 **🗂️ DB**
 - MySQL `8.0.30`
+- MongoDB
+- Redis
 
 **🌐 Server**
-- https (TLS `1.0`)
 - Ubuntu `20.0.4`
 - Nginx `1.23`
 - PuTTY `0.77`
-- mobaXterm `22.1`
 - Docker `20.10.18`
-- Jenkins `Jenkins/jenkins:lts-jdk11` (Docker image tag name)
+- Jenkins `Jenkins/jenkins:lts-jdk11`
 
 **🔨 IDE**
-- IntelliJ `2022.2`
+- IntelliJ `2024.2.1`
 - MySQL Workbench `8.0.29`
 - VSCode `1.69.2`
+- Android Studio `2024.1.2`
 
 ## 💫 시스템 아키텍처
 
-<img src="https://github.com/user-attachments/assets/f7255f71-84b9-457c-9949-1f69d48dfee3" alt="시스템 아키텍처" width="80%">
+<img src="https://github.com/user-attachments/assets/0132b0bc-10ed-4246-aa8e-cdba38da28d0" alt="시스템 아키텍처" width="80%">
+
 
 
 ## ✨ 기술 특이점
