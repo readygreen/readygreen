@@ -2,15 +2,12 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="app.MainComplicationService">
+      <SelectionState runConfigName="Unnamed">
         <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
-      <SelectionState runConfigName="readygreen">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-10-07T12:58:52.715442400Z">
+        <DropdownSelection timestamp="2024-10-08T08:36:48.098735700Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=192.168.137.179:37347;connection=d3e51584" />
+              <DeviceId pluginId="Default" identifier="serial=192.168.137.179:37277;connection=8a07524f" />
             </handle>
           </Target>
         </DropdownSelection>

@@ -39,10 +39,10 @@ fun BookmarkScreen(
     var showModal by remember { mutableStateOf(false) }
     var selectedBookmark by remember { mutableStateOf<BookmarkResponse?>(null) }
 
-    // TTS 관련 상태 및 플래그
     var ttsReady by remember { mutableStateOf(false) }
     var tts by remember { mutableStateOf<TextToSpeech?>(null) }
     var navigateAfterTTS by remember { mutableStateOf(false) }
+    var isSpeaking by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         bookmarkViewModel.getBookmarks()
@@ -54,34 +54,34 @@ fun BookmarkScreen(
                 tts?.language = Locale.KOREAN
                 ttsReady = true
 
-                // TTS가 끝났을 때 콜백 설정
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-                    override fun onStart(utteranceId: String?) {}
+                    override fun onStart(utteranceId: String?) {
+                        isSpeaking = true
+                    }
 
                     override fun onDone(utteranceId: String?) {
-                        // TTS가 끝난 후 페이지 이동 플래그 활성화
+                        isSpeaking = false
                         navigateAfterTTS = true
                     }
 
-                    override fun onError(utteranceId: String?) {}
+                    override fun onError(utteranceId: String?) {
+                        isSpeaking = false
+                    }
                 })
             }
         }
     }
 
-    // TTS 자원 해제
     DisposableEffect(Unit) {
         onDispose {
             tts?.shutdown()
         }
     }
 
-    // TTS가 끝난 후 페이지 전환 처리
     LaunchedEffect(navigateAfterTTS) {
         if (navigateAfterTTS && selectedBookmark != null) {
             val place = selectedBookmark
             if (place != null) {
-                // 길 안내를 시작하고 페이지 전환
                 navigationViewModel.startNavigation(
                     context,
                     place.latitude,
@@ -91,88 +91,90 @@ fun BookmarkScreen(
                 navController.navigate("navigationScreen") {
                     popUpTo("mainScreen") { inclusive = false }
                 }
-                // 플래그 초기화
                 navigateAfterTTS = false
             }
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Black),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            ScalingLazyColumn {
-                item {
-                    Text(
-                        text = "자주가는 목적지",
-                        style = h3Style,
-                        color = Primary,
-                    )
-                }
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-                if (bookmarks.isNotEmpty()) {
+    if (isSpeaking) {
+        LoadingScreen()
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Black),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                ScalingLazyColumn {
                     item {
                         Text(
-                            text = "목적지를 선택해주세요.",
-                            style = pStyle,
-                            color = Color.White,
+                            text = "자주가는 목적지",
+                            style = h3Style,
+                            color = Primary,
                         )
                     }
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
                     }
-                    items(bookmarks) { bookmark ->
-                        val iconResId = when (bookmark.name) {
-                            "회사" -> R.drawable.bookmark_office
-                            "집" -> R.drawable.bookmark_home
-                            else -> R.drawable.bookmark_default
+                    if (bookmarks.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "목적지를 선택해주세요.",
+                                style = pStyle,
+                                color = Color.White,
+                            )
                         }
-                        ButtonIcon(
-                            item = ButtonIconModel(
-                                icon = iconResId,
-                                label = bookmark.destinationName
-                            ),
-                            onClick = {
-                                Log.d("BookmarkScreen", "북마크 버튼 클릭: ${bookmark.destinationName}")
-                                selectedBookmark = bookmark
-                                showModal = true
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        items(bookmarks) { bookmark ->
+                            val iconResId = when (bookmark.name) {
+                                "회사" -> R.drawable.bookmark_office
+                                "집" -> R.drawable.bookmark_home
+                                else -> R.drawable.bookmark_default
                             }
-                        )
-                    }
-                } else {
-                    item {
-                        Text(
-                            text = "저장된 북마크가 없습니다.",
-                            style = pStyle,
-                            color = Color.White,
-                        )
+                            ButtonIcon(
+                                item = ButtonIconModel(
+                                    icon = iconResId,
+                                    label = bookmark.destinationName
+                                ),
+                                onClick = {
+                                    Log.d("BookmarkScreen", "북마크 버튼 클릭: ${bookmark.destinationName}")
+                                    selectedBookmark = bookmark
+                                    showModal = true
+                                }
+                            )
+                        }
+                    } else {
+                        item {
+                            Text(
+                                text = "저장된 북마크가 없습니다.",
+                                style = pStyle,
+                                color = Color.White,
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        if (showModal && selectedBookmark != null) {
-            Modal(
-                title = "길안내 시작",
-                message = "${selectedBookmark?.destinationName}으로 길안내를 시작할까요?",
-                onConfirm = {
-                    val place = selectedBookmark
-                    if (place != null && ttsReady && place.destinationName != null) {
-                        // TTS로 길 안내 메시지 출력
-                        tts?.speak("${place.destinationName}으로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
+            if (showModal && selectedBookmark != null) {
+                Modal(
+                    title = "길안내 시작",
+                    message = "${selectedBookmark?.destinationName}으로 길안내를 시작할까요?",
+                    onConfirm = {
+                        val place = selectedBookmark
+                        if (place != null && ttsReady && place.destinationName != null) {
+                            tts?.speak("${place.destinationName}으로 길안내를 시작합니다", TextToSpeech.QUEUE_FLUSH, null, "ttsId")
+                        }
+                        showModal = false
+                    },
+                    onCancel = {
+                        showModal = false
                     }
-                    showModal = false
-                },
-                onCancel = {
-                    showModal = false
-                }
-            )
+                )
+            }
         }
     }
 }

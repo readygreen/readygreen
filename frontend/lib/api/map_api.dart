@@ -6,7 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class MapStartAPI {
   final storage = const FlutterSecureStorage();
 
-  // 경로 요청 (POST)
+  // 경로 요청 (POST) start
   Future<Map<String, dynamic>?> fetchRoute({
     required double startX,
     required double startY,
@@ -46,10 +46,20 @@ class MapStartAPI {
     print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      return jsonDecode(utf8.decode(response.bodyBytes));
+      await storage.write(key: 'isGuide', value: 'true'); // 문자열로 저장
+
+      await storage.write(key: 'isGuide', value: 'true'); // 문자열로 저장
+      String? isGuide = await storage.read(key: 'isGuide');
+      print('길안내 start - isGuide: $isGuide'); // 확인을 위해 출력
+
+      await storage.write(key: 'isModified', value: 'true');
+      String? isModified = await storage.read(key: 'isModified');
+      print('길안내 start - isModified: $isModified');
+
+      return jsonDecode(utf8.decode(response.bodyBytes)); // 응답 데이터 반환
     } else {
       print('Error response body: ${response.body}');
-      print('실패 코드: ${response.statusCode}');
+      print('start map 실패 코드: ${response.statusCode}');
       return null;
     }
   }
@@ -187,7 +197,7 @@ class MapStartAPI {
     }
   }
 
-  // 길안내 정보 요청 (GET)
+  // 길안내 정보 요청 (GET) guide
   Future<Map<String, dynamic>?> fetchGuideInfo() async {
     String? accessToken = await storage.read(key: 'accessToken');
 
@@ -209,10 +219,19 @@ class MapStartAPI {
     print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      print('길안내 정보 조회 성공');
-      return jsonDecode(utf8.decode(response.bodyBytes));
+      print('guide 길안내 정보 조회 성공');
+
+      await storage.write(key: 'isGuide', value: 'true'); // 문자열로 저장
+      String? isGuide = await storage.read(key: 'isGuide');
+      print('길안내 guide - isGuide: $isGuide'); // 확인을 위해 출력
+
+      await storage.write(key: 'isModified', value: 'true');
+      String? isModified = await storage.read(key: 'isModified');
+      print('길안내 guide - isModified: $isModified');
+
+      return jsonDecode(utf8.decode(response.bodyBytes)); // 응답 데이터 반환
     } else {
-      print('길안내 정보 조회 실패: ${response.statusCode}');
+      print('guide 길안내 정보 조회 실패: ${response.statusCode}');
       return null;
     }
   }
@@ -269,8 +288,17 @@ class MapStartAPI {
     );
 
     if (response.statusCode == 200) {
-      print('check guide 200');
+      print('guide 안내 중지 200');
       // 상태 코드가 200이면 true 반환
+
+      await storage.write(key: 'isGuide', value: 'false');
+      String? isGuide = await storage.read(key: 'isGuide');
+      print('길안내 중지 isGuide: $isGuide');
+
+      await storage.write(key: 'isModified', value: 'true');
+      String? isModified = await storage.read(key: 'isModified');
+      print('길안내 중지 isModified: $isModified');
+
       return true;
     } else {
       // 기타 상태 코드일 경우 false 반환
@@ -351,6 +379,15 @@ class MapStartAPI {
 
     if (response.statusCode == 200) {
       print('길안내 완료 요청 성공');
+
+      await storage.write(key: 'isGuide', value: 'false');
+      String? isGuide = await storage.read(key: 'isGuide');
+      print('길안내 완료 isGuide: $isGuide');
+
+      await storage.write(key: 'isModified', value: 'true');
+      String? isModified = await storage.read(key: 'isModified');
+      print('길안내 완료 isModified: $isModified');
+
       return {'message': response.body};
     } else {
       print('길안내 완료 요청 실패: ${response.statusCode}');
@@ -388,52 +425,49 @@ class MapStartAPI {
     }
   }
 
-Future<bool> updateBlinkerWithTimes({
-  required String id,
-  required String startTime,
-  required String middleTime,
-  required String endTime,
-}) async {
-  String? accessToken = await storage.read(key: 'accessToken');
+  Future<bool> updateBlinkerWithTimes({
+    required String id,
+    required String startTime,
+    required String middleTime,
+    required String endTime,
+  }) async {
+    String? accessToken = await storage.read(key: 'accessToken');
 
-  // hhmmss -> hh:mm:ss 형식으로 변환하는 함수
-  String formatTime(String time) {
-    if (time.length == 6) {
-      return '${time.substring(0, 2)}:${time.substring(2, 4)}:${time.substring(4, 6)}';
+    // hhmmss -> hh:mm:ss 형식으로 변환하는 함수
+    String formatTime(String time) {
+      if (time.length == 6) {
+        return '${time.substring(0, 2)}:${time.substring(2, 4)}:${time.substring(4, 6)}';
+      } else {
+        throw Exception("Invalid time format");
+      }
+    }
+
+    // 시간을 형식에 맞게 변환
+    String formattedStartTime = formatTime(startTime);
+    String formattedMiddleTime = formatTime(middleTime);
+    String formattedEndTime = formatTime(endTime);
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/report/blinker'),
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken',
+      },
+      body: jsonEncode({
+        'id': id,
+        'startTime': formattedStartTime,
+        'middleTime': formattedMiddleTime,
+        'endTime': formattedEndTime,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('신호등 수정 성공');
+      return true;
     } else {
-      throw Exception("Invalid time format");
+      print('신호등 수정 실패: ${response.statusCode}, ${response.body}');
+      return false;
     }
   }
-
-  // 시간을 형식에 맞게 변환
-  String formattedStartTime = formatTime(startTime);
-  String formattedMiddleTime = formatTime(middleTime);
-  String formattedEndTime = formatTime(endTime);
-
-  final response = await http.put(
-    Uri.parse('$baseUrl/report/blinker'),
-    headers: {
-      'Content-Type': 'application/json',
-      'accept': '*/*',
-      'Authorization': 'Bearer $accessToken',
-    },
-    body: jsonEncode({
-      'id': id,
-      'startTime': formattedStartTime,
-      'middleTime': formattedMiddleTime,
-      'endTime': formattedEndTime,
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    print('신호등 수정 성공');
-    return true;
-  } else {
-    print('신호등 수정 실패: ${response.statusCode}, ${response.body}');
-    return false;
-  }
-}
-
-
-
 }
