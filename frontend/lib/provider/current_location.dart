@@ -29,6 +29,7 @@ class CurrentLocationProvider with ChangeNotifier {
         '${position.latitude},${position.longitude}',
         language: 'ko',
       );
+      print('현재위치 provider $response');
 
       if (response.isOkay && response.results.isNotEmpty) {
         final place = response.results.first;

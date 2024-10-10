@@ -2,9 +2,9 @@ package com.ddubucks.readygreen.controller;
 
 import com.ddubucks.readygreen.dto.*;
 import com.ddubucks.readygreen.model.member.Member;
-import com.ddubucks.readygreen.model.Steps;
+import com.ddubucks.readygreen.model.Step;
 import com.ddubucks.readygreen.repository.MemberRepository;
-import com.ddubucks.readygreen.repository.StepsRepository;
+import com.ddubucks.readygreen.repository.StepRepository;
 import com.ddubucks.readygreen.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.messaging.FirebaseMessagingException;
@@ -21,27 +21,27 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
-
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/map")
-public class MapController {
 
+public class MapController {
     private final MapService mapService;
     private final RedisService redisService;
     private final FcmService fcmService;
     private final MemberService memberService;
     private final ObjectMapper objectMapper;
     private final PointService pointService;
-    private final StepsRepository stepsRepository;
+    private final StepRepository stepRepository;
     private final MemberRepository memberRepository;
 
     @PostMapping("start")
     public ResponseEntity<MapResponseDTO> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
         MapResponseDTO mapResponseDTO = mapService.getDestinationGuide(routeRequestDTO, userDetails.getUsername());
         Double distance = mapService.getDistance(mapResponseDTO.getRouteDTO().getFeatures());
+
         mapResponseDTO.setOrigin(routeRequestDTO.getStartName());
         mapResponseDTO.setDestination(routeRequestDTO.getEndName());
         mapResponseDTO.setEndlng(routeRequestDTO.getEndX());
@@ -60,7 +60,7 @@ public class MapController {
     public ResponseEntity<Object> getCheckAlreadyGuide(@AuthenticationPrincipal UserDetails userDetails){
         System.out.println(userDetails.getUsername());
         // Redis에서 데이터를 가져옴
-        Object redisData = redisService.find("dir|" + userDetails.getUsername());
+        Object redisData = redisService.findMap("dir|" + userDetails.getUsername());
         // 데이터가 없을 경우
         if (redisData == null) {
             return ResponseEntity.noContent().build();
@@ -75,7 +75,7 @@ public class MapController {
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         if(member.getWatch()!=null)
             fcmService.sendMessageToOtherDevice(member,isWatch,2);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("길안내 중단 성공");
     }
 
     @PostMapping("guide")
@@ -101,7 +101,7 @@ public class MapController {
         double speedKmPerHour = speedMetersPerSecond * 3.6;
         PointRequestDTO pointRequestDTO = PointRequestDTO.builder()
                 .point(point)
-                .description("걸음수 만큼 포인트")
+                .description("걸음수 "+steps + "보 걷기")
                 .build();
         pointService.addPoint(userDetails.getUsername(),pointRequestDTO);
         System.out.println("Total distance: " + arriveRequestDTO.getDistance() + " meters");
@@ -109,20 +109,21 @@ public class MapController {
         System.out.println("Calculated speed: " + speedKmPerHour + " km/h");
 
         LocalDate today = LocalDate.now();
-        Steps existingSteps = stepsRepository.findByMemberAndDate(member, today);
+        Step existingSteps = stepRepository.findByMemberAndDate(member, today);
         if (existingSteps != null) {
             // 이미 있는 기록에 걸음수 추가
             existingSteps.setSteps(existingSteps.getSteps() + steps);
-            stepsRepository.save(existingSteps);
+            stepRepository.save(existingSteps);
         } else {
             // 새로 걸음수 기록 추가
-            Steps newSteps = Steps.builder()
+            Step newSteps = Step.builder()
                     .member(member)
                     .date(today)
                     .steps(steps)
                     .build();
-            stepsRepository.save(newSteps);
+            stepRepository.save(newSteps);
         }
+        member.setStep(member.getStep()+steps);
 
         member.setSpeed(speedKmPerHour);
         memberRepository.save(member);
@@ -171,8 +172,18 @@ public class MapController {
     }
 
     @DeleteMapping("bookmark")
-    public ResponseEntity<?> deleteBookmark(@RequestParam(required = false) List<Integer> bookmarkIDs, @AuthenticationPrincipal UserDetails userDetails) {
-        mapService.deleteBookmark(bookmarkIDs, userDetails.getUsername());
+    public ResponseEntity<?> deleteBookmark(@RequestParam(name = "placeId") String placeId,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+        mapService.deleteBookmark(placeId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
+
+
+    @PutMapping("bookmark")
+    public ResponseEntity<?> updateBookmark(@Valid @RequestBody BookmarkEditDTO bookmarkEditDTO,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+        mapService.updateBookmark(bookmarkEditDTO, userDetails.getUsername());
+        return ResponseEntity.ok("북마크가 수정되었습니다.");
+    }
+
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:readygreen/api/map_api.dart';
+import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/map/map.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/common/textbutton.dart';
@@ -54,9 +55,9 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.04,
-      minChildSize: 0.04, // 최소 높이
-      maxChildSize: 0.85, // 최대 높이
+      initialChildSize: 0.055,
+      minChildSize: 0.055, // 최소 높이
+      maxChildSize: 0.80, // 최대 높이
       builder: (BuildContext context, ScrollController scrollController) {
         return Container(
           decoration: BoxDecoration(
@@ -85,39 +86,47 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
               const SizedBox(height: 10),
               // 즐겨찾기 목록
               Expanded(
-                child: _bookmarks.isNotEmpty
-                    ? ListView.builder(
-                        controller: scrollController, // 스크롤 가능 설정
-                        itemCount: _bookmarks.length,
-                        itemBuilder: (context, index) {
-                          final bookmark = _bookmarks[index];
-                          return ListTile(
-                              leading: const Icon(Icons.place),
-                              title: Text(bookmark.destinationName),
-                              trailing: const CustomButton(),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MapDirectionPage(
-                                      endLat: bookmark.latitude,
-                                      endLng: bookmark.longitude,
-                                      endPlaceName: bookmark.destinationName,
-                                    ),
-                                  ),
-                                );
-                                // 클릭 시 수행할 작업
-                                print('${bookmark.destinationName} 클릭됨');
-                                print('${bookmark.latitude}');
-                                print('${bookmark.longitude}');
-                                // 예: 클릭 시 배경색 변경 등
-                              });
-                        },
-                      )
-                    : const Center(
-                        child: Text('즐겨찾기가 없습니다.'),
+                  child: ListView.builder(
+                controller: scrollController, // 스크롤 가능 설정
+                itemCount: _bookmarks.isNotEmpty ? _bookmarks.length : 1,
+                itemBuilder: (context, index) {
+                  if (_bookmarks.isEmpty) {
+                    // 즐겨찾기가 없을 때에도 스크롤 가능하게 빈 항목을 반환
+                    return const Center(
+                      child: Text(
+                        '즐겨찾기가 없습니다.',
+                        style: TextStyle(
+                          fontSize: 17, // 글자 크기 증가
+                          color: AppColors.black, // 글자 색상
+                        ),
                       ),
-              ),
+                    );
+                  } else {
+                    final bookmark = _bookmarks[index];
+                    return ListTile(
+                        leading: const Icon(Icons.place),
+                        title: Text(bookmark.destinationName),
+                        trailing: const CustomButton(),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MapDirectionPage(
+                                endLat: bookmark.latitude,
+                                endLng: bookmark.longitude,
+                                endPlaceName: bookmark.destinationName,
+                              ),
+                            ),
+                          );
+                          // 클릭 시 수행할 작업
+                          print('${bookmark.destinationName} 클릭됨');
+                          print('${bookmark.latitude}');
+                          print('${bookmark.longitude}');
+                          // 예: 클릭 시 배경색 변경 등
+                        });
+                  }
+                },
+              )),
             ],
           ),
         );

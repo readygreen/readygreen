@@ -13,6 +13,7 @@ import 'package:readygreen/api/map_api.dart';
 import 'package:provider/provider.dart';
 import 'package:readygreen/provider/current_location.dart';
 import 'package:readygreen/widgets/map/trafficlight.dart';
+import 'package:readygreen/widgets/map/cautionmodal.dart';
 
 class MapDirectionPage extends StatefulWidget {
   final double? endLat; // 도착지 위도
@@ -54,12 +55,6 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   String? _totalTime; // 예상 시간
   List<LatLng> pointCoordinates = [];
 
-// // 유클리드 거리 계산
-//   double calculateDistance(LatLng currentPosition, LatLng point) {
-//     double dx = currentPosition.longitude - point.longitude;
-//     double dy = currentPosition.latitude - point.latitude;
-//     return sqrt(dx * dx + dy * dy) * 111000;
-//   }
   // 하버사인 공식
   double calculateDistance(LatLng currentPosition, LatLng point) {
     const double R = 6371000; // 지구 반지름 (미터 단위)
@@ -116,39 +111,31 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     );
   }
 
-// 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
+  // 현재 위치와 도착지 간의 거리를 계산하여 도착지에 도착했을 때 모달을 띄움
   void _checkProximityToDestination(
       LatLng currentLocation, int type, Map<String, dynamic>? routeData) {
-    double? destinationLat;
-    double? destinationLng;
+    // 도착지 위도, 경도 대신 마지막 포인트 값을 사용
+    if (pointCoordinates.isNotEmpty) {
+      LatLng lastPoint = pointCoordinates.last;
 
-    // type에 따라 도착지 위도, 경도 다르게 처리
-    if (type == 2) {
-      destinationLat = widget.endLat;
-      destinationLng = widget.endLng;
-    } else if (routeData != null) {
-      destinationLat = routeData['endlat'];
-      destinationLng = routeData['endlng'];
-    }
-
-    // 도착지 위도, 경도 값이 있는지 확인
-    if (destinationLat != null && destinationLng != null) {
+      // 마지막 포인트와 현재 위치의 거리 계산
       double distance = calculateDistance(
         currentLocation,
-        LatLng(destinationLat, destinationLng),
+        lastPoint,
       );
+
       print(
           '현재 위치: (${currentLocation.latitude}, ${currentLocation.longitude})');
-      print('도착지 위치: ($destinationLat, $destinationLng)');
+      print('마지막 포인트 위치: (${lastPoint.latitude}, ${lastPoint.longitude})');
       print('계산된 거리: $distance 미터');
 
-      // 도착지와의 거리가 20미터 이내일 때 모달 호출
-      if (distance <= 20) {
-        print("20미터 이내 도착 확인. 모달 표시 시도.");
+      // 20미터 이내 도착하면 모달 호출
+      if (distance <= 10) {
+        print("10미터 이내 도착 확인. 모달 표시 시도.");
         _showRouteFinishModal();
       }
     } else {
-      print('도착지 정보가 없습니다.');
+      print('포인트 리스트가 비어 있습니다.');
     }
   }
 
@@ -188,13 +175,15 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       print("길안내 종료 성공");
       _cameraIdleTimer?.cancel(); // 페이지 종료 시 타이머 취소
       _stopLocationTimer(); // 위치 타이머도 확실히 종료
+
+      // Navigator.of(context).pop();
       handleBackNavigation(context); // 메인 화면으로 돌아가기
     } else {
       print("길안내 종료 실패");
     }
 
     // 모달 닫기
-    Navigator.of(context).pop();
+    // Navigator.of(context).pop();
   }
 
   // 지도 이동 시 타이머를 멈추고, 카메라가 멈춘 후 3초 뒤 타이머 재시작
@@ -283,6 +272,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
         Provider.of<CurrentLocationProvider>(context, listen: false)
             .updateLocation();
         _fetchRouteData(); // 페이지가 로드될 때 API 호출
+        _showCautionModal();
+        // print(object);
       });
     } else {
       print("도착지 정보가 없습니다. 다른 API 요청 실행.");
@@ -290,10 +281,27 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
     }
   }
 
+// 경고 모달을 띄우는 함수
+  void _showCautionModal() {
+    Future.delayed(Duration.zero, () {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return const CautionModal(
+            cautionMessage: '실제 교통 정보와 다를 수 있으니 \n보행시 주의하세요.',
+            cautionImage: 'assets/images/caution.png', // 경고 이미지 경로
+          );
+        },
+      );
+    });
+  }
+
   // 경로 요청을 위한 함수
   Future<void> _fetchRouteData() async {
     final locationProvider =
         Provider.of<CurrentLocationProvider>(context, listen: false);
+
+    print('위치 상태관리 locationProvider $locationProvider');
 
     if (locationProvider.currentPosition != null) {
       // 현재 위치 정보
@@ -301,6 +309,8 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       double startY = locationProvider.currentPosition!.latitude;
       String startName =
           locationProvider.currentPlaceName ?? 'Unknown Start Location';
+
+      print('시작 위치 $startX, $startY, $startName');
 
       // 도착지 정보는 ArriveButton에서 전달받은 값 사용
       double? endX = widget.endLng;
@@ -324,11 +334,11 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
       );
 
       // 응답 데이터 출력
-      print('데이터 값~!~!~!~!~!~!~!~!~!: $routeData');
+      print('경로 요청 routeData : $routeData');
       if (routeData != null) {
         _processRouteData(routeData, 2); // 경로 데이터 처리
         _processBlinkerData(routeData['blinkerDTOs']); // 신호등 데이터 처리
-        // 현재 위치와 도착지의 거리를 계산하고 모달을 띄우기 위해 호출
+        // 현재 위치와 도착지의 거리를 계산하고 모달2을 띄우기 위해 호출
         _checkProximityToDestination(
           LatLng(locationProvider.currentPosition!.latitude,
               locationProvider.currentPosition!.longitude),
@@ -344,18 +354,17 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
   // 신호등 데이터를 처리하고 신호등 마커를 지도에 추가하는 함수
   void _processBlinkerData(List<dynamic> blinkerData) {
     if (blinkerData.isNotEmpty) {
-      // 신호등 ID 리스트 생성
-      List<int> blinkerIds =
-          blinkerData.map<int>((b) => b['id'] as int).toList();
-
       // 신호등을 지도에 추가
       _trafficLightService.addTrafficLightsByIdToMap(
-        blinkerIds: blinkerIds,
+        blinkerData: blinkerData,
         markers: _markers,
         onMarkersUpdated: (updatedMarkers) {
           if (mounted) {
             setState(() {
-              _markers.addAll(updatedMarkers); // 업데이트된 신호등 마커 추가
+              // 업데이트된 신호등 마커를 기존 마커에 추가
+              _markers.clear(); // 이전 마커 제거
+              _markers.addAll(updatedMarkers); // 업데이트된 마커 추가
+              print("마커 업데이트: ${_markers.length}개 마커가 업데이트되었습니다.");
             });
           }
         },
@@ -431,11 +440,18 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             ),
           );
         }
+
         // routeData에서 도착지 정보 가져오기
         _destinationName = routeData['destination'] ?? '장소 정보가 없습니다.';
         _startLocationName = routeData['origin'] ?? '현재위치';
         _totalDistance = routeData['distance'] ?? 0.0;
         _totalTime = routeData['time'] ?? '알 수 없음';
+
+        // null-safe 연산자 ?.를 사용하여 null 체크 및 처리
+        if (_destinationName?.contains('대한민국 대전광역시') == true) {
+          _destinationName =
+              _destinationName?.replaceFirst('대한민국 대전광역시', '').trim();
+        }
 
         print('거리와 시간!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         print("도착지 이름: $_destinationName");
@@ -562,13 +578,17 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
             onCameraIdle: _onCameraIdle, // 지도가 멈췄을 때 호출
           ),
           Positioned(
-            top: screenHeight * 0.8,
+            // _isRouteDetailVisible 상태에 따라 버튼 위치 조정
+            bottom: _isRouteDetailVisible
+                ? screenHeight * 0.25
+                : screenHeight * 0.12,
             right: screenWidth * 0.05,
             child: LocationButton(
               onTap: _currentLocation,
               screenWidth: screenWidth,
             ),
           ),
+
           Positioned(
             top: screenHeight * 0,
             left: screenWidth * 0,
@@ -662,17 +682,12 @@ class _MapDirectionPageState extends State<MapDirectionPage> {
           // 기존 코드
           if (_isRouteDetailVisible == true) // 상세 경로 보일 때
             Positioned(
-              top: screenHeight * 0.18, // 카드 위치 조정
+              top: screenHeight * 0.76, // 카드 위치 조정
               left: screenWidth * 0.02,
               right: screenWidth * 0.02,
               child: RouteCard(
                 routeDescriptions: _routeDescriptions,
                 pageController: _pageController,
-                onClose: () {
-                  setState(() {
-                    _isRouteDetailVisible = false; // 닫기 버튼 클릭 시 카드 닫기
-                  });
-                },
               ), // 경로 설명 카드 추가
             ),
         ],

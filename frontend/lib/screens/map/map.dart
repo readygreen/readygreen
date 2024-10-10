@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:location/location.dart' as loc;
 import 'package:google_maps_webservice/places.dart' as places;
+import 'package:readygreen/constants/appcolors.dart';
 // import 'package:geocoding/geocoding.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/map/mapsearchbar.dart';
@@ -121,12 +122,14 @@ class _MapPageState extends State<MapPage> {
   // 신호등 정보를 업데이트하는 함수
   Future<void> _updateTrafficLights(double latitude, double longitude) async {
     await _trafficLightService.addTrafficLightsToMap(
+      context: context,
       latitude: latitude,
       longitude: longitude,
       markers: _trafficLightMarkers,
       onMarkersUpdated: (newMarkers) {
         if (mounted) {
           setState(() {
+            _trafficLightMarkers.clear();
             _trafficLightMarkers.addAll(newMarkers); // 기존 신호등 마커 업데이트
           });
         }
@@ -141,10 +144,14 @@ class _MapPageState extends State<MapPage> {
   // 새로운 장소로 이동하고 장소 선택 마커 추가하는 함수
   void _goToPlace(double lat, double lng, String placeName, String placeId,
       String address) async {
-    final GoogleMapController controller = await _controller.future;
-
-    // 지도 이동
-    controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
+    if (_controller.isCompleted) {
+      final GoogleMapController controller = await _controller.future;
+      // 지도 이동
+      controller
+          .animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
+    } else {
+      print("GoogleMapController가 초기화되지 않았습니다.");
+    }
 
     // 장소 선택 마커 추가
     setState(() {
@@ -156,10 +163,10 @@ class _MapPageState extends State<MapPage> {
           infoWindow: InfoWindow(title: placeName),
         ),
       );
-      _placeId = _selectedPlaceName = placeName; // 선택된 장소 이름 업데이트
-      _selectedAddress = address; // 선택된 주소 업데이트
-      _selectedLat = lat; // 선택된 위도 업데이트
-      _selectedLng = lng; // 선택된 경도 업데이트
+      _placeId = _selectedPlaceName = placeName;
+      _selectedAddress = address;
+      _selectedLat = lat;
+      _selectedLng = lng;
     });
   }
 
@@ -174,7 +181,15 @@ class _MapPageState extends State<MapPage> {
         children: [
           // Google Map 표시
           locationProvider.currentPosition == null
-              ? const Center(child: CircularProgressIndicator()) // 위치 정보 로딩 중
+              ? Container(
+                  color: AppColors.white, // 배경색 설정
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.green), // 로딩 인디케이터 색상
+                    ),
+                  ),
+                ) // 위치 정보 로딩 중
               : GoogleMap(
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: CameraPosition(
@@ -231,14 +246,15 @@ class _MapPageState extends State<MapPage> {
                   _goToPlace(result['lat'], result['lng'], result['name'],
                       _placeId, '주소 정보 없음');
                 }
+                // 검색 후 뒤로 돌아왔을 때 키보드 내리기
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) {
+                    FocusScope.of(context).unfocus();
+                  }
+                });
               },
             ),
           ),
-          // 즐겨찾기 드래그 가능한 영역 추가
-          DraggableFavorites(
-            scrollController: ScrollController(),
-          ),
-
           // 위치 버튼
           // 위치 버튼 클릭 시 실행되는 함수
           Positioned(
@@ -247,16 +263,15 @@ class _MapPageState extends State<MapPage> {
             child: LocationButton(
               onTap: () async {
                 print('위치 버튼 클릭됨');
-
                 // 위치 업데이트
                 await locationProvider.updateLocation();
 
                 // 위치가 null이 아니면 카메라를 현재 위치로 이동
                 if (locationProvider.currentPosition != null) {
-                  final GoogleMapController? controller =
+                  final GoogleMapController controller =
                       await _controller.future;
 
-                  if (controller != null && mounted) {
+                  if (mounted) {
                     // mounted 상태 확인
                     try {
                       controller.animateCamera(
@@ -284,6 +299,11 @@ class _MapPageState extends State<MapPage> {
               },
               screenWidth: MediaQuery.of(context).size.width,
             ),
+          ),
+
+          // 즐겨찾기 드래그 가능한 영역 추가
+          DraggableFavorites(
+            scrollController: ScrollController(),
           ),
 
           // 하단에 PlaceCard 추가 (위치 정보 표시)

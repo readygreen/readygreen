@@ -10,7 +10,11 @@ import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/modals/weather_modal.dart';
 import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
-import 'package:readygreen/widgets/place/cardbox_home.dart';
+// import 'package:readygreen/widgets/place/cardbox_home.dart';
+import 'package:readygreen/widgets/place/cardbox_place.dart'; // CardBoxPlace 임포트
+import 'package:readygreen/api/place_api.dart'; // Place API 임포트
+import 'package:readygreen/provider/current_location.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,12 +41,16 @@ class HomePageContent extends StatefulWidget {
 
 class _HomePageContentState extends State<HomePageContent> {
   final NewMainApi api = NewMainApi();
+  final PlaceApi placeApi = PlaceApi();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
   bool isLoadingFortune = false; // 운세 로딩중
   Map<String, dynamic>? routeRecords;
   List<Map<String, dynamic>> _bookmarks = [];
+  List<Map<String, String>> nearbyPlaces = [];
+  bool isLoadingPlaces = true; // 주변 장소 로딩 상태
+
   bool _showAllBookmarks = false;
   @override
   void initState() {
@@ -52,13 +60,70 @@ class _HomePageContentState extends State<HomePageContent> {
     _storeFortune(); //  운세 데이터 로드 및 저장
     _storeWeather();
     _loadWeatherInfo();
+    _fetchNearbyPlaces();
+  }
+
+// 주변 장소 데이터 API로부터 받아오는 함수
+  Future<void> _fetchNearbyPlaces() async {
+    setState(() {
+      isLoadingPlaces = true; // 로딩 시작
+    });
+
+    // 저장된 위도와 경도를 가져오기
+    String? latitudeStr = await storage.read(key: 'latitude');
+    String? longitudeStr = await storage.read(key: 'longitude');
+
+    // String? 타입을 double로 변환
+    double userLatitude =
+        latitudeStr != null ? double.parse(latitudeStr) : 36.3551083;
+    double userLongitude =
+        longitudeStr != null ? double.parse(longitudeStr) : 127.3379517;
+
+    try {
+      // Place API 호출하여 주변 장소 가져오기
+      List<dynamic> placesData = await placeApi.getAllNearbyPlaces(
+        userLatitude: userLatitude,
+        userLongitude: userLongitude,
+      );
+
+      // 상위 3개의 장소만 가져오기
+      if (placesData.isNotEmpty) {
+        setState(() {
+          nearbyPlaces = placesData.take(3).map<Map<String, String>>((place) {
+            return {
+              'name': place['name'].toString(),
+              'address': place['address'].toString(),
+            };
+          }).toList();
+          isLoadingPlaces = false;
+        });
+      } else {
+        setState(() {
+          nearbyPlaces = [];
+          isLoadingPlaces = false;
+        });
+      }
+    } catch (error) {
+      print('Failed to load nearby places: $error');
+      setState(() {
+        nearbyPlaces = [];
+        isLoadingPlaces = false;
+      });
+    }
   }
 
   Future<void> _fetchMainDate() async {
     final data = await api.getMainData();
-    print("data");
+    print("_fetchMainDate data");
     setState(() {
       _bookmarks = data?['bookmarkDTOs'];
+
+      // 집 > 회사 > 기타 순으로 정렬
+      _bookmarks.sort((a, b) {
+        const priority = {'집': 0, '회사': 1, '기타': 2};
+        return priority[a['name']]!.compareTo(priority[b['name']]!);
+      });
+
       routeRecords = data?['routeRecordDTO'];
     });
   }
@@ -94,6 +159,11 @@ class _HomePageContentState extends State<HomePageContent> {
     // 위치 정보를 스토리지에 저장
     await storage.write(key: 'latitude', value: location.latitude.toString());
     await storage.write(key: 'longitude', value: location.longitude.toString());
+
+    // 위치 정보를 Provider에 저장 (Provider의 updateLocation 호출)
+    await Provider.of<CurrentLocationProvider>(context, listen: false)
+        .updateLocation();
+
     print('위치 저장 완료: ${location.latitude}, ${location.longitude}');
   }
 
@@ -165,23 +235,12 @@ class _HomePageContentState extends State<HomePageContent> {
     }
   }
 
-  // 현재 시간 가져오기
-  String _getCurrentHour() {
-    final DateTime now = DateTime.now();
-    final DateFormat formatter = DateFormat('yyyy-MM-dd HH');
-    return formatter.format(now);
-  }
-
   // 날씨 요청
   List<Map<String, dynamic>> weatherData = []; // 날씨 정보를 저장하는 리스트
-  String currentWeatherStatus = '맑음'; // 기본 날씨 상태
-  String currentWeatherImage = 'assets/images/w-sun.png'; // 기본 날씨 아이콘
+  String currentWeatherStatus = ''; // 기본 날씨 상태
+  String currentWeatherImage = 'assets/images/w-default.png'; // 기본 날씨 아이콘
 
   Future<void> _storeWeather() async {
-    // 현재 시간 비교
-    final String currentHour = _getCurrentHour();
-    final String? storedHour = await storage.read(key: 'weatherHour');
-
     // 스토리지에서 저장된 위도와 경도 읽기
     String? lat = await storage.read(key: 'latitude');
     String? long = await storage.read(key: 'longitude');
@@ -190,19 +249,17 @@ class _HomePageContentState extends State<HomePageContent> {
       String latitude = lat.substring(0, 2);
       String longitude = long.substring(0, 3);
 
-      if (storedHour != currentHour) {
-        var weatherResponse = await api.getWeather(latitude, longitude);
+      var weatherResponse = await api.getWeather(latitude, longitude);
 
-        if (weatherResponse != null) {
-          if (mounted) {
-            setState(() {
-              weatherData = List<Map<String, dynamic>>.from(weatherResponse);
-            });
-          }
-          String weatherJson = jsonEncode(weatherData);
-          await storage.write(key: 'weather', value: weatherJson);
-          await storage.write(key: 'weatherHour', value: currentHour);
+      if (weatherResponse != null) {
+        if (mounted) {
+          setState(() {
+            weatherData = List<Map<String, dynamic>>.from(weatherResponse);
+          });
         }
+        String weatherJson = jsonEncode(weatherData);
+        print('날씨 데이터 $weatherJson');
+        await storage.write(key: 'weather', value: weatherJson);
       }
     }
   }
@@ -211,14 +268,15 @@ class _HomePageContentState extends State<HomePageContent> {
     // Check if "대전광역시" is present in the string
     if (destinationName.contains('대전광역시')) {
       // Find the position of "대전광역시" and return the substring starting after it
-      int index = destinationName.indexOf('대전광역시');
+      int index = destinationName.indexOf('대한민국 대전광역시');
       destinationName =
-          destinationName.substring(index + '대전광역시'.length).trim();
+          destinationName.substring(index + '대한민국 대전광역시'.length).trim();
+      destinationName.substring(index + '대한민국 대전광역시'.length).trim();
     }
 
     // Trim long text to a maximum of 20 characters (example) and add "..." at the end
     if (destinationName.length > 16) {
-      destinationName = destinationName.substring(0, 16) + '...';
+      destinationName = '${destinationName.substring(0, 16)}...';
     }
 
     return destinationName;
@@ -292,7 +350,7 @@ class _HomePageContentState extends State<HomePageContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 35),
+            const SizedBox(height: 50),
             const Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -367,7 +425,7 @@ class _HomePageContentState extends State<HomePageContent> {
                 Container(
                   width: MediaQuery.of(context).size.width,
                   constraints: BoxConstraints(
-                    minHeight: MediaQuery.of(context).size.height * 0.1,
+                    minHeight: MediaQuery.of(context).size.height * 0.13,
                   ),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -381,7 +439,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         '자주 가는 목적지',
                         style: TextStyle(
                           fontSize: 14,
-                          color: AppColors.greytext,
+                          color: AppColors.black,
                         ),
                       ),
                       const SizedBox(height: 3),
@@ -390,11 +448,22 @@ class _HomePageContentState extends State<HomePageContent> {
                             ? List.generate(
                                 _showAllBookmarks
                                     ? _bookmarks.length
-                                    : (_bookmarks.length > 0
-                                        ? 1
-                                        : 0), // Show only the first item initially
+                                    : (_bookmarks.length > 1
+                                        ? 2
+                                        : _bookmarks.length),
                                 (index) {
                                   final bookmark = _bookmarks[index];
+
+                                  String bookmarkType = '';
+
+                                  // 북마크의 종류에 따라 텍스트 설정
+                                  if (bookmark['name'] == '집') {
+                                    bookmarkType = '집';
+                                  } else if (bookmark['name'] == '회사') {
+                                    bookmarkType = '회사';
+                                  } else {
+                                    bookmarkType = '기타';
+                                  }
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 2.0),
@@ -406,56 +475,70 @@ class _HomePageContentState extends State<HomePageContent> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            const SizedBox(height: 5),
+                                            Text(
+                                              bookmarkType,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: AppColors.greytext,
+                                              ),
+                                            ),
                                             Text(
                                               formatDestinationName(
                                                   bookmark['destinationName']),
                                               style: const TextStyle(
-                                                fontSize: 20,
+                                                fontSize: 18,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                               maxLines: 2, // 최대 2줄로 설정
                                               overflow: TextOverflow
                                                   .ellipsis, // 넘치는 텍스트는 '...'로 표시
                                             ),
-                                            const SizedBox(height: 4),
                                           ],
                                         ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    MapDirectionPage(
-                                                  endLat: bookmark['latitude'],
-                                                  endLng: bookmark['longitude'],
-                                                  endPlaceName: bookmark[
-                                                      'destinationName'],
+                                        Column(
+                                          children: [
+                                            const SizedBox(height: 10), // 여백 추가
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        MapDirectionPage(
+                                                      endLat:
+                                                          bookmark['latitude'],
+                                                      endLng:
+                                                          bookmark['longitude'],
+                                                      endPlaceName: bookmark[
+                                                          'destinationName'],
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.blue,
+                                                backgroundColor: Colors.white,
+                                                side: const BorderSide(
+                                                  color: Colors.blue,
+                                                  width: 1.0,
+                                                ),
+                                                elevation: 0,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            foregroundColor: Colors.blue,
-                                            backgroundColor: Colors.white,
-                                            side: const BorderSide(
-                                              color: Colors.blue,
-                                              width: 1.0,
+                                              child: const Text(
+                                                '길찾기',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue,
+                                                ),
+                                              ),
                                             ),
-                                            elevation: 0,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            '길찾기',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -463,6 +546,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                 },
                               )
                             : [
+                                const SizedBox(height: 12),
                                 const Text(
                                   '자주 가는 목적지가 없습니다.',
                                   style: TextStyle(
@@ -471,18 +555,16 @@ class _HomePageContentState extends State<HomePageContent> {
                                         FontWeight.bold, // 필요한 경우, 글씨 굵기 추가
                                   ),
                                 ),
-                                // ,
                               ],
                       ),
-                      if (_bookmarks.length > 1) const SizedBox(height: 5),
-                      if (_bookmarks.length > 1)
+                      if (_bookmarks.length > 2) const SizedBox(height: 5),
+                      if (_bookmarks.length > 2)
                         const Divider(
-                          // Add this Divider to create the horizontal line
                           color: AppColors.grey, // You can adjust the color
                           thickness:
                               1, // Adjust thickness for a more prominent line
                         ),
-                      if (_bookmarks.length > 1)
+                      if (_bookmarks.length > 2)
                         Center(
                           child: GestureDetector(
                             onTap: () {
@@ -508,7 +590,7 @@ class _HomePageContentState extends State<HomePageContent> {
             Container(
               width: MediaQuery.of(context).size.width,
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height * 0.1,
+                minHeight: MediaQuery.of(context).size.height * 0.13,
               ),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -516,92 +598,109 @@ class _HomePageContentState extends State<HomePageContent> {
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      '최근 목적지',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.greytext,
-                      ),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    '최근 목적지',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.black,
                     ),
-                    routeRecords != null && routeRecords!.isNotEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${routeRecords?['endName']}',
-                                      // '${formatDestinationName(routeRecords?['endName'])}',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
+                  ),
+                  routeRecords != null && routeRecords!.isNotEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // 텍스트를 Flexible로 감싸서 공간 확보
+                              Flexible(
+                                child: Text(
+                                  formatDestinationName(
+                                      routeRecords?['endName']),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  maxLines: 1, // 최대 2줄로 설정
+                                  overflow: TextOverflow
+                                      .ellipsis, // 넘치는 텍스트는 '...'로 표시
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  print('routeRecords');
+                                  print(formatDestinationName(
+                                      routeRecords?['endName']));
+                                  print(formatDestinationName(
+                                      routeRecords?['endName']));
+                                  print(routeRecords?['endLatitude']);
+                                  print(routeRecords?['endLongitude']);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MapDirectionPage(
+                                        endLat: routeRecords?['endLatitude'],
+                                        endLng: routeRecords?['endLongitude'],
+                                        endPlaceName: formatDestinationName(
+                                            routeRecords?['endName']),
                                       ),
                                     ),
-                                  ],
-                                ),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    print(routeRecords?['endName']);
-                                    print(routeRecords?['endLatitude']);
-                                    print(routeRecords?['endLongitude']);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => MapDirectionPage(
-                                          endLat: routeRecords?['endLatitude'],
-                                          endLng: routeRecords?['endLongitude'],
-                                          endPlaceName:
-                                              routeRecords?['endName'],
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: AppColors.green,
-                                    backgroundColor: Colors.white,
-                                    side: const BorderSide(
-                                      color: AppColors.green,
-                                      width: 1.0,
-                                    ),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  foregroundColor: AppColors.green,
+                                  backgroundColor: Colors.white,
+                                  side: const BorderSide(
+                                    color: AppColors.green,
+                                    width: 1.0,
                                   ),
-                                  child: const Text(
-                                    '길찾기',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.green,
-                                    ),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
                                 ),
-                              ],
-                            ),
-                          )
-                        : Column(
-                            children: const [
-                              SizedBox(height: 8), // 여백 추가
-                              Text(
-                                '최근 목적지가 없습니다.',
-                                style: TextStyle(
-                                  fontSize: 18, // 글씨 크기
-                                  fontWeight: FontWeight.bold, // 글씨 굵기
+                                child: const Text(
+                                  '길찾기',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.green,
+                                  ),
                                 ),
                               ),
                             ],
-                          )
-                  ]),
+                          ),
+                        )
+                      : const Column(
+                          children: [
+                            SizedBox(height: 10), // 여백 추가
+                            Text(
+                              '최근 목적지가 없습니다.',
+                              style: TextStyle(
+                                fontSize: 18, // 글씨 크기
+                                fontWeight: FontWeight.bold, // 글씨 굵기
+                              ),
+                            ),
+                          ],
+                        )
+                ],
+              ),
             ),
 
             const SizedBox(height: 16),
-            const CardBoxHome(title: '주변 장소'),
+            // 주변 장소 출력
+            if (isLoadingPlaces)
+              const Center(child: CircularProgressIndicator())
+            else if (nearbyPlaces.isNotEmpty)
+              CardBoxPlace(
+                places: nearbyPlaces,
+                selectedCategory: '전체',
+              )
+            else
+              const Center(child: Text('주변 장소를 찾을 수 없습니다.')),
+
+            const SizedBox(height: 16),
             const SizedBox(height: 16),
             // const Row(
             //   mainAxisAlignment: MainAxisAlignment.end,

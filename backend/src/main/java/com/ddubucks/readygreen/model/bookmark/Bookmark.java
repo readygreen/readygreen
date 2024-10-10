@@ -2,11 +2,12 @@ package com.ddubucks.readygreen.model.bookmark;
 
 import com.ddubucks.readygreen.model.BaseEntity;
 import com.ddubucks.readygreen.model.member.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.checkerframework.common.aliasing.qual.Unique;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalTime;
@@ -14,6 +15,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "destination_bookmark")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -34,10 +36,15 @@ public class Bookmark extends BaseEntity {
 
     private LocalTime alertTime;
 
+    @Column(unique = true)
+    private String placeId;
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private BookmarkType type;
 
+    private BookmarkType type;
+    @JsonIgnore
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

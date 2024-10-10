@@ -52,6 +52,7 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   lottie: ^2.2.0
   confetti: ^0.8.0
+  flutter_native_splash: ^2.4.1
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +64,13 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/images/readygreen.png # 스플래시 화면에서 사용할 이미지
+  android_12:
+    image: assets/images/readygreen.png # Android 12 이상에서 사용할 이미지
+  android: true
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -104,34 +112,40 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  # assets:
+  #   - assets/images/foot.png
+  #   - assets/images/star.png
+  #   - assets/images/rainbow.png
+  #   - assets/images/walk.png
+  #   - assets/images/coin.png
+  #   - assets/images/coins.png
+  #   - assets/images/icon.png
+  #   - assets/images/map.png
+  #   - assets/images/kakao.png
+  #   - assets/images/luck.png
+  #   - assets/images/mic.png
+  #   - assets/images/badge.png
+  #   - assets/images/place.png
+  #   - assets/images/placepage.png
+  #   - assets/images/fortune.png
+  #   - assets/images/nobirth.png
+  #   - assets/images/user.png
+  #   - assets/images/trophy.png
+  #   - assets/images/coinpig.png
+  #   - assets/images/w-sun.png
+  #   - assets/images/w-rain.png
+  #   - assets/images/w-rainsnow.png
+  #   - assets/images/w-suncloud.png
+  #   - assets/images/w-cloudy.png
+  #   - assets/images/w-snow.png
+  #   - assets/images/w-default.png
+  #   - assets/lottie/search_mike.json
+  #   - assets/images
+  #   - assets/image
   assets:
-    - assets/images/foot.png
-    - assets/images/star.png
-    - assets/images/rainbow.png
-    - assets/images/walk.png
-    - assets/images/coin.png
-    - assets/images/coins.png
-    - assets/images/icon.png
-    - assets/images/map.png
-    - assets/images/kakao.png
-    - assets/images/luck.png
-    - assets/images/mic.png
-    - assets/images/badge.png
-    - assets/images/place.png
-    - assets/images/placepage.png
-    - assets/images/fortune.png
-    - assets/images/nobirth.png
-    - assets/images/user.png
-    - assets/images/trophy.png
-    - assets/images/coinpig.png
-    - assets/images/w-sun.png
-    - assets/images/w-rain.png
-    - assets/images/w-rainsnow.png
-    - assets/images/w-suncloud.png
-    - assets/images/w-cloudy.png
-    - assets/images/w-snow.png
-    - assets/images/w-default.png
-    - assets/lottie/search_mike.json
+    - assets/lottie/ # lottie 폴더 내 모든 파일 포함
+    - assets/images/
+    - assets/icon/
 
   fonts:
     - family: CustomFont

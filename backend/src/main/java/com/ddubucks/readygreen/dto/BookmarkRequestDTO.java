@@ -32,4 +32,7 @@ public class BookmarkRequestDTO {
 
     @NotNull(message = "Bookmark Type cannot be null")
     private BookmarkType type;
+
+    @NotNull(message = "placeId cannot be null")
+    private String placeId;
 }

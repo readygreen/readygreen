@@ -3,6 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:readygreen/screens/mypage/badge.dart';
 import 'package:readygreen/screens/mypage/feedback.dart';
 import 'package:readygreen/screens/mypage/feedback_list.dart';
+// import 'package:readygreen/screens/mypage/myBadge.dart';
 import 'package:readygreen/screens/mypage/myPlace.dart';
 import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/cardbox.dart';
@@ -26,11 +27,13 @@ class _MyPageState extends State<MyPage> {
   final storage = const FlutterSecureStorage();
   Map<String, dynamic>? profileData;
   bool isLoading = true;
+  int title = 0;
 
   @override
   void initState() {
     super.initState();
     _getProfile();
+    _getTitleBadge();
   }
 
   Future<void> _getProfile() async {
@@ -40,6 +43,15 @@ class _MyPageState extends State<MyPage> {
         profileData = data;
         isLoading = false; // 데이터 로딩 완료
         // print('Profile Image URL: ${profileData?['profileImg']}');
+      });
+    }
+  }
+
+  Future<void> _getTitleBadge() async {
+    final data = await userApi.getBadgeTitle();
+    if (mounted) {
+      setState(() {
+        title = data;
       });
     }
   }
@@ -68,6 +80,20 @@ class _MyPageState extends State<MyPage> {
     // 모달이 닫히고 나면 프로필 새로고침 (result가 true일 때)
     if (result != null) {
       await _getProfile();
+    }
+  }
+
+  String _getBadge(int title) {
+    if (title == 0) {
+      return "assets/images/signupcong.png";
+    } else if (title == 1) {
+      return "assets/images/badge.png";
+    } else if (title == 2) {
+      return "assets/images/trophy.png";
+    } else if (title == 3) {
+      return "assets/images/coinpig.png";
+    } else {
+      return "assets/images/default.png"; // 예외적인 경우 기본 이미지를 반환
     }
   }
 
@@ -117,18 +143,24 @@ class _MyPageState extends State<MyPage> {
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: () {
+                            onTap: () async {
                               // 페이지 이동을 위한 네비게이션
-                              Navigator.push(
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => BadgePage(), // 이동할 페이지
                                 ),
                               );
+                              if (result != null) {
+                                print(result);
+                                setState(() {
+                                  title = result;
+                                });
+                              }
                             },
                             child: SquareCardMypage(
                               title: '내 배지',
-                              imageUrl: 'assets/images/badge.png',
+                              imageUrl: _getBadge(title),
                               subtitle: '설정하기',
                             ),
                           ),
@@ -350,7 +382,7 @@ class _MyPageState extends State<MyPage> {
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () async {
-              _showDeleteUser(context); // 탈퇴 확인 창 호출
+              _showDeleteConfirmationDialog(context); // 탈퇴 확인 창 호출
             },
             child: _buildItem('회원탈퇴'),
           ),
@@ -369,7 +401,7 @@ class _MyPageState extends State<MyPage> {
   }
 
   // 탈퇴 알림창
-  Future<void> _showDeleteUser(BuildContext context) async {
+  Future<void> _showDeleteConfirmationDialog(BuildContext context) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // 다른 곳을 눌러도 창이 닫히지 않게 설정

@@ -133,7 +133,7 @@ class MapStartAPI {
   }
 
   // 즐겨찾기 삭제 (DELETE)
-  Future<bool> deleteBookmark(int placeId) async {
+  Future<bool> deleteBookmark(String placeId) async {
     String? accessToken = await storage.read(key: 'accessToken');
 
     final response = await http.delete(
@@ -359,9 +359,9 @@ class MapStartAPI {
     }
   }
 
-  Future<void> updateBookmarkType(int id, int newType) async {
+  Future<bool> updateBookmarkType(int id, int newType) async {
     String? accessToken = await storage.read(key: 'accessToken');
-    
+
     final response = await http.put(
       Uri.parse('$baseUrl/map/bookmark'),
       headers: {
@@ -371,15 +371,69 @@ class MapStartAPI {
       },
       body: jsonEncode({
         'id': id,
-        'type': newType==0?"HOME" : newType==1 ? "COMPANY" :"ETC", // "HOME", "COMPANY", "ETC" 중 하나
+        'type': newType == 0
+            ? "HOME"
+            : newType == 1
+                ? "COMPANY"
+                : "ETC", // "HOME", "COMPANY", "ETC" 중 하나
       }),
     );
 
     if (response.statusCode == 200) {
       print('북마크 수정 성공');
+      return true;
     } else {
       print('북마크 수정 실패: ${response.statusCode}, ${response.body}');
+      return false;
     }
   }
+
+Future<bool> updateBlinkerWithTimes({
+  required String id,
+  required String startTime,
+  required String middleTime,
+  required String endTime,
+}) async {
+  String? accessToken = await storage.read(key: 'accessToken');
+
+  // hhmmss -> hh:mm:ss 형식으로 변환하는 함수
+  String formatTime(String time) {
+    if (time.length == 6) {
+      return '${time.substring(0, 2)}:${time.substring(2, 4)}:${time.substring(4, 6)}';
+    } else {
+      throw Exception("Invalid time format");
+    }
+  }
+
+  // 시간을 형식에 맞게 변환
+  String formattedStartTime = formatTime(startTime);
+  String formattedMiddleTime = formatTime(middleTime);
+  String formattedEndTime = formatTime(endTime);
+
+  final response = await http.put(
+    Uri.parse('$baseUrl/report/blinker'),
+    headers: {
+      'Content-Type': 'application/json',
+      'accept': '*/*',
+      'Authorization': 'Bearer $accessToken',
+    },
+    body: jsonEncode({
+      'id': id,
+      'startTime': formattedStartTime,
+      'middleTime': formattedMiddleTime,
+      'endTime': formattedEndTime,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('신호등 수정 성공');
+    return true;
+  } else {
+    print('신호등 수정 실패: ${response.statusCode}, ${response.body}');
+    return false;
+  }
+}
+
+
 
 }
