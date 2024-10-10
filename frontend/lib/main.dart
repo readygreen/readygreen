@@ -214,7 +214,7 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("메시지 수신!");
       if (message.data['type'] == '1') {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const MapDirectionPage()),
         );
@@ -230,22 +230,22 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
         print('알림 본문: ${message.notification!.body}');
       }
 
-      // 데이터 메시지 출력 (데이터)
-      if (message.data.isNotEmpty) {
-        String type = message.data['type'];
-        print('받은 메시지 타입: $type');
-        if (type == '1') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const MapDirectionPage()),
-          );
-        } else if (type == '2') {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const MainPage()),
-          );
-        }
-      }
+      // // 데이터 메시지 출력 (데이터)
+      // if (message.data.isNotEmpty) {
+      //   String type = message.data['type'];
+      //   print('받은 메시지 타입: $type');
+      //   if (type == '1') {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const MapDirectionPage()),
+      //     );
+      //   } else if (type == '2') {
+      //     Navigator.pushReplacement(
+      //       context,
+      //       MaterialPageRoute(builder: (context) => const MainPage()),
+      //     );
+      //   }
+      // }
 
       if (!mounted) return;
       RemoteNotification? notification = message.notification;

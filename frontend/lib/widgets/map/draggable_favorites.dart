@@ -108,7 +108,7 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
                         title: Text(bookmark.destinationName),
                         trailing: const CustomButton(),
                         onTap: () {
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => MapDirectionPage(
