@@ -2,89 +2,131 @@ import 'package:flutter/material.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/common/bgcontainer.dart';
 import 'package:readygreen/widgets/place/cardbox_place.dart';
+import 'package:readygreen/api/place_api.dart'; // API 파일 가져오기
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PlacePage extends StatefulWidget {
+  const PlacePage({super.key});
+
   @override
   _PlacePageState createState() => _PlacePageState();
 }
 
 class _PlacePageState extends State<PlacePage> {
-  // 선택된 카테고리 상태를 관리할 변수
-  String selectedCategory = '전체';
+  final PlaceApi placeApi = PlaceApi();
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
 
-  // 한글 카테고리를 영어로 변환하는 매핑 테이블
+  String selectedCategory = '전체';
+  List<Map<String, String>> places = [];
+  bool isLoading = false; // 로딩 상태 관리
+
   final Map<String, String> categoryMapping = {
     '전체': 'all',
-    '맛집': 'restaurant',
-    '편의점': 'convenience store',
+    '맛집': 'food',
+    '카페': 'cafe',
+    '편의점': 'conv',
     '은행': 'bank',
     '병원': 'hospital',
-    '약국': 'pharmacy',
-    '영화관': 'cinema',
-    '미용실': 'hair salon',
-    '놀거리': 'entertainment',
+    '약국': 'med',
+    '영화관': 'movie',
+    '놀거리': 'play',
     '헬스장': 'gym',
     '공원': 'park',
   };
 
-  // 카테고리 목록 (한글)
   final List<String> categories = [
     '전체',
     '맛집',
+    '카페',
     '편의점',
     '은행',
     '병원',
     '약국',
     '영화관',
-    '미용실',
     '놀거리',
     '헬스장',
     '공원',
   ];
+// 장소 데이터 API로부터 받아오는 함수
+  Future<void> _getPlace() async {
+    setState(() {
+      isLoading = true; // 로딩 시작
+    });
 
-  // 예시 데이터 (카테고리별 장소 정보)
-  final List<Map<String, String>> places = [
-    {
-      'name': '삼성화재 유성연수원',
-      'category': '맛집',
-      'description': '대전 유성구 동서대로 98-39',
-      'distance': '6.9km',
-    },
-    {
-      'name': '스타벅스',
-      'category': '맛집',
-      'description': '대전 유성구 동서대로 98-39',
-      'distance': '2.5km',
-    },
-    {
-      'name': '편의점1',
-      'category': '편의점',
-      'description': '대전 유성구 동서대로 98-39',
-      'distance': '2.5km',
-    },
-    {
-      'name': '은행',
-      'category': '은행',
-      'description': '대전 유성구 동서대로 98-39',
-      'distance': '2.5km',
-    },
-    // 추가 장소 데이터...
-  ];
+    // 저장된 위도와 경도를 가져오기
+    String? latitudeStr = await storage.read(key: 'latitude');
+    String? longitudeStr = await storage.read(key: 'longitude');
 
-  // 선택한 카테고리에 맞는 장소 목록 필터링
-  List<Map<String, String>> get filteredPlaces {
-    if (selectedCategory == '전체') {
-      return places;
-    } else {
-      return places
-          .where((place) => place['category'] == selectedCategory)
-          .toList();
+    // String? 타입을 double로 변환
+    double userLatitude =
+        latitudeStr != null ? double.parse(latitudeStr) : 36.3551083;
+    double userLongitude =
+        longitudeStr != null ? double.parse(longitudeStr) : 127.3379517;
+
+    try {
+      List<dynamic> placeData;
+
+      // '전체' 카테고리 선택 시 전체 장소 추천 API 호출
+      if (selectedCategory == '전체') {
+        placeData = await placeApi.getAllNearbyPlaces(
+          userLatitude: userLatitude,
+          userLongitude: userLongitude,
+        );
+      } else {
+        // 선택된 카테고리에 맞는 type 설정
+        String type = categoryMapping[selectedCategory] ?? 'all';
+
+        // 로그로 카테고리 및 타입 확인
+        print('Selected Category: $selectedCategory, Type: $type');
+
+        // API 호출
+        placeData = await placeApi.getPlaces(
+          type: type,
+          userLatitude: userLatitude,
+          userLongitude: userLongitude,
+        );
+      }
+      setState(() {
+        print('placeData $placeData');
+        places = placeData.map<Map<String, String>>((place) {
+          return {
+            'id': place['id'].toString(), // ID 추가
+            'name': place['name'].toString(), // 이름
+            'address': place['address'].toString(), // 주소
+            'latitude': place['latitude'].toString(), // 위도
+            'longitude': place['longitude'].toString(), // 경도
+          };
+        }).toList();
+        isLoading = false;
+      });
+    } catch (error) {
+      print('Failed to load places: $error');
+      if (mounted) {
+        setState(() {
+          places = [];
+          isLoading = false;
+        });
+      }
     }
   }
 
-  // 선택된 카테고리를 영어로 변환하는 함수
-  String getEnglishCategory(String koreanCategory) {
-    return categoryMapping[koreanCategory] ?? 'default';
+  @override
+  void initState() {
+    super.initState();
+    _getPlace(); // 화면이 처음 로드될 때 API 호출
+  }
+
+  List<Map<String, String>> get filteredPlaces {
+    if (selectedCategory == '전체') {
+      return places; // 전체를 선택한 경우 모든 장소 반환
+    } else {
+      // '병원'은 type이 'hospital'인 데이터 필터링
+      final filtered = places.where((place) {
+        return place['type'] == categoryMapping[selectedCategory];
+      }).toList();
+      print('Filtered Places ($selectedCategory): $filtered');
+      return filtered;
+    }
   }
 
   @override
@@ -104,7 +146,7 @@ class _PlacePageState extends State<PlacePage> {
                       height: 200,
                     ),
                     const SizedBox(height: 10),
-                    Text(
+                    const Text(
                       '지금 내 주변 핫플은?',
                       style:
                           TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
@@ -129,6 +171,7 @@ class _PlacePageState extends State<PlacePage> {
                           setState(() {
                             selectedCategory = categories[index];
                           });
+                          _getPlace(); // 카테고리 변경 시 API 다시 호출
                         },
                         child: Chip(
                           label: Text(
@@ -160,21 +203,29 @@ class _PlacePageState extends State<PlacePage> {
               ),
               const SizedBox(height: 10),
 
-              // CardBoxPlace 부분, 필터링된 장소 목록을 전달
-              CardBoxPlace(
-                places: filteredPlaces
-                    .asMap()
-                    .entries
-                    .map((entry) => {
-                          'name': entry.value['name']!,
-                          'category': getEnglishCategory(
-                              entry.value['category']!), // 영어 카테고리 변환
-                          'description': entry.value['description']!,
-                          'distance': entry.value['distance']!,
-                          'imageIndex': entry.key.toString(), // 장소 인덱스 추가
-                        })
-                    .toList(), // 필터링된 장소 리스트 전달
-              ),
+              // 로딩 상태일 때는 로딩 인디케이터 표시
+              if (isLoading)
+                // Center(child: CircularProgressIndicator())
+                const Center(child: Text('로딩중..'))
+              else if (places.isEmpty)
+                const Center(child: Text('해당 카테고리의 장소를 찾을 수 없습니다.'))
+              else
+                CardBoxPlace(
+                  places: places
+                      .asMap()
+                      .entries
+                      .map((entry) => {
+                            'id': entry.value['id'] ?? '0', // ID 전달
+                            'name': entry.value['name']!, // 이름
+                            'address':
+                                entry.value['address'] ?? '주소 정보 없음', // 주소
+                            'latitude': entry.value['latitude']!, // 위도
+                            'longitude': entry.value['longitude']!, // 경도
+                            'imageIndex': entry.key.toString(),
+                          })
+                      .toList(),
+                  selectedCategory: selectedCategory, // 페이지에서 선택한 카테고리 전달
+                )
             ],
           ),
         ),

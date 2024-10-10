@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 // import 'package:location/location.dart' as loc;
 import 'package:google_maps_webservice/places.dart' as places;
+import 'package:readygreen/constants/appcolors.dart';
 // import 'package:geocoding/geocoding.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/map/mapsearchbar.dart';
@@ -180,7 +181,15 @@ class _MapPageState extends State<MapPage> {
         children: [
           // Google Map 표시
           locationProvider.currentPosition == null
-              ? const Center(child: CircularProgressIndicator()) // 위치 정보 로딩 중
+              ? Container(
+                  color: AppColors.white, // 배경색 설정
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.green), // 로딩 인디케이터 색상
+                    ),
+                  ),
+                ) // 위치 정보 로딩 중
               : GoogleMap(
                   onMapCreated: _onMapCreated,
                   initialCameraPosition: CameraPosition(
@@ -246,11 +255,6 @@ class _MapPageState extends State<MapPage> {
               },
             ),
           ),
-          // 즐겨찾기 드래그 가능한 영역 추가
-          DraggableFavorites(
-            scrollController: ScrollController(),
-          ),
-
           // 위치 버튼
           // 위치 버튼 클릭 시 실행되는 함수
           Positioned(
@@ -259,7 +263,6 @@ class _MapPageState extends State<MapPage> {
             child: LocationButton(
               onTap: () async {
                 print('위치 버튼 클릭됨');
-
                 // 위치 업데이트
                 await locationProvider.updateLocation();
 
@@ -296,6 +299,11 @@ class _MapPageState extends State<MapPage> {
               },
               screenWidth: MediaQuery.of(context).size.width,
             ),
+          ),
+
+          // 즐겨찾기 드래그 가능한 영역 추가
+          DraggableFavorites(
+            scrollController: ScrollController(),
           ),
 
           // 하단에 PlaceCard 추가 (위치 정보 표시)

@@ -22,7 +22,7 @@ class MyPage extends StatefulWidget {
   _MyPageState createState() => _MyPageState();
 }
 
-class _MyPageState extends State<MyPage>{
+class _MyPageState extends State<MyPage> {
   final NewUserApi userApi = NewUserApi();
   final storage = const FlutterSecureStorage();
   Map<String, dynamic>? profileData;
@@ -55,8 +55,6 @@ class _MyPageState extends State<MyPage>{
       });
     }
   }
-
-  
 
   Future<void> _handleLogout(BuildContext context) async {
     // 저장된 토큰 삭제
@@ -98,7 +96,6 @@ class _MyPageState extends State<MyPage>{
       return "assets/images/default.png"; // 예외적인 경우 기본 이미지를 반환
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -154,8 +151,8 @@ class _MyPageState extends State<MyPage>{
                                   builder: (context) => BadgePage(), // 이동할 페이지
                                 ),
                               );
-                              if(result!=null){
-                                  print(result);
+                              if (result != null) {
+                                print(result);
                                 setState(() {
                                   title = result;
                                 });
