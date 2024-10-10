@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:readygreen/api/main_api.dart';
@@ -36,12 +38,14 @@ class _HomePageState extends State<HomePage> {
 
 class HomePageContent extends StatefulWidget {
   const HomePageContent({super.key});
+  
 
   @override
   _HomePageContentState createState() => _HomePageContentState();
 }
 
 class _HomePageContentState extends State<HomePageContent> {
+  static final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final NewMainApi api = NewMainApi();
   final PlaceApi placeApi = PlaceApi();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
@@ -57,12 +61,22 @@ class _HomePageContentState extends State<HomePageContent> {
   @override
   void initState() {
     super.initState();
+    _notiPermission();
     _fetchMainDate();
     _storeLocation(); // 위치 정보 저장 함수 호출
     _storeFortune(); //  운세 데이터 로드 및 저장
     _storeWeather();
     _loadWeatherInfo();
     _fetchNearbyPlaces();
+  }
+
+  Future<void> _notiPermission() async {
+    if (Platform.isAndroid) {
+      _flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()!
+          .requestNotificationsPermission();
+    }
   }
 
 // 주변 장소 데이터 API로부터 받아오는 함수
