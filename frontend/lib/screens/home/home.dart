@@ -294,10 +294,6 @@ class _HomePageContentState extends State<HomePageContent> {
       destinationName.substring(index + '대한민국 대전광역시'.length).trim();
     }
 
-    // Trim long text to a maximum of 20 characters (example) and add "..." at the end
-    if (destinationName.length > 16) {
-      destinationName = '${destinationName.substring(0, 16)}...';
-    }
 
     return destinationName;
   }
@@ -503,16 +499,17 @@ class _HomePageContentState extends State<HomePageContent> {
                                                 color: AppColors.greytext,
                                               ),
                                             ),
-                                            Text(
-                                              formatDestinationName(
-                                                  bookmark['destinationName']),
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
+                                            Container(
+                                              width: MediaQuery.of(context).size.width * 0.6, // 화면 너비의 70%로 제한
+                                              child: Text(
+                                                formatDestinationName(bookmark['destinationName']),
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                maxLines: 1, // 최대 1줄로 설정
+                                                overflow: TextOverflow.ellipsis, // 넘치는 텍스트는 '...'로 표시
                                               ),
-                                              maxLines: 2, // 최대 2줄로 설정
-                                              overflow: TextOverflow
-                                                  .ellipsis, // 넘치는 텍스트는 '...'로 표시
                                             ),
                                           ],
                                         ),
@@ -521,7 +518,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                             const SizedBox(height: 10), // 여백 추가
                                             ElevatedButton(
                                               onPressed: () {
-                                                Navigator.push(
+                                                Navigator.pushReplacement(
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
@@ -656,7 +653,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                       routeRecords?['endName']));
                                   print(routeRecords?['endLatitude']);
                                   print(routeRecords?['endLongitude']);
-                                  Navigator.push(
+                                  Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => MapDirectionPage(
