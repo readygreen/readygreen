@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:readygreen/background/background_service.dart';
 import 'package:readygreen/constants/baseurl.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -46,15 +47,7 @@ class MapStartAPI {
     print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      await storage.write(key: 'isGuide', value: 'true'); // 문자열로 저장
-
-      await storage.write(key: 'isGuide', value: 'true'); // 문자열로 저장
-      String? isGuide = await storage.read(key: 'isGuide');
-      print('길안내 start - isGuide: $isGuide'); // 확인을 위해 출력
-
-      await storage.write(key: 'isModified', value: 'true');
-      String? isModified = await storage.read(key: 'isModified');
-      print('길안내 start - isModified: $isModified');
+      initializeService();
 
       return jsonDecode(utf8.decode(response.bodyBytes)); // 응답 데이터 반환
     } else {
@@ -214,20 +207,12 @@ class MapStartAPI {
         'Authorization': 'Bearer $accessToken',
       },
     );
-
+    
     print('Response status code: ${response.statusCode}');
     print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      print('guide 길안내 정보 조회 성공');
-
-      await storage.write(key: 'isGuide', value: 'true'); // 문자열로 저장
-      String? isGuide = await storage.read(key: 'isGuide');
-      print('길안내 guide - isGuide: $isGuide'); // 확인을 위해 출력
-
-      await storage.write(key: 'isModified', value: 'true');
-      String? isModified = await storage.read(key: 'isModified');
-      print('길안내 guide - isModified: $isModified');
+      initializeService();
 
       return jsonDecode(utf8.decode(response.bodyBytes)); // 응답 데이터 반환
     } else {
@@ -288,16 +273,7 @@ class MapStartAPI {
     );
 
     if (response.statusCode == 200) {
-      print('guide 안내 중지 200');
-      // 상태 코드가 200이면 true 반환
-
-      await storage.write(key: 'isGuide', value: 'false');
-      String? isGuide = await storage.read(key: 'isGuide');
-      print('길안내 중지 isGuide: $isGuide');
-
       await storage.write(key: 'isModified', value: 'true');
-      String? isModified = await storage.read(key: 'isModified');
-      print('길안내 중지 isModified: $isModified');
 
       return true;
     } else {
@@ -380,13 +356,7 @@ class MapStartAPI {
     if (response.statusCode == 200) {
       print('길안내 완료 요청 성공');
 
-      await storage.write(key: 'isGuide', value: 'false');
-      String? isGuide = await storage.read(key: 'isGuide');
-      print('길안내 완료 isGuide: $isGuide');
-
       await storage.write(key: 'isModified', value: 'true');
-      String? isModified = await storage.read(key: 'isModified');
-      print('길안내 완료 isModified: $isModified');
 
       return {'message': response.body};
     } else {

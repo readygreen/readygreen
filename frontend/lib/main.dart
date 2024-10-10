@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/screens/loading/start_loading.dart';
@@ -19,23 +20,19 @@ import 'package:readygreen/screens/point/pointDetail.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'firebase_options.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:firebase_messaging/firebase_messaging.dart';
-// import '../../firebase_options.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Secure Storage
 import 'package:flutter/services.dart'; // SystemNavigator를 사용하기 위해 필요
+import 'package:readygreen/background/background_service.dart'; 
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
 }
 
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-
+final storage = const FlutterSecureStorage();
 Future<void> initializeNotification() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // 알림 채널 ID
@@ -45,13 +42,11 @@ Future<void> initializeNotification() async {
   );
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(const AndroidNotificationChannel(
-          'high_importance_channel', 'high_importance_notification',
-          importance: Importance.max));
+      ?.createNotificationChannel(channel);
+
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -60,44 +55,11 @@ Future<void> initializeNotification() async {
   );
 
   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  await flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(channel);
-
-  await flutterLocalNotificationsPlugin.initialize(const InitializationSettings(
-    android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-  ));
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
     sound: true,
   );
-}
-
-Future<void> initializeService() async {
-  final service = FlutterBackgroundService();
-
-  await service.configure(
-    iosConfiguration: IosConfiguration(
-      autoStart: true,
-      onForeground: onStart,
-      onBackground: onIosBackground,
-    ),
-    androidConfiguration: AndroidConfiguration(
-      onStart: onStart,
-      autoStart: true,
-      isForegroundMode: true,
-    ),
-  );
-
-  service.startService();
-}
-
-@pragma('vm:entry-point')
-Future<bool> onIosBackground(ServiceInstance service) async {
-  DartPluginRegistrant.ensureInitialized();
-  return true;
 }
 
 Future<void> main() async {
@@ -112,86 +74,61 @@ Future<void> main() async {
   runApp(const App());
 }
 
-@pragma('vm:entry-point')
-void onStart(ServiceInstance service) async {
-  DartPluginRegistrant.ensureInitialized();
+// @pragma('vm:entry-point')
+// void onStart(ServiceInstance service) async {
+//   if (service is AndroidServiceInstance) {
+//     Timer.periodic(const Duration(seconds: 5), (timer) async {
 
-  if (service is AndroidServiceInstance) {
-    // 포그라운드 알림 설정
-    service.setAsForegroundService();
+//       String? isGuideString = await storage.read(key: 'isGuide');
+//       bool? isGuide = isGuideString != null ? isGuideString == 'true' : false;
 
-    // Foreground 알림 업데이트
-    service.setForegroundNotificationInfo(
-      title: "Foreground Service",
-      content: "Background service is running...",
-    );
-  }
+//       String? isModiString = await storage.read(key: 'isModified');
+//       bool? isModi = isModiString != null ? isModiString == 'true' : false;
+//       print("isModiString");
+//       print(isModiString);
+//       print("isGuideString");
+//       print(isGuideString);
+      
+//       // 주기적으로 포그라운드 알림 업데이트
+//       if (isGuide && await service.isForegroundService()) {
+//         Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+//         flutterLocalNotificationsPlugin.show(
+//           0,
+//           '포그라운드 서비스',
+//           '서비스가 실행 중입니다: ${position.latitude} ${position.longitude}',
+//           const NotificationDetails(
+//             android: AndroidNotificationDetails(
+//               'high_importance_channel',
+//               '포그라운드 알림',
+//               importance: Importance.high,
+//               priority: Priority.high,
+//               ongoing: false,
+//             ),
+//           ),
+//         );
+//       }
+//       if(isModi){
+//         if(isGuide){
+//           print("알림 고정 시작");
+//           DartPluginRegistrant.ensureInitialized();
+//           service.setAsForegroundService();
 
-  service.on('stopService').listen((event) {
-    service.stopSelf();
-  });
+//           // Foreground 알림 업데이트
+//           service.setForegroundNotificationInfo(
+//             title: "언제그린",
+//             content: "길 안내가 실행 중 입니다...",
+//           );
+//           //라우트 데이터 받아오기
 
-  Timer.periodic(const Duration(seconds: 1), (timer) async {
-    double targetLatitude = 37.7749;
-    double targetLongitude = -122.4194;
-    int greenDuration = 40; // 초록불 지속 시간 (초)
-    int redDuration = 110; // 빨간불 지속 시간 (초)
-    int totalDuration = greenDuration + redDuration; // 총 주기 (초)
-    String startTimeString = "00:01:23"; // hh:mm:ss
-    List<String> startTimeParts = startTimeString.split(':');
-    DateTime startTime = DateTime.now().copyWith(
-      hour: int.parse(startTimeParts[0]),
-      minute: int.parse(startTimeParts[1]),
-      second: int.parse(startTimeParts[2]),
-    );
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    double latitude = position.latitude;
-    double longitude = position.longitude;
-    double distance = Geolocator.distanceBetween(
-      latitude,
-      longitude,
-      targetLatitude,
-      targetLongitude,
-    );
-    if (distance <= 15) {
-      DateTime now = DateTime.now();
-      int secondsSinceStart =
-          now.difference(startTime).inSeconds % totalDuration;
-
-      // 파란불 켜지기 5초 전이면
-      if (secondsSinceStart >= (redDuration - 5) &&
-          secondsSinceStart < redDuration) {
-        await showNotification(); // 알림 전송
-      }
-    }
-  });
-
-  // 주기적인 작업 수행
-  // Timer.periodic(const Duration(seconds: 5), (timer) async {
-  //   if (service is AndroidServiceInstance) {
-  //     if (await service.isForegroundService()) {
-  //       // 포그라운드 알림을 주기적으로 업데이트
-  //       flutterLocalNotificationsPlugin.show(
-  //         0,
-  //         '포그라운드 서비스',
-  //         '서비스가 실행 중입니다: ${DateTime.now()}',
-  //         const NotificationDetails(
-  //           android: AndroidNotificationDetails(
-  //             'high_importance_channel',
-  //             '포그라운드 알림',
-  //             importance: Importance.max,
-  //             priority: Priority.high,
-  //             ongoing: true,
-  //           ),
-  //         ),
-  //       );
-  //     }
-  //   }
-  //   print('Background Service: Running at ${DateTime.now()}');
-  //   service.invoke('update');
-  // });
-}
+//         }else{
+//           print("알림 고정 종료");
+//           service.stopSelf();
+//         }
+//         await storage.write(key: 'isModified', value: 'false');
+//       }
+//     });
+//   }
+// }
 
 Future<void> showNotification() async {
   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
@@ -232,13 +169,11 @@ class App extends StatelessWidget {
         title: 'Flutter Navigation Example',
         theme: ThemeData(
           fontFamily: 'CustomFont',
-          // primarySwatch: Colors.green,
         ),
         initialRoute: '/',
         routes: {
           '/': (context) => const StartLoadingPage(),
           '/login': (context) => const LoginPage(),
-          // '/home': (context) => const HomePage(), // MainScreen으로 변경
           '/map': (context) => const MapPage(),
         },
       ),
@@ -253,11 +188,10 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   int _selectedIndex = 0;
   var messageString = "";
   DateTime? backPressedTime;
-  // Secure Storage 객체 생성
 
   static final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),
@@ -267,21 +201,23 @@ class _MainPageState extends State<MainPage> {
     const MyPage(),
     PointDetailPage()
   ];
-  // 저장된 accessToken 확인하여 자동 로그인 처리
 
   @override
   void initState() {
-    print("init하는중");
     super.initState();
+    WidgetsBinding.instance.addObserver(this); // 앱 상태 감지 옵저버 추가
+    print("init하는중");
+
+// 서비스 초기화 호출
+
+    // Firebase 메시지 수신 처리
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       print("메시지 수신!");
-      if (message.data['type'] == 1) {
-        if (message.data['type'] == '1') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const MapDirectionPage()),
-          );
-        }
+      if (message.data['type'] == '1') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MapDirectionPage()),
+        );
       } else if (message.data['type'] == '2') {
         Navigator.push(
           context,
@@ -296,24 +232,21 @@ class _MainPageState extends State<MainPage> {
 
       // 데이터 메시지 출력 (데이터)
       if (message.data.isNotEmpty) {
-        print('데이터 메시지: ${message.data}');
-        // 예: message.data['type'] 확인
-        if (message.data.containsKey('type')) {
-          String type = message.data['type'];
-          print('받은 메시지 타입: $type');
-          if (type == '1') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MapDirectionPage()),
-            );
-          } else if (type == '2') {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const MainPage()),
-            );
-          }
+        String type = message.data['type'];
+        print('받은 메시지 타입: $type');
+        if (type == '1') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const MapDirectionPage()),
+          );
+        } else if (type == '2') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const MainPage()),
+          );
         }
       }
+
       if (!mounted) return;
       RemoteNotification? notification = message.notification;
       if (notification != null) {
@@ -338,6 +271,21 @@ class _MainPageState extends State<MainPage> {
     });
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this); // 옵저버 제거
+    super.dispose();
+  }
+
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   // 앱 상태 변경 감지
+  //   if (state == AppLifecycleState.paused) {
+  //     // 앱이 백그라운드로 전환되었을 때 알림을 띄움
+  //     showNotification();
+  //   }
+  // }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -347,41 +295,41 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-        canPop: false, // 뒤로 가기 제어: false로 설정하여 기본 동작을 막음
-        onPopInvoked: (bool didPop) {
-          DateTime nowTime = DateTime.now();
-          if (didPop == false &&
-              (backPressedTime == null ||
+      canPop: false, // 뒤로 가기 제어: false로 설정하여 기본 동작을 막음
+      onPopInvoked: (bool didPop) {
+        DateTime nowTime = DateTime.now();
+        if (didPop == false &&
+            (backPressedTime == null ||
                   nowTime.difference(backPressedTime!) >
                       const Duration(seconds: 2))) {
             // 2초 내로 다시 누르면 앱 종료
-            backPressedTime = nowTime;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("한 번 더 누르면 앱이 종료됩니다."),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          } else {
+          backPressedTime = nowTime;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("한 번 더 누르면 앱이 종료됩니다."),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        } else {
             // 2초 안에 두 번 누르면 앱 종료
-            SystemNavigator.pop();
-          }
-        },
-        child: Scaffold(
-          body: _widgetOptions.elementAt(_selectedIndex),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            type: BottomNavigationBarType.fixed,
-            iconSize: 24,
-            backgroundColor: Colors.white,
-            selectedItemColor: AppColors.green,
-            unselectedItemColor: AppColors.greytext,
-            selectedLabelStyle: const TextStyle(fontSize: 12),
-            unselectedLabelStyle: const TextStyle(fontSize: 12),
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        body: _widgetOptions.elementAt(_selectedIndex),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          type: BottomNavigationBarType.fixed,
+          iconSize: 24,
+          backgroundColor: Colors.white,
+          selectedItemColor: AppColors.green,
+          unselectedItemColor: AppColors.greytext,
+          selectedLabelStyle: const TextStyle(fontSize: 12),
+          unselectedLabelStyle: const TextStyle(fontSize: 12),
             // elevation: 0,
             items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
+            BottomNavigationBarItem(
                 icon: Image.asset(
                   'assets/icon/nothome.png', // 선택되지 않았을 때 이미지
                   width: 21,
@@ -392,9 +340,9 @@ class _MainPageState extends State<MainPage> {
                   width: 21,
                   height: 21,
                 ),
-                label: '홈',
-              ),
-              BottomNavigationBarItem(
+              label: '홈',
+            ),
+            BottomNavigationBarItem(
                 icon: Image.asset(
                   'assets/icon/notpoint.png', // 선택되지 않았을 때 이미지
                   width: 23,
@@ -405,9 +353,9 @@ class _MainPageState extends State<MainPage> {
                   width: 23,
                   height: 23,
                 ),
-                label: '포인트',
-              ),
-              BottomNavigationBarItem(
+              label: '포인트',
+            ),
+            BottomNavigationBarItem(
                 icon: Image.asset(
                   'assets/icon/notmap.png', // 선택되지 않았을 때 이미지
                   width: 21,
@@ -418,9 +366,9 @@ class _MainPageState extends State<MainPage> {
                   width: 21,
                   height: 21,
                 ),
-                label: '지도',
-              ),
-              BottomNavigationBarItem(
+              label: '지도',
+            ),
+            BottomNavigationBarItem(
                 icon: Image.asset(
                   'assets/icon/notlocation.png', // 선택되지 않았을 때 이미지
                   width: 23,
@@ -431,9 +379,9 @@ class _MainPageState extends State<MainPage> {
                   width: 23,
                   height: 23,
                 ),
-                label: '주변',
-              ),
-              BottomNavigationBarItem(
+              label: '주변',
+            ),
+            BottomNavigationBarItem(
                 icon: Image.asset(
                   'assets/icon/notprofile.png', // 선택되지 않았을 때 이미지
                   width: 23,
@@ -444,10 +392,10 @@ class _MainPageState extends State<MainPage> {
                   width: 23,
                   height: 23,
                 ),
-                label: '프로필',
-              ),
-            ],
-          ),
+              label: '프로필',
+            ),
+          ],
+        ),
         ));
   }
 }
