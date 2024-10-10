@@ -585,36 +585,36 @@ class TrafficLightService {
             borderRadius: BorderRadius.circular(20.0),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(30.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.check_circle_outline,
-                    color: Colors.green, size: 80),
-                const SizedBox(height: 20),
                 const Text(
-                  '성공!',
+                  '제보 완료',
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'LogoFont'),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
+                Image.asset(
+                  'assets/images/check.png', // 경로는 pubspec.yaml에 등록한 경로
+                  width: 70,
+                  height: 70,
+                ),
+                const SizedBox(height: 10),
                 const Text(
                   '포인트 300점을 얻었습니다!',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.black54,
-                  ),
+                  style: TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.green,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                        horizontal: 30, vertical: 10),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   onPressed: () {
