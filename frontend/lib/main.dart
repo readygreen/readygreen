@@ -32,6 +32,7 @@ import 'package:flutter/services.dart'; // SystemNavigator를 사용하기 위�
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
 }
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
@@ -73,6 +74,7 @@ Future<void> initializeNotification() async {
     sound: true,
   );
 }
+
 Future<void> initializeService() async {
   final service = FlutterBackgroundService();
 
@@ -129,8 +131,6 @@ void onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  
-
   Timer.periodic(const Duration(seconds: 1), (timer) async {
     double targetLatitude = 37.7749;
     double targetLongitude = -122.4194;
@@ -144,7 +144,7 @@ void onStart(ServiceInstance service) async {
       minute: int.parse(startTimeParts[1]),
       second: int.parse(startTimeParts[2]),
     );
-  Position position = await Geolocator.getCurrentPosition(
+    Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     double latitude = position.latitude;
     double longitude = position.longitude;
@@ -156,10 +156,12 @@ void onStart(ServiceInstance service) async {
     );
     if (distance <= 15) {
       DateTime now = DateTime.now();
-      int secondsSinceStart = now.difference(startTime).inSeconds % totalDuration;
+      int secondsSinceStart =
+          now.difference(startTime).inSeconds % totalDuration;
 
       // 파란불 켜지기 5초 전이면
-      if (secondsSinceStart >= (redDuration - 5) && secondsSinceStart < redDuration) {
+      if (secondsSinceStart >= (redDuration - 5) &&
+          secondsSinceStart < redDuration) {
         await showNotification(); // 알림 전송
       }
     }
@@ -190,6 +192,7 @@ void onStart(ServiceInstance service) async {
   //   service.invoke('update');
   // });
 }
+
 Future<void> showNotification() async {
   const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
     'channel_id', // 채널 ID
