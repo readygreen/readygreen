@@ -147,16 +147,22 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = navigationState.destinationName ?: "목적지 정보 없음",
             style = pStyle,
             color = White,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .wrapContentHeight(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+
         Spacer(modifier = Modifier.height(10.dp))
 
         Icon(
@@ -169,7 +175,9 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             }),
             contentDescription = "방향",
             tint = Color.Unspecified,
-            modifier = Modifier.size(40.dp)
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.CenterHorizontally)
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -179,7 +187,7 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             style = pStyle,
             color = White,
             modifier = Modifier
-                .fillMaxWidth(0.85f)
+                .align(Alignment.CenterHorizontally)
                 .wrapContentHeight(),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
@@ -191,7 +199,8 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             Text(
                 text = "신호등 없음",
                 style = pStyle,
-                color = White
+                color = White,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         } else {
             Text(
@@ -201,7 +210,8 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
                     "RED" -> Red
                     "GREEN" -> Green
                     else -> Gray
-                }
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
         }
     }

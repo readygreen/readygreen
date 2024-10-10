@@ -47,7 +47,7 @@ class NavigationViewModel : ViewModel() {
             if (location != null) {
                 Log.d("NavigationViewModel", "현재 위치: ${location.latitude}, ${location.longitude}")
                 currentLocation = location
-                initiateNavigation(location.latitude, location.longitude, lat, lng, name)
+                initiateNavigation(context, location.latitude, location.longitude, lat, lng, name)
             } else {
                 Log.d("NavigationViewModel", "현재 위치 불러오기 실패")
                 _navigationState.value = NavigationState(isNavigating = false)
@@ -56,7 +56,7 @@ class NavigationViewModel : ViewModel() {
     }
 
     // 길안내 시작 api 요청
-    private fun initiateNavigation(curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
+    private fun initiateNavigation(context: Context, curLat: Double, curLng: Double, lat: Double, lng: Double, name: String) {
         val navigationApi = RestClient.createService(NavigationApi::class.java)
         val navigationRequest = NavigationRequest(
             startX = roundToSix(curLng),
@@ -75,8 +75,7 @@ class NavigationViewModel : ViewModel() {
                 override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
                     if (response.isSuccessful) {
                         Log.d("NavigationViewModel", "Navigation API 받기 성공")
-                        // 응답 데이터 처리
-                        handleNavigationResponse(response)
+                        handleNavigationResponse(response, context)
                     } else {
                         Log.d("NavigationViewModel", "Navigation API 받기 실패: ${response.errorBody()?.string()}")
                         _navigationState.value = NavigationState(isNavigating = false)
@@ -92,6 +91,7 @@ class NavigationViewModel : ViewModel() {
     }
 
 
+
     // 좌표 반올림
     private fun roundToSix(value: Double): Double {
         return String.format("%.6f", value).toDouble()
@@ -99,8 +99,13 @@ class NavigationViewModel : ViewModel() {
 
 
     // 응답 데이터 처리
-    private fun handleNavigationResponse(response: Response<NavigationResponse>) {
+    private fun handleNavigationResponse(response: Response<NavigationResponse>, context: Context) {
+        if (locationService == null) {
+            locationService = LocationService(context)
+        }
+
         response.body()?.let { navigationResponse ->
+
             route = navigationResponse.routeDTO.features // 경로 정보
             blinkers = navigationResponse.blinkerDTOs // 신호등 정보
 
@@ -109,10 +114,10 @@ class NavigationViewModel : ViewModel() {
                 if (feature.geometry.type == "Point") index else null
             } ?: emptyList()
 
-            // 1. description업데이트
+            // description 업데이트
             updateCurrentDescription()
 
-            // 2. currentIndex에 해당하는 feature와 index가 일치하는 신호등 정보 업데이트
+            // currentIndex에 해당하는 feature와 index가 일치하는 신호등 정보 업데이트
             val currentFeature = route?.getOrNull(currentIndex)
             updateBlinkerInfo(currentFeature)
 
@@ -124,14 +129,25 @@ class NavigationViewModel : ViewModel() {
                 destinationName = navigationResponse.routeDTO.features.lastOrNull()?.properties?.name ?: "알 수 없음"
             )
 
-            // 위치 업데이트 빈도 설정
+            locationService?.getLastLocation { location ->
+                if (location != null) {
+                    Log.d("NavigationViewModel", "현재 위치 수신 - 위도: ${location.latitude}, 경도: ${location.longitude}")
+                    currentLocation = location
+                } else {
+                    Log.d("NavigationViewModel", "현재 위치 불러오기 실패")
+                    _navigationState.value = NavigationState(isNavigating = false)
+                }
+            }
+
             locationService?.adjustLocationRequest(
                 priority = Priority.PRIORITY_HIGH_ACCURACY,
                 interval = 500
             )
 
-            // 위치 업데이트 시작
-            locationService?.startLocationUpdates { location -> updateNavigation(location) }
+            locationService?.startLocationUpdates { location ->
+                Log.d("NavigationViewModel", "위치 업데이트 수신: ${location.latitude}, ${location.longitude}")
+                updateNavigation(location)
+            }
 
         } ?: run {
             Log.d("NavigationViewModel", "경로 정보 받기 실패")
@@ -146,7 +162,7 @@ class NavigationViewModel : ViewModel() {
             route?.get(index)?.let { feature ->
                 if (feature.geometry.type == "Point") {
                     _navigationState.value = _navigationState.value.copy(
-                        currentDescription = feature.properties.description ?: "안내 없음"
+                        currentDescription = feature.properties.description
                     )
                 }
             }
@@ -158,13 +174,13 @@ class NavigationViewModel : ViewModel() {
     private fun updateBlinkerInfo(feature: Feature?) {
         feature ?: return
 
-        val featureIndex = feature.properties.index // 현재 feature의 인덱스
+        val featureIndex = feature.properties.index
 
-        // 현재 위치 인덱스보다 크거나 같은 신호등 인덱스를 찾기
+        // 현재 위치 인덱스보다 크거나 같은 신호등 인덱스
         val relevantBlinkers = blinkers?.filter { it.index >= featureIndex }
 
         if (!relevantBlinkers.isNullOrEmpty()) {
-            // 가장 작은 인덱스의 신호등 정보 가져오기
+            // 가장 작은 인덱스의 신호등 정보
             val nearestBlinker = relevantBlinkers.minByOrNull { it.index }
             nearestBlinker?.let { blinker ->
                 // 신호등 상태 계산
@@ -319,7 +335,7 @@ class NavigationViewModel : ViewModel() {
 
 
     // 네비게이션 상태 체크
-    fun checkNavigation() {
+    fun checkNavigation(context: Context) {
         val navigationApi = RestClient.createService(NavigationApi::class.java)
 
         viewModelScope.launch {
@@ -330,7 +346,8 @@ class NavigationViewModel : ViewModel() {
                         when (response.code()) {
                             200 -> {
                                 Log.d("NavigationViewModel", "길안내 중입니다.")
-                                getNavigation()
+                                // 길안내 중일 때 getNavigation 호출
+                                getNavigation(context)
                             }
                             204 -> {
                                 Log.d("NavigationViewModel", "길안내 중이 아닙니다.")
@@ -352,8 +369,9 @@ class NavigationViewModel : ViewModel() {
     }
 
 
-    // 네이게이션 정보 불러오기
-    fun getNavigation() {
+
+    // 네비게이션 정보 불러오기
+    fun getNavigation(context: Context) {
         _navigationCommand.value = "get_navigation"
         val navigationApi = RestClient.createService(NavigationApi::class.java)
 
@@ -364,7 +382,8 @@ class NavigationViewModel : ViewModel() {
                     override fun onResponse(call: Call<NavigationResponse>, response: Response<NavigationResponse>) {
                         if (response.isSuccessful) {
                             Log.d("NavigationViewModel", "길안내 정보 받기 성공: $response")
-                            handleNavigationResponse(response)
+                            // 응답 데이터 처리 - context 전달
+                            handleNavigationResponse(response, context)
                         } else {
                             Log.d("NavigationViewModel", "길안내 정보 불러오기 실패: ${response.errorBody()?.string()}")
                         }

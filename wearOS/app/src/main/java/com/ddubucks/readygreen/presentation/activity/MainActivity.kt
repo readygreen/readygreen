@@ -43,7 +43,10 @@ class MainActivity : ComponentActivity() {
                 when (messageType) {
                     FirebaseMessagingService.MESSAGE_TYPE_NAVIGATION -> {
                         Log.d("MainActivity", "getNavigation() 시작")
-                        navigationViewModel.getNavigation()
+                        context?.let {
+                            // context 전달
+                            navigationViewModel.getNavigation(it)
+                        }
                         FirebaseMessagingService().resetRequestState()
                     }
                     FirebaseMessagingService.MESSAGE_TYPE_CLEAR -> {
@@ -77,7 +80,7 @@ class MainActivity : ComponentActivity() {
                 val startDestination = if (token.isNullOrEmpty()) {
                     "linkEmailScreen"
                 } else {
-                    navigationViewModel.checkNavigation()
+                    navigationViewModel.checkNavigation(this) // context 전달
 
                     navigationViewModel.navigationCommand.observe(this) { command ->
                         if (command == "get_navigation") {

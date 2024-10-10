@@ -32,10 +32,13 @@ data class Geometry(
 ) {
     // Point
     fun getCoordinatesAsDoubleArray(): List<Double>? {
-        return if (type == "Point") {
-            (coordinates as? List<*>)
-                ?.filterIsInstance<Double>()
-        } else null
+        return try {
+            if (type == "Point") {
+                (coordinates as? List<*>)?.filterIsInstance<Double>()
+            } else null
+        } catch (e: Exception) {
+            null
+        }
     }
 
     // LineString
