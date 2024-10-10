@@ -115,16 +115,6 @@ class _HomePageContentState extends State<HomePageContent> {
     }
   }
 
-  Future<void> _startGuide() async {
-    print("startGuide");
-    initializeService();
-  }
-
-  Future<void> _endGuide() async {
-    print("endGuide");
-    await storage.write(key: 'isModified', value: 'true');
-  }
-
   Future<void> _fetchMainDate() async {
     final data = await api.getMainData();
     print("_fetchMainDate data");
@@ -723,54 +713,6 @@ class _HomePageContentState extends State<HomePageContent> {
             //     CustomButton(),
             //   ],
             // ),
-            Positioned(
-            bottom: 20, // 버튼을 하단에 고정
-            left: 20,
-            right: 20,
-            child: ElevatedButton(
-              onPressed: () async {
-                await _startGuide(); // 버튼 클릭 시 토글
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.green,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                '길안내 시작버튼',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color.fromRGBO(255, 255, 255, 1),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 20, // 버튼을 하단에 고정
-            left: 30,
-            right: 10,
-            child: ElevatedButton(
-              onPressed: () async {
-                await _endGuide(); // 버튼 클릭 시 토글
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.green,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                '길안내 끝버튼',
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
           ],
         ),
       ),
