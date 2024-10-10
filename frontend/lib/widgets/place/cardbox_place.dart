@@ -108,7 +108,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
               final int index = entry.key;
               final Map<String, String> place = entry.value;
               final String imageUrl =
-                  imageCache[index] ?? 'https://via.placeholder.com/150';
+                  imageCache[index] ?? 'https://picsum.photos/150/150';
 
               return Column(
                 children: [

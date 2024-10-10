@@ -52,6 +52,8 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   lottie: ^2.2.0
   confetti: ^0.8.0
+  flutter_dotenv: ^5.1.0
+  flutter_background_service: ^5.0.10
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +65,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  # flutter_native_splash: ^2.0.4+1
+
 
 flutter_native_splash:
   color: "#ffffff"
@@ -144,6 +148,8 @@ flutter:
   assets:
     - assets/lottie/ # lottie 폴더 내 모든 파일 포함
     - assets/images/
+    - assets/icon/
+    - config/.env
 
   fonts:
     - family: CustomFont

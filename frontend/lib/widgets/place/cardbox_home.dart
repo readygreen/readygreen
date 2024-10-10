@@ -65,9 +65,14 @@ class _CardBoxHomeState extends State<CardBoxHome> {
                           width: 100,
                           height: 100,
                           child: Image.network(
-                            place['imageUrl'] ??
-                                'https://via.placeholder.com/150',
+                            place['imageUrl'] ?? 'https://picsum.photos/150/150',
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Image.asset(
+                                '', // 기본 이미지 파일 경로
+                                fit: BoxFit.cover,
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),

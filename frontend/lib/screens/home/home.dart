@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:readygreen/api/main_api.dart';
+import 'package:readygreen/background/background_service.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/widgets/common/bgcontainer_home.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
@@ -112,6 +113,16 @@ class _HomePageContentState extends State<HomePageContent> {
     }
   }
 
+  Future<void> _startGuide() async {
+    print("startGuide");
+    initializeService();
+  }
+
+  Future<void> _endGuide() async {
+    print("endGuide");
+    await storage.write(key: 'isModified', value: 'true');
+  }
+
   Future<void> _fetchMainDate() async {
     final data = await api.getMainData();
     print("_fetchMainDate data");
@@ -154,15 +165,17 @@ class _HomePageContentState extends State<HomePageContent> {
 
     // 현재 위치 가져오기
     Position location = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.bestForNavigation);
 
     // 위치 정보를 스토리지에 저장
     await storage.write(key: 'latitude', value: location.latitude.toString());
     await storage.write(key: 'longitude', value: location.longitude.toString());
 
     // 위치 정보를 Provider에 저장 (Provider의 updateLocation 호출)
-    await Provider.of<CurrentLocationProvider>(context, listen: false)
-        .updateLocation();
+    if (mounted) {
+      await Provider.of<CurrentLocationProvider>(context, listen: false)
+          .updateLocation();
+    }
 
     print('위치 저장 완료: ${location.latitude}, ${location.longitude}');
   }
@@ -708,6 +721,54 @@ class _HomePageContentState extends State<HomePageContent> {
             //     CustomButton(),
             //   ],
             // ),
+            Positioned(
+            bottom: 20, // 버튼을 하단에 고정
+            left: 20,
+            right: 20,
+            child: ElevatedButton(
+              onPressed: () async {
+                await _startGuide(); // 버튼 클릭 시 토글
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.green,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                '길안내 시작버튼',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Color.fromRGBO(255, 255, 255, 1),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20, // 버튼을 하단에 고정
+            left: 30,
+            right: 10,
+            child: ElevatedButton(
+              onPressed: () async {
+                await _endGuide(); // 버튼 클릭 시 토글
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.green,
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                '길안내 끝버튼',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
           ],
         ),
       ),
