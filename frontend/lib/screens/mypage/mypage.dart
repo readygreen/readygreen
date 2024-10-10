@@ -57,9 +57,17 @@ class _MyPageState extends State<MyPage> {
   }
 
   Future<void> _handleLogout(BuildContext context) async {
-    // 저장된 토큰 삭제
-    await storage.delete(key: 'accessToken');
-    await storage.deleteAll();
+    // 저장된 모든 키-값 쌍을 가져오기
+    Map<String, String> allValues = await storage.readAll();
+
+    // 'fortuneDate'를 제외한 나머지 키들 삭제
+    allValues.remove('fortuneDate'); // 'fortuneDate' 삭제되지 않게 제거
+    allValues.remove('fortune');
+
+    // 남은 키들을 삭제
+    for (String key in allValues.keys) {
+      await storage.delete(key: key);
+    }
 
     // 로그아웃 후 로그인 페이지로 이동
     Navigator.of(context).pushNamedAndRemoveUntil(
