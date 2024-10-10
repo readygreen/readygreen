@@ -72,7 +72,15 @@ class _MyPlacePageState extends State<MyPlacePage> {
       ),
       backgroundColor: AppColors.white,
       body: _bookmarks.isEmpty
-          ? const Center(child: CircularProgressIndicator()) // 데이터 로딩 중
+          ? const Center(
+              child: Text(
+                '자주 가는 목적지가 등록되지 않았습니다.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+            ) // 데이터가 없을 때 출력
           : ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: _bookmarks.length,
@@ -363,7 +371,8 @@ class _MyPlacePageState extends State<MyPlacePage> {
   }
 
 // 삭제 모달
-  void _showDeleteModal(BuildContext context, String placeName, String placeId) {
+  void _showDeleteModal(
+      BuildContext context, String placeName, String placeId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {

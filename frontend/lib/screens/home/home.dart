@@ -11,6 +11,7 @@ import 'package:readygreen/constants/appcolors.dart';
 import 'package:readygreen/widgets/modals/weather_modal.dart';
 import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
+import 'package:readygreen/widgets/place/cardbox_home.dart';
 // import 'package:readygreen/widgets/place/cardbox_home.dart';
 import 'package:readygreen/widgets/place/cardbox_place.dart'; // CardBoxPlace 임포트
 import 'package:readygreen/api/place_api.dart'; // Place API 임포트
@@ -698,21 +699,13 @@ class _HomePageContentState extends State<HomePageContent> {
             if (isLoadingPlaces)
               const Center(child: CircularProgressIndicator())
             else if (nearbyPlaces.isNotEmpty)
-              CardBoxPlace(
+              CardBoxHome(
                 places: nearbyPlaces,
-                selectedCategory: '전체',
               )
             else
               const Center(child: Text('주변 장소를 찾을 수 없습니다.')),
 
             const SizedBox(height: 16),
-            const SizedBox(height: 16),
-            // const Row(
-            //   mainAxisAlignment: MainAxisAlignment.end,
-            //   children: [
-            //     CustomButton(),
-            //   ],
-            // ),
           ],
         ),
       ),

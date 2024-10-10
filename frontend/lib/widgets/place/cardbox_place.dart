@@ -148,15 +148,20 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                               const SizedBox(height: 5),
                               ElevatedButton(
                                 onPressed: () {
-                                  // 위도와 경도를 double 타입으로 변환
-                                  double latitude =
-                                      double.parse(place['latitude']!);
-                                  double longitude =
-                                      double.parse(place['longitude']!);
-                                  print('위더 경도 려깃지렁 $latitude, $longitude');
-                                  print(place['name']);
-                                  print(place['address']);
-                                  print(place['id']);
+                                  // 위도와 경도를 double 타입으로 변환 (null 체크 추가)
+                                  double latitude = place['latitude'] != null
+                                      ? double.parse(place['latitude']!)
+                                      : 36.3551083; // 기본값 설정
+                                  double longitude = place['longitude'] != null
+                                      ? double.parse(place['longitude']!)
+                                      : 127.3379517; // 기본값 설정
+
+                                  // null 체크 후 값 출력
+                                  print('위도: $latitude, 경도: $longitude');
+                                  print('장소 이름: ${place['name']}');
+                                  print('주소: ${place['address']}');
+                                  print('ID: ${place['id']}');
+
                                   // ResultMapPage로 이동하며 데이터 전달
                                   Navigator.push(
                                     context,
@@ -164,12 +169,14 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                                       builder: (context) => ResultMapPage(
                                         lat: latitude, // 위도
                                         lng: longitude, // 경도
-                                        placeName: place['name']!, // 장소 이름
+                                        placeName:
+                                            place['name'] ?? '이름 없음', // null 체크
                                         address: place['address'] ??
-                                            '주소 정보 없음', // 주소
-                                        searchQuery:
-                                            place['name']!, // 검색 쿼리로 이름 사용
-                                        placeId: place['id']!, // 장소 ID
+                                            '주소 정보 없음', // null 체크
+                                        searchQuery: place['name'] ??
+                                            '검색어 없음', // null 체크
+                                        placeId:
+                                            place['id'] ?? 'ID 없음', // null 체크
                                       ),
                                     ),
                                   );
@@ -192,7 +199,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                                   '지도보기',
                                   style: TextStyle(fontSize: 13),
                                 ),
-                              ),
+                              )
                             ],
                           ),
                         ),
