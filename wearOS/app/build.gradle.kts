@@ -29,6 +29,17 @@ android {
         buildConfigField("String", "MAPS_API_KEY", "\"${properties.getProperty("MAPS_API_KEY")}\"")
     }
 
+    applicationVariants.configureEach {
+        val appName = "readygreen"
+        this.outputs.configureEach {
+            buildOutputs.forEach {
+                val archivesBaseName = "${appName}.apk"
+                val variantOutputImpl = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+                variantOutputImpl.outputFileName =  archivesBaseName
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -76,7 +87,7 @@ dependencies {
     implementation(libs.watchface.complications.data.source.ktx)
     implementation(libs.navigation.compose)
     implementation(libs.material3.android)
-    implementation(libs.firebase.messaging.ktx) // Firebase 메시징(KTX)
+    implementation(libs.firebase.messaging.ktx)
     implementation(libs.runtime.livedata)
 
     // Compose BOM
@@ -85,6 +96,8 @@ dependencies {
 
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material:material:<latest_version>")
+
 
     // Wear OS에서 데이터 레이어 (모바일 연결)
     implementation("com.google.android.gms:play-services-wearable:18.0.0")

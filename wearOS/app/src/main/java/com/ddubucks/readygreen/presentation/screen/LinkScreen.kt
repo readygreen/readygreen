@@ -97,7 +97,7 @@ fun LinkScreen(
         ) {
             Text(
                 text = "시작하기",
-                color = if (authNumber.length == 6) Black else White,  // 입력에 따라 텍스트 색상 변경
+                color = if (authNumber.length == 6) Black else White,
                 fontSize = 12.sp
             )
         }

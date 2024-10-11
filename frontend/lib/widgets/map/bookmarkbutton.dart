@@ -32,8 +32,8 @@ class BookmarkButton extends StatefulWidget {
 }
 
 class _BookmarkButtonState extends State<BookmarkButton> {
-  double? _lat = 0.0;
-  double? _lng = 0.0;
+  double? _lat;
+  double? _lng;
   bool _isBookmarked = false;
   final MapStartAPI _api = MapStartAPI(); // API 클래스 인스턴스 생성
 
@@ -41,24 +41,29 @@ class _BookmarkButtonState extends State<BookmarkButton> {
   void initState() {
     super.initState();
     _isBookmarked = widget.checked; // checked 값으로 초기화
+    _lat = widget.latitude; // 초기 위도 설정
+    _lng = widget.longitude; // 초기 경도 설정
     _selectPlace(widget.placeId);
   }
 
   Future<void> _selectPlace(String placeId) async {
     GoogleMapsPlaces places =
         GoogleMapsPlaces(apiKey: 'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M');
-    final response = await places.getDetailsByPlaceId(placeId, language: 'ko');
+    try {
+      final response =
+          await places.getDetailsByPlaceId(placeId, language: 'ko');
 
-    if (response.isOkay) {
-      final result = response.result;
-      if (mounted) {
+      if (response.isOkay) {
+        final result = response.result;
         setState(() {
-          _lat = result.geometry?.location.lat; // null check 추가
-          _lng = result.geometry?.location.lng; // null check 추가
+          _lat = result.geometry?.location.lat ?? 0.0; // Null 처리
+          _lng = result.geometry?.location.lng ?? 0.0; // Null 처리
         });
+      } else {
+        print('장소 선택 실패: ${response.errorMessage}');
       }
-    } else {
-      print('장소 선택 실패: ${response.errorMessage}');
+    } catch (e) {
+      print('Error fetching place details: $e');
     }
   }
 
@@ -90,6 +95,12 @@ class _BookmarkButtonState extends State<BookmarkButton> {
 
   // 북마크 삭제 함수 (DELETE)
   Future<void> _deleteBookmark() async {
+    if (widget.placeId == null || widget.placeId.isEmpty) {
+      // 추가: placeId가 유효하지 않으면 처리
+      print('북마크 삭제 실패: placeId가 유효하지 않음');
+      return;
+    }
+
     print('북마크 삭제 요청: 기타');
 
     bool result = await _api.deleteBookmark(widget.placeId); // name은 기타로 고정
