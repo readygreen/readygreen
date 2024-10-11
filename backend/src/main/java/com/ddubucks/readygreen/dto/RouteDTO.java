@@ -50,10 +50,6 @@ public class RouteDTO {
         private String nearPoiX;
         private String nearPoiY;
         private String crossName;
-        private int totalDistance;
-        private int totalTime;
-        private int distance;   // m
-        private int time;   // 초
         private int turnType;
         private String pointType;
     }

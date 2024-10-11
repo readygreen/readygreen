@@ -16,8 +16,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public Member signup(SignupRequestDTO signupRequestDTO) {
-        return memberRepository.save(Member.builder()
+    public void signup(SignupRequestDTO signupRequestDTO) {
+        memberRepository.save(Member.builder()
                 .email(signupRequestDTO.getEmail())
                 .nickname(signupRequestDTO.getNickname())
                 .birth(signupRequestDTO.getBirth())
@@ -26,8 +26,7 @@ public class MemberService {
                 .smartphone(signupRequestDTO.getSmartphone())
                 .profileImg(signupRequestDTO.getProfileImg())
                 .role(Role.USER)
-                .step(0)
-                .build()); // 생성된 member의 ID 반환
+                .build());
     }
 
     @Transactional
