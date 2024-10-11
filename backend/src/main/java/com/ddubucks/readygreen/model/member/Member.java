@@ -1,6 +1,7 @@
 package com.ddubucks.readygreen.model.member;
 
 import com.ddubucks.readygreen.model.*;
+import com.ddubucks.readygreen.model.bookmark.Bookmark;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -47,6 +48,9 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private int point;
 
+    @Column(nullable = false)
+    private int step;
+
     private String smartphone;
 
     private String watch;
@@ -80,10 +84,20 @@ public class Member extends BaseEntity {
     // Steps 연결
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
-    private List<Step> step;
+    private List<Step> steps;
 
     // Route_record 연결
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<RouteRecord> routeRecords;
+
+    // bookmark 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Bookmark> bookmark;
+
+    // badge 연결
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Badge> badge;
 }

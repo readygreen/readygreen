@@ -1,12 +1,16 @@
 package com.ddubucks.readygreen.controller;
 
+import com.ddubucks.readygreen.dto.ProfileResponseDTO;
 import com.ddubucks.readygreen.dto.SignupRequestDTO;
+import com.ddubucks.readygreen.model.Badge;
+import com.ddubucks.readygreen.repository.BadgeRepository;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import com.ddubucks.readygreen.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -25,12 +29,19 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final BadgeRepository badgeRepository;
 
     @PostMapping
     public ResponseEntity<?> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO) {
         System.out.println("회원가입");
-        System.out.println();
-        memberService.signup(signupRequestDTO);
+        System.out.println(signupRequestDTO.getSmartphone());
+        Member member = memberService.signup(signupRequestDTO);
+        Badge badge = Badge.builder()
+                .type("000")
+                .title(0)
+                .member(member)
+                .build();
+        badgeRepository.save(badge);
         return ResponseEntity.ok("회원가입 성공");
     }
 
@@ -62,4 +73,11 @@ public class MemberController {
         Member member = memberService.getMemberInfo(userDetails.getUsername());
         return ResponseEntity.ok(member);
     }
+
+    @GetMapping("badge")
+    public  ResponseEntity<Integer> getTitleBadge(@AuthenticationPrincipal UserDetails userDetails){
+        Badge badge = badgeRepository.findBadgeByMemberEmail(userDetails.getUsername());
+        return ResponseEntity.ok(badge.getTitle());
+    }
+
 }

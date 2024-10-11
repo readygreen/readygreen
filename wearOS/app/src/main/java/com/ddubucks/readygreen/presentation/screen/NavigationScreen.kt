@@ -1,6 +1,5 @@
 package com.ddubucks.readygreen.presentation.screen
 
-import android.speech.tts.TextToSpeech
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.wear.compose.material.Icon
@@ -18,50 +18,37 @@ import androidx.wear.compose.material.Text
 import com.ddubucks.readygreen.R
 import com.ddubucks.readygreen.presentation.components.Modal
 import com.ddubucks.readygreen.presentation.retrofit.navigation.NavigationState
-import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.Gray
-import com.ddubucks.readygreen.presentation.theme.Red
-import com.ddubucks.readygreen.presentation.theme.White
-import com.ddubucks.readygreen.presentation.theme.Primary
+import com.ddubucks.readygreen.presentation.theme.*
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.text.style.TextAlign
+import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
+import kotlinx.coroutines.delay
 import h3Style
 import pStyle
 import secStyle
-import java.util.*
 
 @Composable
 fun NavigationScreen(
     navController: NavHostController,
-    navigationViewModel: NavigationViewModel = viewModel()
+    navigationViewModel: NavigationViewModel = viewModel(),
 ) {
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
-
+    val (showArrivalDialog, setShowArrivalDialog) = remember { mutableStateOf(false) }
+    var isTimerActive by remember { mutableStateOf(navigationState.isNavigating) }
     val context = LocalContext.current
-    var ttsReady by remember { mutableStateOf(false) }
-    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
-
-    LaunchedEffect(Unit) {
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.KOREAN
-                ttsReady = true
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            tts?.shutdown()
-        }
-    }
+    val ttsViewModel = remember { TTSViewModel(context) }
 
     LaunchedEffect(navigationState.currentDescription) {
-        if (ttsReady && navigationState.currentDescription != null) {
-            val descriptionWithUnits = navigationState.currentDescription
-                .replace(" m", " 미터")
-                .replace(" km", " 킬로미터")
-            tts?.speak(descriptionWithUnits, TextToSpeech.QUEUE_ADD, null, "utteranceId")
+        navigationState.currentDescription?.let { description ->
+            ttsViewModel.speakText(description)
+
+            if (description == "도착") {
+                ttsViewModel.speakText("목적지에 도착하였습니다")
+                setShowArrivalDialog(true)
+            }
         }
     }
 
@@ -71,6 +58,10 @@ fun NavigationScreen(
         } else {
             navController.popBackStack()
         }
+    }
+
+    LaunchedEffect(navigationState.isNavigating) {
+        isTimerActive = navigationState.isNavigating
     }
 
     Column(
@@ -89,7 +80,7 @@ fun NavigationScreen(
         Spacer(modifier = Modifier.height(10.dp))
 
         if (navigationState.isNavigating) {
-            NavigationInfo(navigationState)
+            NavigationInfo(navigationState, isTimerActive)
         } else {
             Text(
                 text = "길안내 중이 아닙니다.",
@@ -105,68 +96,129 @@ fun NavigationScreen(
             message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
             onConfirm = {
                 navigationViewModel.stopNavigation()
+                isTimerActive = false
                 setShowExitDialog(false)
                 navController.popBackStack()
             },
             onCancel = {
                 setShowExitDialog(false)
+                navController.popBackStack()
+            }
+        )
+    }
+
+    if (showArrivalDialog) {
+        Modal(
+            title = "목적지 도착",
+            message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
+            onConfirm = {
+                navigationViewModel.finishNavigation()
+                isTimerActive = false
+                setShowArrivalDialog(false)
+                navController.popBackStack()
+            },
+            onCancel = {
+                setShowArrivalDialog(false)
             }
         )
     }
 }
 
 @Composable
-fun NavigationInfo(navigationState: NavigationState) {
-    Text(
-        text = navigationState.destinationName ?: "목적지 정보 없음",
-        style = pStyle,
-        color = White
-    )
+fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
+    var remainingTime by remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
+    var currentBlinkerState by remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
 
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Icon(
-        painter = painterResource(id = when (navigationState.nextDirection) {
-            11 -> R.drawable.arrow_straight                // 직진
-            12, 16, 17 -> R.drawable.arrow_left            // 좌회전 및 관련 좌회전
-            13, 18, 19 -> R.drawable.arrow_right           // 우회전 및 관련 우회전
-            14 -> R.drawable.arrow_back                    // 유턴
-            else -> R.drawable.arrow_straight              // 나머지 값은 안내 없음 처리
-        }),
-        contentDescription = "방향",
-        tint = Color.Unspecified,
-        modifier = Modifier.size(40.dp)
-    )
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Text(
-        text = navigationState.currentDescription ?: "안내 없음",
-        style = pStyle,
-        color = White
-    )
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    // 남은 거리에 단위 추가
-    Text(
-        text = "남은 거리: ${navigationState.remainingDistance?.let { String.format("%.1f", it) + " 미터" } ?: "정보 없음"}",
-        style = pStyle,
-        color = White
-    )
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    // 신호등 색상 처리
-    navigationState.trafficLightColor?.let { color ->
-        Text(
-            text = "${navigationState.trafficLightRemainingTime ?: "정보 없음"}초",
-            style = secStyle,
-            color = when (color) {
-                "GREEN" -> Color.Green
-                "RED" -> Red
-                else -> Gray
+    LaunchedEffect(remainingTime, isTimerActive) {
+        if (isTimerActive) {
+            if (remainingTime > 0) {
+                delay(1000L)
+                remainingTime--
+            } else {
+                if (currentBlinkerState == "RED") {
+                    remainingTime = navigationState.currentBlinkerInfo?.greenDuration ?: 0
+                    currentBlinkerState = "GREEN"
+                } else {
+                    remainingTime = navigationState.currentBlinkerInfo?.redDuration ?: 0
+                    currentBlinkerState = "RED"
+                }
             }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = navigationState.destinationName ?: "목적지 정보 없음",
+            style = pStyle,
+            color = White,
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .align(Alignment.CenterHorizontally)
+                .wrapContentHeight(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
         )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Icon(
+            painter = painterResource(id = when (navigationState.nextDirection) {
+                11 -> R.drawable.arrow_straight
+                12, 16, 17 -> R.drawable.arrow_left
+                13, 18, 19 -> R.drawable.arrow_right
+                14 -> R.drawable.arrow_back
+                else -> R.drawable.arrow_straight
+            }),
+            contentDescription = "방향",
+            tint = Color.Unspecified,
+            modifier = Modifier
+                .size(40.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = navigationState.currentDescription ?: "안내 없음",
+            style = pStyle,
+            color = White,
+            modifier = Modifier
+                .fillMaxWidth(0.8f)
+                .align(Alignment.CenterHorizontally)
+                .wrapContentHeight(),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
+        )
+
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        if (navigationState.currentBlinkerInfo == null) {
+            Text(
+                text = "신호등 없음",
+                style = pStyle,
+                color = White,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+        } else {
+            Text(
+                text = "${remainingTime}초",
+                style = secStyle,
+                color = when (currentBlinkerState) {
+                    "RED" -> Red
+                    "GREEN" -> Green
+                    else -> Gray
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
     }
 }

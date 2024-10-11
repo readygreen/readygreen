@@ -123,6 +123,7 @@ public class MapController {
                     .build();
             stepRepository.save(newSteps);
         }
+        member.setStep(member.getStep()+steps);
 
         member.setSpeed(speedKmPerHour);
         memberRepository.save(member);
@@ -171,8 +172,18 @@ public class MapController {
     }
 
     @DeleteMapping("bookmark")
-    public ResponseEntity<?> deleteBookmark(@RequestParam(required = false) String placeId, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> deleteBookmark(@RequestParam(name = "placeId") String placeId,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
         mapService.deleteBookmark(placeId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
+
+
+    @PutMapping("bookmark")
+    public ResponseEntity<?> updateBookmark(@Valid @RequestBody BookmarkEditDTO bookmarkEditDTO,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
+        mapService.updateBookmark(bookmarkEditDTO, userDetails.getUsername());
+        return ResponseEntity.ok("북마크가 수정되었습니다.");
+    }
+
 }

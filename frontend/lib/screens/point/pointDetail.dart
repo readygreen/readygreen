@@ -39,18 +39,24 @@ class _PointDetailPageState extends State<PointDetailPage> {
           children: [
             // 포인트 및 버튼
             _buildHeader(context),
-            // const SizedBox(height: 5),
             // 거래 내역
             Expanded(
-              child: ListView(
-                children: [
-                  for (var entry in pointDays.entries) // Map의 엔트리 반복
-                    _pointPerDay(
-                        entry.key,
-                        entry
-                            .value), // entry.value의 타입이 List<Map<String, dynamic>>이므로 잘 작동
-                ],
-              ),
+              child: pointDays.isEmpty // 포인트 내역이 없을 때 조건
+                  ? const Center(
+                      child: Text(
+                        '포인트 내역이 없습니다.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ) // 데이터가 없을 때 출력
+                  : ListView(
+                      children: [
+                        for (var entry in pointDays.entries) // Map의 엔트리 반복
+                          _pointPerDay(entry.key, entry.value),
+                      ],
+                    ),
             ),
           ],
         ),
@@ -159,9 +165,9 @@ class _PointDetailPageState extends State<PointDetailPage> {
       imagePath = 'assets/images/foot.png'; // 걸음수일 때 사용할 이미지
     } else if (firstWord == '운세') {
       imagePath = 'assets/images/star.png'; // 운세일 때 사용할 이미지
-    } else if(firstWord == '제보'){
+    } else if (firstWord == '제보') {
       imagePath = 'assets/images/rainbow.png'; // 기본 이미지 (필요시)
-    }else{
+    } else {
       imagePath = 'assets/images/rainbow.png';
     }
 
