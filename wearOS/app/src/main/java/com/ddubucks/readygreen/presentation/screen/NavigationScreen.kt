@@ -34,6 +34,7 @@ fun NavigationScreen(
     navController: NavHostController,
     navigationViewModel: NavigationViewModel = viewModel(),
 ) {
+    var isDataLoaded by remember { mutableStateOf(false) }
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
     val (showArrivalDialog, setShowArrivalDialog) = remember { mutableStateOf(false) }
@@ -41,6 +42,15 @@ fun NavigationScreen(
     val context = LocalContext.current
     val ttsViewModel = remember { TTSViewModel(context) }
 
+    // 길안내 시작 TTS 출력
+    LaunchedEffect(navigationState.destinationName) {
+        navigationState.destinationName?.let { destinationName ->
+            ttsViewModel.speakText("${destinationName}으로 길안내를 시작합니다") {
+            }
+        }
+    }
+
+    // 길안내 중간 안내 TTS 실행
     LaunchedEffect(navigationState.currentDescription) {
         navigationState.currentDescription?.let { description ->
             ttsViewModel.speakText(description)
@@ -64,63 +74,75 @@ fun NavigationScreen(
         isTimerActive = navigationState.isNavigating
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "경로 안내",
-            style = h3Style,
-            color = Primary
-        )
 
-        Spacer(modifier = Modifier.height(10.dp))
+    if (!isDataLoaded && navigationState.isNavigating) {
+        LoadingScreen()
 
-        if (navigationState.isNavigating) {
-            NavigationInfo(navigationState, isTimerActive)
-        } else {
+        LaunchedEffect(navigationState.isNavigating) {
+            if (navigationState.isNavigating) {
+                isDataLoaded = true
+            }
+        }
+    } else {
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Black),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
-                text = "길안내 중이 아닙니다.",
-                style = pStyle,
-                color = White
+                text = "경로 안내",
+                style = h3Style,
+                color = Primary
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            if (navigationState.isNavigating) {
+                NavigationInfo(navigationState, isTimerActive)
+            } else {
+                Text(
+                    text = "길안내 중이 아닙니다.",
+                    style = pStyle,
+                    color = White
+                )
+            }
+        }
+
+        if (showExitDialog) {
+            Modal(
+                title = "길 안내 중지",
+                message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
+                onConfirm = {
+                    navigationViewModel.stopNavigation()
+                    isTimerActive = false
+                    setShowExitDialog(false)
+                    navController.popBackStack()
+                },
+                onCancel = {
+                    setShowExitDialog(false)
+                    navController.popBackStack()
+                }
             )
         }
-    }
 
-    if (showExitDialog) {
-        Modal(
-            title = "길 안내 중지",
-            message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
-            onConfirm = {
-                navigationViewModel.stopNavigation()
-                isTimerActive = false
-                setShowExitDialog(false)
-                navController.popBackStack()
-            },
-            onCancel = {
-                setShowExitDialog(false)
-                navController.popBackStack()
-            }
-        )
-    }
-
-    if (showArrivalDialog) {
-        Modal(
-            title = "목적지 도착",
-            message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
-            onConfirm = {
-                navigationViewModel.finishNavigation()
-                isTimerActive = false
-                setShowArrivalDialog(false)
-                navController.popBackStack()
-            },
-            onCancel = {
-                setShowArrivalDialog(false)
-            }
-        )
+        if (showArrivalDialog) {
+            Modal(
+                title = "목적지 도착",
+                message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
+                onConfirm = {
+                    navigationViewModel.finishNavigation()
+                    isTimerActive = false
+                    setShowArrivalDialog(false)
+                    navController.popBackStack()
+                },
+                onCancel = {
+                    setShowArrivalDialog(false)
+                }
+            )
+        }
     }
 }
 
