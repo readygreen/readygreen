@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:readygreen/constants/appcolors.dart';
 
 class SpeechSearchDialog {
   static void show(BuildContext context, String voiceInput, String imagePath) {
@@ -17,7 +18,7 @@ class SpeechSearchDialog {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Column(
@@ -38,21 +39,21 @@ class SpeechSearchDialog {
                       style: const TextStyle(
                           fontSize: 18,
                           fontStyle: FontStyle.italic,
-                          color: Colors.blue),
+                          color: AppColors.blue),
                     ),
                   ],
                 ),
               ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: IconButton(
-                  icon: const Icon(Icons.close, size: 30),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // X 버튼 클릭 시 다이얼로그 닫기
-                  },
-                ),
-              ),
+              // Positioned(
+              //   top: 10,
+              //   right: 10,
+              //   child: IconButton(
+              //     icon: const Icon(Icons.close, size: 30),
+              //     onPressed: () {
+              //       Navigator.pop(context); // X 버튼 클릭 시 다이얼로그 닫기
+              //     },
+              //   ),
+              // ),
             ],
           ),
         );
