@@ -194,7 +194,8 @@ class _ResultMapPageState extends State<ResultMapPage> {
                 checked: _isPlaceBookmarked(widget.placeId),
                 onTap: () {
                   // PlaceCard 클릭 시 처리
-                  print('PlaceCard clicked: ${widget.placeName}');
+                  print(
+                      'PlaceCard clicked: ${widget.placeName} 위도 ${widget.lat} 경도 ${widget.lng}');
                 },
               ),
             ),

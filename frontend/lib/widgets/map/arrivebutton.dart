@@ -30,8 +30,8 @@ class ArriveButton extends StatefulWidget {
 }
 
 class _ArriveButtonState extends State<ArriveButton> {
-  double? _lat = 0.0;
-  double? _lng = 0.0;
+  double? _lat;
+  double? _lng;
   bool _isLoading = true; // 비동기 작업 상태
 
   Future<void> _selectPlace(String placeId) async {
@@ -41,16 +41,18 @@ class _ArriveButtonState extends State<ArriveButton> {
     try {
       final response =
           await places.getDetailsByPlaceId(placeId, language: 'ko');
+      print('여기어야야양야야야야야야야양야:  $response');
 
       if (response.isOkay) {
         // null 체크 추가
         final result = response.result;
         if (mounted) {
           setState(() {
-            _lat = result.geometry?.location.lat ?? 0.0; // Null 처리
-            _lng = result.geometry?.location.lng ?? 0.0; // Null 처리
+            _lat = result.geometry?.location.lat ?? widget.lat; // Null 처리
+            _lng = result.geometry?.location.lng ?? widget.lng; // Null 처리
             _isLoading = false; // 로딩 완료 상태로 변경
           });
+          print('여기에 위도경도야!!!! lat: $_lat, lng: $_lng');
         }
       } else {
         print('장소 선택 실패: ${response.errorMessage}');
@@ -85,8 +87,8 @@ class _ArriveButtonState extends State<ArriveButton> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => MapDirectionPage(
-                    endLat: _lat,
-                    endLng: _lng,
+                    endLat: _lat ?? widget.lat,
+                    endLng: _lng ?? widget.lng,
                     endPlaceName: widget.placeName,
                   ),
                 ),
