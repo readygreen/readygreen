@@ -22,6 +22,7 @@ import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.BookmarkViewModel
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
+import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
 import h3Style
 import pStyle
 
@@ -36,6 +37,7 @@ fun BookmarkScreen(
     var showModal by remember { mutableStateOf(false) }
     var selectedBookmark by remember { mutableStateOf<BookmarkResponse?>(null) }
     val isLoading by bookmarkViewModel.isLoading.collectAsState(initial = true)
+    val ttsViewModel = remember { TTSViewModel(context) }
 
     LaunchedEffect(Unit) {
         bookmarkViewModel.getBookmarks()
@@ -131,6 +133,7 @@ fun BookmarkScreen(
                             bookmark.longitude,
                             bookmark.destinationName
                         )
+                        ttsViewModel.speakText("${bookmark.destinationName}으로 길안내를 시작합니다")
                         navController.navigate("navigationScreen") {
                             popUpTo("mainScreen") { inclusive = false }
                         }

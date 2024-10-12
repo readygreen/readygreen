@@ -20,6 +20,7 @@ import com.ddubucks.readygreen.presentation.theme.Black
 import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.viewmodel.NavigationViewModel
+import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
 import h3Style
 import pStyle
 
@@ -29,6 +30,7 @@ fun SearchResultScreen(
     navigationViewModel: NavigationViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val ttsViewModel = remember { TTSViewModel(context) }
     var showConfirmationDialog by remember { mutableStateOf(false) }
     var selectedPlace by remember { mutableStateOf<SearchCandidate?>(null) }
     val searchResults = navController.previousBackStackEntry
@@ -104,6 +106,7 @@ fun SearchResultScreen(
                         place.geometry.location.lng,
                         place.name
                     )
+                    ttsViewModel.speakText("${place.name}으로 길안내를 시작합니다")
                     navController.navigate("navigationScreen") {
                         popUpTo("mainScreen") { inclusive = false }
                     }

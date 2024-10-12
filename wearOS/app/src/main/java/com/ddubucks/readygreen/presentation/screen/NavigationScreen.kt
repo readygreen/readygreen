@@ -42,13 +42,6 @@ fun NavigationScreen(
     val context = LocalContext.current
     val ttsViewModel = remember { TTSViewModel(context) }
 
-    // 길안내 시작 TTS 출력
-    LaunchedEffect(navigationState.destinationName) {
-        navigationState.destinationName?.let { destinationName ->
-            ttsViewModel.speakText("${destinationName}으로 길안내를 시작합니다")
-        }
-    }
-
     // 길안내 중간 안내 TTS 실행
     LaunchedEffect(navigationState.currentDescription) {
         navigationState.currentDescription?.let { description ->
@@ -132,6 +125,7 @@ fun NavigationScreen(
                 },
                 onCancel = {
                     setShowExitDialog(false)
+                    navController.popBackStack()
                 }
             )
         }
@@ -149,6 +143,7 @@ fun NavigationScreen(
                 },
                 onCancel = {
                     setShowArrivalDialog(false)
+                    navController.popBackStack()
                 }
             )
         }
