@@ -27,6 +27,7 @@ public class PlaceService {
                 .filter(place -> place.getLatitude() != 0 && place.getLongitude() != 0) // 위도, 경도가 있는 데이터만 필터링
                 .sorted(Comparator.comparingDouble(place ->
                         calculateDistance(userLatitude, userLongitude, place.getLatitude(), place.getLongitude())))
+                .limit(30) // 가장 가까운 30개만 선택
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -39,6 +40,7 @@ public class PlaceService {
                 .filter(place -> place.getLatitude() != 0 && place.getLongitude() != 0)
                 .sorted(Comparator.comparingDouble(place ->
                         calculateDistance(userLatitude, userLongitude, place.getLatitude(), place.getLongitude())))
+                .limit(30) // 가장 가까운 30개만 선택
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
