@@ -18,4 +18,5 @@ class AppColors {
   static const Color pink = Color(0xFFF7887B); // 생일
   static const Color orange = Color(0xFFFCAA3F); // 집
   static const Color bluecompany = Color.fromARGB(255, 95, 167, 255); // 회사
+  static const Color watch = Color(0xFFD1DAFF);
 }

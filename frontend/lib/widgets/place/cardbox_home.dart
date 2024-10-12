@@ -87,11 +87,10 @@ class _CardBoxHomeState extends State<CardBoxHome> {
                 '가까운 장소 추천',
                 style: TextStyle(
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                  // fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10), // 제목과 내용 사이 간격 추가
-
+              const SizedBox(height: 10),
               // 기존 places 리스트 처리 부분
               Column(
                 children: widget.places.asMap().entries.map((entry) {
@@ -105,7 +104,7 @@ class _CardBoxHomeState extends State<CardBoxHome> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
                               width: 100,
