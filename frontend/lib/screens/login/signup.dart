@@ -112,8 +112,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Image.asset(
-                    'assets/images/map.png',
-                    height: 180,
+                    'assets/images/logo.png',
+                    height: 150,
                   ),
                   const SizedBox(height: 10),
                   const Text(
@@ -247,7 +247,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 1),
+                  const SizedBox(height: 10),
                   // 동의 체크박스
                   SizedBox(
                     width: deviceWidth * 0.86,
@@ -279,7 +279,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 10),
                   // 회원가입 버튼
                   getSignUpButton(),
                 ],
