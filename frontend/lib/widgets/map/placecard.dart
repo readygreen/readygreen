@@ -80,7 +80,11 @@ class PlaceCard extends StatelessWidget {
           ],
         ),
       ),
-      onTap: onTap,
+      onTap: () {
+        // PlaceCard 전체가 눌렸을 때 확인
+        print('PlaceCard tapped: $placeName, lat: $lat, lng: $lng');
+        onTap();
+      },
     );
   }
 }
