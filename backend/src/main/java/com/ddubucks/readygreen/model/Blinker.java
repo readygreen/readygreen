@@ -16,6 +16,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class Blinker extends BaseEntity {
     @Id
     private int id;

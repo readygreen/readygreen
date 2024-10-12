@@ -52,7 +52,8 @@ dependencies {
 
     // Redis, MongoDB 관련 Dependencies
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:2.5.6' // 최신 버전으로 업데이트
+
 
     // Apache Spark
     implementation 'org.apache.spark:spark-core_2.12:3.4.0'
