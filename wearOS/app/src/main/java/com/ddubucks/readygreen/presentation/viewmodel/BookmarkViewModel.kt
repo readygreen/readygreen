@@ -21,11 +21,14 @@ class BookmarkViewModel : ViewModel() {
     private val _bookmark = MutableStateFlow<List<BookmarkResponse>>(emptyList())
     val bookmark: StateFlow<List<BookmarkResponse>> = _bookmark
     val apiKey = BuildConfig.MAPS_API_KEY
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
 
     fun getBookmarks() {
         val bookmarkApi = RestClient.createService(BookmarkApi::class.java)
 
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val response = withContext(Dispatchers.IO) {
                     bookmarkApi.getBookmarks().awaitResponse()
@@ -42,7 +45,7 @@ class BookmarkViewModel : ViewModel() {
                             bookmark
                         }
                     }
-
+                    _isLoading.value = false
                     _bookmark.value = updatedBookmarks
                 } else {
                     Log.e("BookmarkViewModel", "북마크 요청 실패: ${response.code()} - ${response.message()}")

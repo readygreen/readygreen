@@ -35,14 +35,12 @@ fun BookmarkScreen(
     val context = LocalContext.current
     var showModal by remember { mutableStateOf(false) }
     var selectedBookmark by remember { mutableStateOf<BookmarkResponse?>(null) }
-    var isLoading by remember { mutableStateOf(true) }
+    val isLoading by bookmarkViewModel.isLoading.collectAsState(initial = true)
 
     LaunchedEffect(Unit) {
         bookmarkViewModel.getBookmarks()
-        isLoading = false
     }
 
-    // UI 구성
     Box(modifier = Modifier.fillMaxSize()) {
         when {
             isLoading -> {
@@ -56,6 +54,12 @@ fun BookmarkScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    Text(
+                        text = "자주가는 목적지",
+                        style = h3Style,
+                        color = Primary,
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
                         text = "저장된 북마크가 없습니다.",
                         style = pStyle,

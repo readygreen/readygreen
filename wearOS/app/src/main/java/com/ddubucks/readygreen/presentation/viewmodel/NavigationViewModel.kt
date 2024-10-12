@@ -26,6 +26,10 @@ class NavigationViewModel : ViewModel() {
     private val _navigationCommand = MutableLiveData<String>()
     val navigationCommand: LiveData<String> get() = _navigationCommand
 
+    // 로딩 상태
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
     // 길안내 상태
     private val _navigationState = MutableStateFlow(NavigationState())
     val navigationState: StateFlow<NavigationState> = _navigationState
@@ -38,6 +42,8 @@ class NavigationViewModel : ViewModel() {
 
     // 길안내 시작
     fun startNavigation(context: Context, lat: Double, lng: Double, name: String) {
+        _isLoading.value = true
+
         locationService = LocationService(context)
         _navigationState.value = _navigationState.value.copy(destinationName = name)
 
@@ -49,6 +55,7 @@ class NavigationViewModel : ViewModel() {
             } else {
                 Log.d("NavigationViewModel", "현재 위치 불러오기 실패")
                 _navigationState.value = NavigationState(isNavigating = false)
+                _isLoading.value = false
             }
         }
     }
@@ -78,6 +85,7 @@ class NavigationViewModel : ViewModel() {
                     } else {
                         Log.d("NavigationViewModel", "Navigation API 받기 실패: ${response.errorBody()?.string()}")
                         _navigationState.value = NavigationState(isNavigating = false)
+                        _isLoading.value = false
                     }
                 }
 
@@ -127,6 +135,8 @@ class NavigationViewModel : ViewModel() {
                 destinationName = navigationResponse.routeDTO.features.lastOrNull()?.properties?.name ?: "알 수 없음"
             )
 
+            _isLoading.value = false
+
             locationService?.getLastLocation { location ->
                 if (location != null) {
                     Log.d("NavigationViewModel", "현재 위치 수신 - 위도: ${location.latitude}, 경도: ${location.longitude}")
@@ -134,6 +144,7 @@ class NavigationViewModel : ViewModel() {
                 } else {
                     Log.d("NavigationViewModel", "현재 위치 불러오기 실패")
                     _navigationState.value = NavigationState(isNavigating = false)
+                    _isLoading.value = false
                 }
             }
 
