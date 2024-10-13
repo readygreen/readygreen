@@ -44,7 +44,7 @@ class PlaceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 1, horizontal: 30),
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 30),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -52,14 +52,16 @@ class PlaceCard extends StatelessWidget {
             placeName,
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
+          const SizedBox(height: 5),
           Text(
             address,
             style: const TextStyle(color: Colors.grey, fontSize: 14),
           ),
+          const SizedBox(height: 7),
         ],
       ),
       subtitle: Padding(
-        padding: const EdgeInsets.only(top: 5),
+        padding: const EdgeInsets.only(top: 5, bottom: 4),
         child: Row(
           children: [
             // 위도, 경도, 장소 이름을 ArriveButton에 넘겨줌
@@ -69,7 +71,7 @@ class PlaceCard extends StatelessWidget {
               placeName: placeName,
               placeId: placeId,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             // BookmarkButton에 위도, 경도, 장소 이름 전달
             BookmarkButton(
                 destinationName: address, // 장소 이름

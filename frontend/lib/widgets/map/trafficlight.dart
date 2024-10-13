@@ -108,8 +108,14 @@ class TrafficLightService {
         String trafficLightId = trafficLight['id'].toString();
 
         // 상태에 따른 색상 설정
-        Color circleColor =
-            currentState == "RED" ? AppColors.red : AppColors.green;
+        Color circleColor;
+        if (redDuration == 0 || greenDuration == 0) {
+          // redDuration 또는 greenDuration이 0이면 색상을 회색으로 설정
+          circleColor = AppColors.grey;
+        } else {
+          // 기존 상태에 따른 색상 설정
+          circleColor = currentState == "RED" ? AppColors.red : AppColors.green;
+        }
 
         // 커스텀 마커 생성 및 초기 표시
         BitmapDescriptor customMarker = await createCircleMarker(
@@ -188,9 +194,14 @@ class TrafficLightService {
         }
 
         // 상태에 따른 색상 설정
-        Color circleColor =
-            currentState == "RED" ? AppColors.red : AppColors.green;
-
+        Color circleColor;
+        if (redDuration == 0 || greenDuration == 0) {
+          // redDuration 또는 greenDuration이 0이면 색상을 회색으로 설정
+          circleColor = AppColors.grey;
+        } else {
+          // 기존 상태에 따른 색상 설정
+          circleColor = currentState == "RED" ? AppColors.red : AppColors.green;
+        }
         // 커스텀 마커 생성 및 업데이트
         BitmapDescriptor customMarker = await createCircleMarker(
           '$remainingTime',
