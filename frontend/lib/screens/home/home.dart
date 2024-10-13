@@ -140,17 +140,19 @@ class _HomePageContentState extends State<HomePageContent> {
   Future<void> _fetchMainDate() async {
     final data = await api.getMainData();
     print("_fetchMainDate data");
-    setState(() {
-      _bookmarks = data?['bookmarkDTOs'];
+    if (mounted) {
+      setState(() {
+        _bookmarks = data?['bookmarkDTOs'];
 
-      // 집 > 회사 > 기타 순으로 정렬
-      _bookmarks.sort((a, b) {
-        const priority = {'집': 0, '회사': 1, '기타': 2};
-        return priority[a['name']]!.compareTo(priority[b['name']]!);
+        // 집 > 회사 > 기타 순으로 정렬
+        _bookmarks.sort((a, b) {
+          const priority = {'집': 0, '회사': 1, '기타': 2};
+          return priority[a['name']]!.compareTo(priority[b['name']]!);
+        });
+
+        routeRecords = data?['routeRecordDTO'];
       });
-
-      routeRecords = data?['routeRecordDTO'];
-    });
+    }
   }
 
   // 위치 권한 요청 및 저장
@@ -454,7 +456,7 @@ class _HomePageContentState extends State<HomePageContent> {
                     },
                     child: const SquareCardBox(
                       title: '워치 연결하기',
-                      backgroundGradient: const LinearGradient(
+                      backgroundGradient: LinearGradient(
                         colors: [AppColors.watch, AppColors.white],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -496,7 +498,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => BadgePage(),
+                          builder: (context) => const BadgePage(),
                         ),
                       );
 
@@ -603,7 +605,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                                 color: AppColors.greytext,
                                               ),
                                             ),
-                                            Container(
+                                            SizedBox(
                                               width: MediaQuery.of(context)
                                                       .size
                                                       .width *

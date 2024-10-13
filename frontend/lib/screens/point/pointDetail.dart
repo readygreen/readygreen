@@ -97,8 +97,7 @@ class _PointDetailPageState extends State<PointDetailPage> {
                   onPressed: () {
                     // 버튼 클릭 시 클릭 시 모달 호출
                     AgreeModal.showConversionDialog(context, () {
-                      // 동의 시 처리할 로직
-                      print('전환 동의가 완료되었습니다.');
+                      print('전환하기 버튼 클릭.');
                       // 동의 후 수행할 추가 로직이 있으면 여기서 처리
                     });
                   },
