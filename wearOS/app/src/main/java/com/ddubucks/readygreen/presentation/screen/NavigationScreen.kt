@@ -34,6 +34,7 @@ fun NavigationScreen(
     navController: NavHostController,
     navigationViewModel: NavigationViewModel = viewModel(),
 ) {
+    val isLoading by navigationViewModel.isLoading.collectAsState(initial = true)
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
     val (showArrivalDialog, setShowArrivalDialog) = remember { mutableStateOf(false) }
@@ -41,6 +42,7 @@ fun NavigationScreen(
     val context = LocalContext.current
     val ttsViewModel = remember { TTSViewModel(context) }
 
+    // 길안내 중간 안내 TTS 실행
     LaunchedEffect(navigationState.currentDescription) {
         navigationState.currentDescription?.let { description ->
             ttsViewModel.speakText(description)
@@ -52,6 +54,7 @@ fun NavigationScreen(
         }
     }
 
+    // 뒤로가기 핸들러
     BackHandler(enabled = navigationState.isNavigating) {
         if (navigationState.isNavigating) {
             setShowExitDialog(true)
@@ -64,70 +67,93 @@ fun NavigationScreen(
         isTimerActive = navigationState.isNavigating
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Black),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "경로 안내",
-            style = h3Style,
-            color = Primary
-        )
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            isLoading -> {
+                LoadingScreen()
+            }
+            navigationState.isNavigating -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Black),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "경로 안내",
+                        style = h3Style,
+                        color = Primary
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    NavigationInfo(navigationState, isTimerActive)
+                }
+            }
+            else -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Black),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "경로 안내",
+                        style = h3Style,
+                        color = Primary
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "길안내 중이 아닙니다.",
+                        style = pStyle,
+                        color = White,
+                    )
+                }
+            }
+        }
 
-        Spacer(modifier = Modifier.height(10.dp))
-
-        if (navigationState.isNavigating) {
-            NavigationInfo(navigationState, isTimerActive)
-        } else {
-            Text(
-                text = "길안내 중이 아닙니다.",
-                style = pStyle,
-                color = White
+        // 길안내 중지 확인 모달
+        if (showExitDialog) {
+            Modal(
+                title = "길 안내 중지",
+                message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
+                onConfirm = {
+                    navigationViewModel.stopNavigation()
+                    isTimerActive = false
+                    setShowExitDialog(false)
+                    navController.popBackStack()
+                },
+                onCancel = {
+                    setShowExitDialog(false)
+                    navController.popBackStack()
+                }
             )
         }
-    }
 
-    if (showExitDialog) {
-        Modal(
-            title = "길 안내 중지",
-            message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
-            onConfirm = {
-                navigationViewModel.stopNavigation()
-                isTimerActive = false
-                setShowExitDialog(false)
-                navController.popBackStack()
-            },
-            onCancel = {
-                setShowExitDialog(false)
-                navController.popBackStack()
-            }
-        )
-    }
-
-    if (showArrivalDialog) {
-        Modal(
-            title = "목적지 도착",
-            message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
-            onConfirm = {
-                navigationViewModel.finishNavigation()
-                isTimerActive = false
-                setShowArrivalDialog(false)
-                navController.popBackStack()
-            },
-            onCancel = {
-                setShowArrivalDialog(false)
-            }
-        )
+        // 목적지 도착 모달
+        if (showArrivalDialog) {
+            Modal(
+                title = "목적지 도착",
+                message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
+                onConfirm = {
+                    navigationViewModel.finishNavigation()
+                    isTimerActive = false
+                    setShowArrivalDialog(false)
+                    navController.popBackStack()
+                },
+                onCancel = {
+                    setShowArrivalDialog(false)
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
 @Composable
 fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
-    var remainingTime by remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
-    var currentBlinkerState by remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
+    var remainingTime by remember { mutableStateOf(navigationState.trafficLightRemainingTime ?: 0) }
+    var currentBlinkerState by remember { mutableStateOf(navigationState.trafficLightColor ?: "RED") }
 
     LaunchedEffect(remainingTime, isTimerActive) {
         if (isTimerActive) {
@@ -196,7 +222,6 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             overflow = TextOverflow.Ellipsis,
             textAlign = TextAlign.Center
         )
-
 
         Spacer(modifier = Modifier.height(10.dp))
 
