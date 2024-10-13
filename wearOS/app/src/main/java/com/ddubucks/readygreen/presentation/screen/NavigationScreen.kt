@@ -39,7 +39,6 @@ fun NavigationScreen(
     val navigationState = navigationViewModel.navigationState.collectAsState().value
     val (showExitDialog, setShowExitDialog) = remember { mutableStateOf(false) }
     val (showArrivalDialog, setShowArrivalDialog) = remember { mutableStateOf(false) }
-    var isTimerActive by remember { mutableStateOf(navigationState.isNavigating) }
     val context = LocalContext.current
     val ttsViewModel = remember { TTSViewModel(context) }
 
@@ -64,10 +63,6 @@ fun NavigationScreen(
         }
     }
 
-    LaunchedEffect(navigationState.isNavigating) {
-        isTimerActive = navigationState.isNavigating
-    }
-
     Box(modifier = Modifier.fillMaxSize()) {
         when {
             isLoading -> {
@@ -87,7 +82,7 @@ fun NavigationScreen(
                         color = Primary
                     )
                     Spacer(modifier = Modifier.height(10.dp))
-                    NavigationInfo(navigationState, isTimerActive)
+                    NavigationInfo(navigationState)
                 }
             }
             else -> {
@@ -120,7 +115,6 @@ fun NavigationScreen(
                 message = "길 안내를 중지하시겠습니까? 아니오를 누르면 길안내가 유지됩니다.",
                 onConfirm = {
                     navigationViewModel.stopNavigation()
-                    isTimerActive = false
                     setShowExitDialog(false)
                     navController.popBackStack()
                 },
@@ -138,7 +132,6 @@ fun NavigationScreen(
                 message = "목적지에 도착하셨습니다. 길 안내를 종료하시겠습니까?",
                 onConfirm = {
                     navigationViewModel.finishNavigation()
-                    isTimerActive = false
                     setShowArrivalDialog(false)
                     navController.popBackStack()
                 },
@@ -152,12 +145,12 @@ fun NavigationScreen(
 }
 
 @Composable
-fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
+fun NavigationInfo(navigationState: NavigationState) {
     var remainingTime by remember { mutableStateOf(navigationState.trafficLightRemainingTime ?: 0) }
     var currentBlinkerState by remember { mutableStateOf(navigationState.trafficLightColor ?: "RED") }
 
-    LaunchedEffect(remainingTime, isTimerActive) {
-        if (isTimerActive) {
+    LaunchedEffect(remainingTime, navigationState.isNavigating) {
+        if (navigationState.isNavigating) {
             if (currentBlinkerState == "GREY") {
                 remainingTime = 0
             } else {
