@@ -22,6 +22,73 @@ class CardBoxPlace extends StatefulWidget {
 class _CardBoxPlaceState extends State<CardBoxPlace> {
   final Map<int, String> imageCache = {};
 
+  // 로컬 이미지 리스트 추가
+  final List<String> restaurantImages = [
+    'assets/images/restaurant/1.png',
+    'assets/images/restaurant/2.png',
+    'assets/images/restaurant/3.png',
+    'assets/images/restaurant/4.png',
+    'assets/images/restaurant/5.png',
+    'assets/images/restaurant/6.png',
+    'assets/images/restaurant/7.png',
+    'assets/images/restaurant/8.png',
+    'assets/images/restaurant/9.png',
+    'assets/images/restaurant/10.png',
+    'assets/images/restaurant/11.png',
+    'assets/images/restaurant/12.png',
+    'assets/images/restaurant/13.png',
+    'assets/images/restaurant/14.png',
+    'assets/images/restaurant/15.png',
+    'assets/images/restaurant/16.png',
+    'assets/images/restaurant/17.png',
+    'assets/images/restaurant/18.png',
+    'assets/images/restaurant/19.png',
+    'assets/images/restaurant/20.png',
+    'assets/images/restaurant/21.png',
+    'assets/images/restaurant/22.png',
+    'assets/images/restaurant/23.png',
+    'assets/images/restaurant/24.png',
+    'assets/images/restaurant/25.png',
+    'assets/images/restaurant/26.png',
+    'assets/images/restaurant/27.png',
+    'assets/images/restaurant/28.png',
+    'assets/images/restaurant/29.png',
+    'assets/images/restaurant/30.png',
+  ];
+
+  final List<String> cafeImages = [
+    'assets/images/cafe/1.png',
+    'assets/images/cafe/2.png',
+    'assets/images/cafe/3.png',
+    'assets/images/cafe/4.png',
+    'assets/images/cafe/5.png',
+    'assets/images/cafe/6.png',
+    'assets/images/cafe/7.png',
+    'assets/images/cafe/8.png',
+    'assets/images/cafe/9.png',
+    'assets/images/cafe/10.png',
+    'assets/images/cafe/11.png',
+    'assets/images/cafe/12.png',
+    'assets/images/cafe/13.png',
+    'assets/images/cafe/14.png',
+    'assets/images/cafe/15.png',
+    'assets/images/cafe/16.png',
+    'assets/images/cafe/17.png',
+    'assets/images/cafe/18.png',
+    'assets/images/cafe/19.png',
+    'assets/images/cafe/20.png',
+    'assets/images/cafe/21.png',
+    'assets/images/cafe/22.png',
+    'assets/images/cafe/23.png',
+    'assets/images/cafe/24.png',
+    'assets/images/cafe/25.png',
+    'assets/images/cafe/26.png',
+    'assets/images/cafe/27.png',
+    'assets/images/cafe/28.png',
+    'assets/images/cafe/29.png',
+    'assets/images/cafe/30.png',
+  ];
+
   // 한글 카테고리를 영어로 매핑하는 Map
   final Map<String, String> categoryMapping = {
     '전체': 'place',
@@ -42,9 +109,19 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
         categoryMapping[widget.selectedCategory] ?? 'all'; // 한글 카테고리를 영어로 변환
 
     for (var i = 0; i < widget.places.length; i++) {
-      String imageUrl = await fetchImageUrl(category, i); // 영어로 변환된 카테고리 사용
+      String imageUrl;
 
-      // setState() 호출 전에 mounted 상태 확인
+      // 카테고리가 '맛집' 또는 '카페'일 경우 로컬 이미지 사용
+      if (widget.selectedCategory == '맛집') {
+        imageUrl = restaurantImages[i % restaurantImages.length];
+      } else if (widget.selectedCategory == '카페') {
+        imageUrl = cafeImages[i % cafeImages.length];
+      } else {
+        // 그 외 카테고리에서는 Unsplash API를 사용
+        imageUrl = await fetchImageUrl(category, i);
+      }
+
+      // 이미지 캐시 저장
       if (mounted) {
         setState(() {
           imageCache[i] = imageUrl;
@@ -70,7 +147,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
         return data['results'][randomIndex]['urls']['small'];
       }
     }
-    return 'https://picsum.photos/150/150';
+    return 'https://via.placeholder.com/150';
   }
 
   @override
@@ -78,7 +155,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
     super.initState();
 
     // print로 places 값을 출력
-    print('Received places 받은거! : ${widget.places}');
+    // print('Received places 받은거! : ${widget.places}');
     loadImages();
   }
 
@@ -108,7 +185,7 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
               final int index = entry.key;
               final Map<String, String> place = entry.value;
               final String imageUrl =
-                  imageCache[index] ?? 'https://picsum.photos/150/150';
+                  imageCache[index] ?? 'https://via.placeholder.com/150';
 
               return Column(
                 children: [
@@ -120,10 +197,16 @@ class _CardBoxPlaceState extends State<CardBoxPlace> {
                         SizedBox(
                           width: 100,
                           height: 100,
-                          child: Image.network(
-                            imageUrl,
-                            fit: BoxFit.cover,
-                          ),
+                          child: widget.selectedCategory == '맛집' ||
+                                  widget.selectedCategory == '카페'
+                              ? Image.asset(
+                                  imageUrl, // 로컬 이미지를 표시
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.network(
+                                  imageUrl, // 네트워크 이미지를 표시
+                                  fit: BoxFit.cover,
+                                ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(

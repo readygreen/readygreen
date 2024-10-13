@@ -67,7 +67,6 @@ dev_dependencies:
   flutter_lints: ^4.0.0
   # flutter_native_splash: ^2.0.4+1
 
-
 flutter_native_splash:
   color: "#ffffff"
   image: assets/images/readygreen.png # 스플래시 화면에서 사용할 이미지
@@ -148,6 +147,8 @@ flutter:
   assets:
     - assets/lottie/ # lottie 폴더 내 모든 파일 포함
     - assets/images/
+    - assets/images/restaurant/
+    - assets/images/cafe/
     - assets/icon/
     - config/.env
 
