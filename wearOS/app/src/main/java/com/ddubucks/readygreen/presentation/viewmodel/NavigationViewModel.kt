@@ -165,6 +165,50 @@ class NavigationViewModel : ViewModel() {
     }
 
 
+    // 길안내 추적
+    private fun updateNavigation(currentLocation: Location) {
+        this.currentLocation = currentLocation
+
+        val currentLat = currentLocation.latitude
+        val currentLng = currentLocation.longitude
+
+        // 다음 안내 중인 포인트가 있는지 확인
+        if (currentIndex + 1 < pointIndexList.size) {
+
+            val nextFeature = route?.get(pointIndexList[currentIndex + 1])
+
+            nextFeature?.let { feature ->
+                val coordinates = feature.geometry.getCoordinatesAsDoubleArray()
+                coordinates?.let {
+                    val distance = calculateDistance(currentLat, currentLng, it[1], it[0])
+
+                    // 현재 위치가 다음 포인트 반경 15미터 이내인지 확인
+                    if (distance < 15.0) {
+                        Log.d("NavigationViewModel", "다음 지점으로 이동: ${feature.properties.description}")
+                        currentIndex++
+                        updateCurrentDescription()
+                        updateBlinkerInfo(feature)
+                    }
+                }
+            }
+        }
+    }
+
+
+    // 좌표 사이의 거리를 계산
+    private fun calculateDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+        val location1 = Location("").apply {
+            latitude = lat1
+            longitude = lng1
+        }
+        val location2 = Location("").apply {
+            latitude = lat2
+            longitude = lng2
+        }
+        return location1.distanceTo(location2).toDouble()
+    }
+
+
     // description 업데이트
     private fun updateCurrentDescription() {
         pointIndexList.getOrNull(currentIndex)?.let { index ->
@@ -241,50 +285,6 @@ class NavigationViewModel : ViewModel() {
             val remainingTime = (blinker.redDuration - (cycleTime - blinker.greenDuration)).toInt()
             Pair("RED", remainingTime)
         }
-    }
-
-
-    // 길안내 추적
-    private fun updateNavigation(currentLocation: Location) {
-        this.currentLocation = currentLocation
-
-        val currentLat = currentLocation.latitude
-        val currentLng = currentLocation.longitude
-
-        // 다음 안내 중인 포인트가 있는지 확인
-        if (currentIndex + 1 < pointIndexList.size) {
-
-            val nextFeature = route?.get(pointIndexList[currentIndex + 1])
-
-            nextFeature?.let { feature ->
-                val coordinates = feature.geometry.getCoordinatesAsDoubleArray()
-                coordinates?.let {
-                    val distance = calculateDistance(currentLat, currentLng, it[1], it[0])
-
-                    // 현재 위치가 다음 포인트 반경 15미터 이내인지 확인
-                    if (distance < 15.0) {
-                        Log.d("NavigationViewModel", "다음 지점으로 이동: ${feature.properties.description}")
-                        currentIndex++
-                        updateCurrentDescription()
-                        updateBlinkerInfo(feature)
-                    }
-                }
-            }
-        }
-    }
-
-
-    // 좌표 사이의 거리를 계산
-    private fun calculateDistance(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
-        val location1 = Location("").apply {
-            latitude = lat1
-            longitude = lng1
-        }
-        val location2 = Location("").apply {
-            latitude = lat2
-            longitude = lng2
-        }
-        return location1.distanceTo(location2).toDouble()
     }
 
 
