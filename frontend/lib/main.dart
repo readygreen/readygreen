@@ -23,16 +23,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/services.dart'; // SystemNavigator를 사용하기 위해 필요
-import 'package:readygreen/background/background_service.dart'; 
+import 'package:readygreen/background/background_service.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
 }
 
-
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
-final storage = const FlutterSecureStorage();
+const storage = FlutterSecureStorage();
 Future<void> initializeNotification() async {
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // 알림 채널 ID
@@ -50,7 +49,7 @@ Future<void> initializeNotification() async {
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  final InitializationSettings initializationSettings = InitializationSettings(
+  const InitializationSettings initializationSettings = InitializationSettings(
     android: initializationSettingsAndroid,
   );
 
@@ -88,7 +87,7 @@ Future<void> main() async {
 //       print(isModiString);
 //       print("isGuideString");
 //       print(isGuideString);
-      
+
 //       // 주기적으로 포그라운드 알림 업데이트
 //       if (isGuide && await service.isForegroundService()) {
 //         Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -197,9 +196,9 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
     const HomePage(),
     PointPage(),
     const MapPage(),
-    PlacePage(),
+    const PlacePage(),
     const MyPage(),
-    PointDetailPage()
+    const PointDetailPage()
   ];
 
   @override
@@ -295,107 +294,110 @@ class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false, // 뒤로 가기 제어: false로 설정하여 기본 동작을 막음
-      onPopInvoked: (bool didPop) {
-        DateTime nowTime = DateTime.now();
-        if (didPop == false &&
-            (backPressedTime == null ||
+        canPop: false, // 뒤로 가기 제어: false로 설정하여 기본 동작을 막음
+        onPopInvoked: (bool didPop) {
+          DateTime nowTime = DateTime.now();
+          if (didPop == false &&
+              (backPressedTime == null ||
                   nowTime.difference(backPressedTime!) >
                       const Duration(seconds: 2))) {
             // 2초 내로 다시 누르면 앱 종료
-          backPressedTime = nowTime;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("한 번 더 누르면 앱이 종료됩니다."),
-              duration: Duration(seconds: 2),
-            ),
-          );
-        } else {
+            backPressedTime = nowTime;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("한 번 더 누르면 앱이 종료됩니다."),
+                duration: Duration(seconds: 2),
+              ),
+            );
+          } else {
             // 2초 안에 두 번 누르면 앱 종료
-          SystemNavigator.pop();
-        }
-      },
-      child: Scaffold(
-        body: _widgetOptions.elementAt(_selectedIndex),
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          type: BottomNavigationBarType.fixed,
-          iconSize: 24,
-          backgroundColor: Colors.white,
-          selectedItemColor: AppColors.green,
-          unselectedItemColor: AppColors.greytext,
-          selectedLabelStyle: const TextStyle(fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontSize: 12),
-            // elevation: 0,
-            items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'assets/icon/nothome.png', // 선택되지 않았을 때 이미지
-                  width: 21,
-                  height: 21,
+            SystemNavigator.pop();
+          }
+        },
+        child: Scaffold(
+          body: _widgetOptions.elementAt(_selectedIndex),
+          bottomNavigationBar: SizedBox(
+            height: 65, // 원하는 높이 지정
+            child: BottomNavigationBar(
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+              type: BottomNavigationBarType.fixed,
+              iconSize: 24,
+              backgroundColor: Colors.white,
+              selectedItemColor: AppColors.green,
+              unselectedItemColor: AppColors.greytext,
+              selectedLabelStyle: const TextStyle(fontSize: 12),
+              unselectedLabelStyle: const TextStyle(fontSize: 12),
+              // elevation: 0,
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Image.asset(
+                    'assets/icon/nothome.png', // 선택되지 않았을 때 이미지
+                    width: 21,
+                    height: 21,
+                  ),
+                  activeIcon: Image.asset(
+                    'assets/icon/home.png', // 선택되었을 때 이미지
+                    width: 21,
+                    height: 21,
+                  ),
+                  label: '홈',
                 ),
-                activeIcon: Image.asset(
-                  'assets/icon/home.png', // 선택되었을 때 이미지
-                  width: 21,
-                  height: 21,
+                BottomNavigationBarItem(
+                  icon: Image.asset(
+                    'assets/icon/notpoint.png', // 선택되지 않았을 때 이미지
+                    width: 23,
+                    height: 23,
+                  ),
+                  activeIcon: Image.asset(
+                    'assets/icon/point.png', // 선택되었을 때 이미지
+                    width: 23,
+                    height: 23,
+                  ),
+                  label: '포인트',
                 ),
-              label: '홈',
+                BottomNavigationBarItem(
+                  icon: Image.asset(
+                    'assets/icon/notmap.png', // 선택되지 않았을 때 이미지
+                    width: 21,
+                    height: 21,
+                  ),
+                  activeIcon: Image.asset(
+                    'assets/icon/map.png', // 선택되었을 때 이미지
+                    width: 21,
+                    height: 21,
+                  ),
+                  label: '지도',
+                ),
+                BottomNavigationBarItem(
+                  icon: Image.asset(
+                    'assets/icon/notlocation.png', // 선택되지 않았을 때 이미지
+                    width: 23,
+                    height: 23,
+                  ),
+                  activeIcon: Image.asset(
+                    'assets/icon/location.png', // 선택되었을 때 이미지
+                    width: 23,
+                    height: 23,
+                  ),
+                  label: '주변',
+                ),
+                BottomNavigationBarItem(
+                  icon: Image.asset(
+                    'assets/icon/notprofile.png', // 선택되지 않았을 때 이미지
+                    width: 23,
+                    height: 23,
+                  ),
+                  activeIcon: Image.asset(
+                    'assets/icon/profile.png', // 선택되었을 때 이미지
+                    width: 23,
+                    height: 23,
+                  ),
+                  label: '프로필',
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'assets/icon/notpoint.png', // 선택되지 않았을 때 이미지
-                  width: 23,
-                  height: 23,
-                ),
-                activeIcon: Image.asset(
-                  'assets/icon/point.png', // 선택되었을 때 이미지
-                  width: 23,
-                  height: 23,
-                ),
-              label: '포인트',
-            ),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'assets/icon/notmap.png', // 선택되지 않았을 때 이미지
-                  width: 21,
-                  height: 21,
-                ),
-                activeIcon: Image.asset(
-                  'assets/icon/map.png', // 선택되었을 때 이미지
-                  width: 21,
-                  height: 21,
-                ),
-              label: '지도',
-            ),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'assets/icon/notlocation.png', // 선택되지 않았을 때 이미지
-                  width: 23,
-                  height: 23,
-                ),
-                activeIcon: Image.asset(
-                  'assets/icon/location.png', // 선택되었을 때 이미지
-                  width: 23,
-                  height: 23,
-                ),
-              label: '주변',
-            ),
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'assets/icon/notprofile.png', // 선택되지 않았을 때 이미지
-                  width: 23,
-                  height: 23,
-                ),
-                activeIcon: Image.asset(
-                  'assets/icon/profile.png', // 선택되었을 때 이미지
-                  width: 23,
-                  height: 23,
-                ),
-              label: '프로필',
-            ),
-          ],
-        ),
+          ),
         ));
   }
 }
