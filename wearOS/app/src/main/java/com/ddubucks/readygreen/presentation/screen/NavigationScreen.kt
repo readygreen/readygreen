@@ -158,19 +158,21 @@ fun NavigationInfo(navigationState: NavigationState) {
                     delay(1000L)
                     remainingTime--
                 } else {
-                    // 신호등이 RED일 때 다음 GREEN으로 전환
+                    // 남은 시간이 0일 때 신호등 상태 전환 (RED -> GREEN, GREEN -> RED)
                     if (currentBlinkerState == "RED") {
                         remainingTime = navigationState.currentBlinkerInfo?.greenDuration ?: 0
                         currentBlinkerState = "GREEN"
                     } else {
-                        // 신호등이 GREEN일 때 다음 RED로 전환
                         remainingTime = navigationState.currentBlinkerInfo?.redDuration ?: 0
                         currentBlinkerState = "RED"
                     }
                 }
             }
+        } else {
+            remainingTime = 0
         }
     }
+
 
     Column(
         modifier = Modifier
