@@ -95,7 +95,7 @@ class _MyPageState extends State<MyPage> {
 
   String _getBadge(int title) {
     if (title == 0) {
-      return "assets/images/signupcong.png";
+      return "assets/images/gift.png";
     } else if (title == 1) {
       return "assets/images/badge.png";
     } else if (title == 2) {
@@ -198,6 +198,9 @@ class _MyPageState extends State<MyPage> {
                     ),
                     const SizedBox(height: 16),
                     // 고객지원 섹션
+                    _buildWatchSection(),
+                    const SizedBox(height: 16),
+                    // 고객지원 섹션
                     _buildSupportSection(),
                     const SizedBox(height: 16),
                     // 계정 설정 섹션
@@ -289,6 +292,46 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
+  // 워치 섹션
+  Widget _buildWatchSection() {
+    return CardboxMypage(
+      title: const Row(
+        children: [
+          Icon(Icons.phone_android_rounded,
+              size: 20, color: AppColors.blue), // 설정 아이콘 추가
+          SizedBox(width: 8), // 아이콘과 텍스트 사이 간격
+          Text(
+            '기기 설정',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+      height: 110,
+      backgroundColor: Colors.white,
+      textColor: Colors.black,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => WatchPage()),
+              );
+            },
+            child: _buildItem('워치 연결'),
+          ),
+          // const SizedBox(height: 10),
+        ],
+      ),
+    );
+  }
+
   // 고객지원 섹션
   Widget _buildSupportSection() {
     return CardboxMypage(
@@ -365,22 +408,12 @@ class _MyPageState extends State<MyPage> {
           ),
         ],
       ),
-      height: 180,
+      height: 140,
       backgroundColor: Colors.white,
       textColor: Colors.black,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 10),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => WatchPage()),
-              );
-            },
-            child: _buildItem('워치 연결'),
-          ),
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () {

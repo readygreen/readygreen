@@ -378,7 +378,7 @@ class _HomePageContentState extends State<HomePageContent> {
 
   String _getBadge(int title) {
     if (title == 0) {
-      return "assets/images/signupcong.png";
+      return "assets/images/gift.png";
     } else if (title == 1) {
       return "assets/images/badge.png";
     } else if (title == 2) {
