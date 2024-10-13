@@ -140,12 +140,15 @@ public class MapController {
     }
 
     @GetMapping
-    public ResponseEntity<BlinkerResponseDTO> getNearbyBlinker(@RequestParam(required = false) double latitude,
-                                              @RequestParam(required = false) double longitude,
-                                              @RequestParam(required = false) int radius) {
+    public ResponseEntity<BlinkerResponseDTO> getNearbyBlinker(
+            @RequestParam(name = "latitude", required = false) double latitude,
+            @RequestParam(name = "longitude", required = false) double longitude,
+            @RequestParam(name = "radius", required = false) int radius) {
+
         BlinkerResponseDTO blinkerResponseDTO = mapService.getNearbyBlinker(latitude, longitude, radius);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
+
 
     @GetMapping("blinker")
     public ResponseEntity<BlinkerResponseDTO> getBlinker(@RequestParam(required = false) List<Integer> blinkerIDs) {
