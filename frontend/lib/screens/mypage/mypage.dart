@@ -16,7 +16,7 @@ import 'package:readygreen/screens/mypage/notice.dart';
 import 'package:readygreen/widgets/mypage/squarecard_mypage.dart';
 
 class MyPage extends StatefulWidget {
-  const MyPage({Key? key}) : super(key: key);
+  const MyPage({super.key});
 
   @override
   _MyPageState createState() => _MyPageState();
@@ -70,10 +70,12 @@ class _MyPageState extends State<MyPage> {
     }
 
     // 로그아웃 후 로그인 페이지로 이동
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      '/login', // 로그인 화면 경로
-      (Route<dynamic> route) => false, // 이전 페이지 스택 제거
-    );
+    if (mounted) {
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/login', // 로그인 화면 경로
+        (Route<dynamic> route) => false, // 이전 페이지 스택 제거
+      );
+    }
   }
 
   Future<void> _openBirthModal() async {
@@ -155,7 +157,7 @@ class _MyPageState extends State<MyPage> {
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => BadgePage(),
+                                  builder: (context) => const BadgePage(),
                                 ),
                               );
                               if (result != null) {
@@ -180,10 +182,10 @@ class _MyPageState extends State<MyPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        MyPlacePage()), // PlacePage로 이동
+                                        const MyPlacePage()), // PlacePage로 이동
                               );
                             },
-                            child: SquareCardMypage(
+                            child: const SquareCardMypage(
                               title: '내 장소',
                               backgroundColor: Colors.white,
                               textColor: Colors.black,
@@ -290,11 +292,11 @@ class _MyPageState extends State<MyPage> {
   // 고객지원 섹션
   Widget _buildSupportSection() {
     return CardboxMypage(
-      title: Row(
+      title: const Row(
         children: [
           Icon(Icons.feedback_rounded, size: 20, color: AppColors.red),
-          const SizedBox(width: 8),
-          const Text(
+          SizedBox(width: 8),
+          Text(
             '고객지원',
             style: TextStyle(
               fontSize: 16,
@@ -348,12 +350,12 @@ class _MyPageState extends State<MyPage> {
   // 계정 설정 섹션
   Widget _buildSettingsSection() {
     return CardboxMypage(
-      title: Row(
+      title: const Row(
         children: [
           Icon(Icons.settings_rounded,
               size: 20, color: AppColors.greytext), // 설정 아이콘 추가
-          const SizedBox(width: 8), // 아이콘과 텍스트 사이 간격
-          const Text(
+          SizedBox(width: 8), // 아이콘과 텍스트 사이 간격
+          Text(
             '계정',
             style: TextStyle(
               fontSize: 16,
@@ -413,50 +415,89 @@ class _MyPageState extends State<MyPage> {
       context: context,
       barrierDismissible: false, // 다른 곳을 눌러도 창이 닫히지 않게 설정
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Column(
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                '정말 탈퇴하시겠습니까?',
-                style: TextStyle(fontSize: 20),
-                textAlign: TextAlign.center,
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Dialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20), // 모서리를 둥글게
               ),
-            ],
-          ),
-          content: const Text(
-            '회원 정보 및 포인트 등 모든 내역이 삭제됩니다.',
-            textAlign: TextAlign.center,
-          ),
-          backgroundColor: Colors.white,
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                '취소',
-                style: TextStyle(color: Colors.black),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      '회원탈퇴',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: "LogoFont"), // 큰 제목 스타일
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      '정말 탈퇴하시겠습니까?\n\n회원 정보 및 포인트 등 \n모든 내역이 삭제됩니다.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16), // 본문 스타일
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceEvenly, // 버튼 간격 맞추기
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.red, // 확인 버튼 색상
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 28, vertical: 10), // 버튼 패딩
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(15), // 모서리 둥글게
+                            ),
+                          ),
+                          onPressed: () async {
+                            Navigator.of(context).pop(); // 모달 닫기
+                            await userApi.deleteUser(); // 탈퇴 API 호출
+                            if (mounted) {
+                              _handleLogout(context); // 로그아웃 처리
+                            }
+                          },
+                          child: const Text(
+                            '확인',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.white), // 확인 버튼 텍스트
+                          ),
+                        ),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey, // 취소 버튼 색상
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 28, vertical: 10), // 버튼 패딩
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(15), // 모서리 둥글게
+                            ),
+                          ),
+                          onPressed: () {
+                            if (mounted) {
+                              Navigator.of(context).pop(); // 모달 닫기
+                            }
+                          },
+                          child: const Text(
+                            '취소',
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: AppColors.white), // 취소 버튼 텍스트
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
               ),
-              onPressed: () {
-                if (mounted) {
-                  Navigator.of(context).pop(); // 알림창 닫기
-                }
-              },
-            ),
-            TextButton(
-              child: const Text(
-                '확인',
-                style: TextStyle(color: Colors.red),
-              ),
-              onPressed: () async {
-                if (mounted) {
-                  Navigator.of(context).pop(); // 알림창 닫기
-                }
-
-                await userApi.deleteUser(); // 탈퇴 API 호출
-                if (mounted) {
-                  _handleLogout(context); // 로그아웃 처리
-                }
-              },
             ),
           ],
         );
