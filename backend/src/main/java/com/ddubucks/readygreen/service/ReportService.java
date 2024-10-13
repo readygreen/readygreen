@@ -125,7 +125,7 @@ public class ReportService {
 
 
             // 근처에 있는 신호등 찾기
-            Blinker blinker2 = blinkerRepository.findAllNear(blinker1.getName(), String.valueOf(blinker1.getCoordinate()));
+        //     Blinker blinker2 = blinkerRepository.findAllNear(blinker1.getName(), String.valueOf(blinker1.getCoordinate()));
 
 
             // 신호등 시간 업데이트
@@ -133,13 +133,13 @@ public class ReportService {
             blinker1.setGreenDuration((int) greenDurationInSeconds);
             blinker1.setRedDuration((int) redDurationInSeconds);
 
-            blinker2.setStartTime(startTime);
-            blinker2.setGreenDuration((int) greenDurationInSeconds);
-            blinker2.setRedDuration((int) redDurationInSeconds);
+        //     blinker2.setStartTime(startTime);
+        //     blinker2.setGreenDuration((int) greenDurationInSeconds);
+        //     blinker2.setRedDuration((int) redDurationInSeconds);
 
             // 변경된 값 저장 (주석 해제 시 데이터베이스 저장 가능)
              blinkerRepository.save(blinker1);
-             blinkerRepository.save(blinker2);
+        //      blinkerRepository.save(blinker2);
 
 
     }
