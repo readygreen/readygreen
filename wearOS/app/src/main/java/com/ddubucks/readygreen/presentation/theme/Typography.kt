@@ -44,3 +44,9 @@ val secStyle = TextStyle(
     fontSize = 40.sp,
     fontWeight = FontWeight.ExtraBold
 )
+
+val secNullStyle = TextStyle(
+    fontFamily = NumberFontFamily,
+    fontSize = 25.sp,
+    fontWeight = FontWeight.ExtraBold
+)

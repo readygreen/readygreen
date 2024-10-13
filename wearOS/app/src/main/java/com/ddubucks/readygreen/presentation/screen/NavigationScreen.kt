@@ -27,6 +27,7 @@ import com.ddubucks.readygreen.presentation.viewmodel.TTSViewModel
 import kotlinx.coroutines.delay
 import h3Style
 import pStyle
+import secNullStyle
 import secStyle
 
 @Composable
@@ -157,16 +158,22 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
 
     LaunchedEffect(remainingTime, isTimerActive) {
         if (isTimerActive) {
-            if (remainingTime > 0) {
-                delay(1000L)
-                remainingTime--
+            if (currentBlinkerState == "GREY") {
+                remainingTime = 0
             } else {
-                if (currentBlinkerState == "RED") {
-                    remainingTime = navigationState.currentBlinkerInfo?.greenDuration ?: 0
-                    currentBlinkerState = "GREEN"
+                if (remainingTime > 0) {
+                    delay(1000L)
+                    remainingTime--
                 } else {
-                    remainingTime = navigationState.currentBlinkerInfo?.redDuration ?: 0
-                    currentBlinkerState = "RED"
+                    // 신호등이 RED일 때 다음 GREEN으로 전환
+                    if (currentBlinkerState == "RED") {
+                        remainingTime = navigationState.currentBlinkerInfo?.greenDuration ?: 0
+                        currentBlinkerState = "GREEN"
+                    } else {
+                        // 신호등이 GREEN일 때 다음 RED로 전환
+                        remainingTime = navigationState.currentBlinkerInfo?.redDuration ?: 0
+                        currentBlinkerState = "RED"
+                    }
                 }
             }
         }
@@ -234,12 +241,19 @@ fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
             )
         } else {
             Text(
-                text = "${remainingTime}초",
-                style = secStyle,
+                text = if (currentBlinkerState == "GREY") {
+                    "정보 없음"
+                } else {
+                    "${remainingTime}초"
+                },
+                style = when (currentBlinkerState) {
+                    "GREY" -> secNullStyle
+                    else -> secStyle
+                },
                 color = when (currentBlinkerState) {
                     "RED" -> Red
                     "GREEN" -> Green
-                    else -> Gray
+                    else -> Grey
                 },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
