@@ -16,12 +16,11 @@ class AgreeModal {
               Container(
                 width: MediaQuery.of(context).size.width * 0.85,
                 padding:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    const SizedBox(height: 15),
-                    // 모달 상단 타이틀
+                    const SizedBox(height: 20),
                     const Text(
                       '포인트전환',
                       style: TextStyle(
@@ -33,19 +32,25 @@ class AgreeModal {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-                    // 스크롤 가능한 동의서 내용
+                    // 이미지 추가
+                    Image.asset(
+                      'assets/images/coin2.png', // 이미지 경로
+                      height: 90, // 이미지 높이
+                    ),
+                    // 모달 상단 타이틀
+                    const SizedBox(height: 25),
+
                     const SizedBox(
-                      height: 40, // 최대 높이 설정 (스크롤 가능)
-                      child: SingleChildScrollView(
-                        child: Text(
-                          '삼성 월렛과의 연동 예정입니다.',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.left,
+                      height: 25, // 최대 높이 설정 (스크롤 가능)
+
+                      child: Text(
+                        '추후 삼성 페이 포인트로 전환 예정입니다.',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                          height: 1.5,
                         ),
+                        textAlign: TextAlign.left,
                       ),
                     ),
                     const SizedBox(height: 30),
