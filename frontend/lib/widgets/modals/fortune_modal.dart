@@ -130,7 +130,10 @@ class _FortuneModalState extends State<FortuneModal> {
                   // 로딩 중일 때
                   if (isLoadingFortune) ...[
                     const SizedBox(height: 30),
-                    const CircularProgressIndicator(),
+                    CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(AppColors.green),
+                    ),
                     const SizedBox(height: 20),
                     const Text(
                       '운세를 불러오는 중입니다...',
@@ -152,6 +155,7 @@ class _FortuneModalState extends State<FortuneModal> {
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 10),
                     Text(
                       '이용을 원하시면 생일 등록 후 \n이용 해주세요!',
                       style: const TextStyle(

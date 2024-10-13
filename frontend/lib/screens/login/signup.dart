@@ -37,6 +37,14 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
 
+    // 비밀번호 8자 이상
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('비밀번호는 8자 이상이어야 합니다,')),
+      );
+      return;
+    }
+
     if (email.isNotEmpty &&
         nickname.isNotEmpty &&
         password.isNotEmpty &&
@@ -193,7 +201,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       controller: passwordController,
                       obscureText: true, // 비밀번호 필드
                       decoration: InputDecoration(
-                        labelText: '비밀번호',
+                        labelText: '비밀번호 (8자 이상)',
                         labelStyle: const TextStyle(
                           color: AppColors.grey,
                           fontSize: 18,

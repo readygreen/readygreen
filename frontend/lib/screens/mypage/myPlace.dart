@@ -224,7 +224,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
                                     child: const Center(
                                       child: Icon(
                                         Icons.home_rounded,
-                                        size: 45,
+                                        size: 40,
                                         color: Colors.white, // 아이콘 흰색
                                       ),
                                     ),
