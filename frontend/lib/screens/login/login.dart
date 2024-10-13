@@ -271,10 +271,10 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const SizedBox(height: 60),
+              const SizedBox(height: 70),
               Image.asset(
-                'assets/images/map.png',
-                height: 180,
+                'assets/images/logo.png',
+                height: 150,
               ),
               const SizedBox(height: 10),
               const Text(
@@ -286,7 +286,7 @@ class _LoginPageState extends State<LoginPage> {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               Container(
                 width: deviceWidth * 0.8,
                 child: TextFormField(

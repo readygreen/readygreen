@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:readygreen/api/pointStep_api.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/widgets/modals/pointconv_modal.dart';
 
 class PointDetailPage extends StatefulWidget {
+  const PointDetailPage({super.key});
+
   @override
   _PointDetailPageState createState() => _PointDetailPageState();
 }
@@ -24,7 +27,7 @@ class _PointDetailPageState extends State<PointDetailPage> {
     String fetchedPoint = await pointstepApi.fetchPoint();
     setState(() {
       pointDays = points;
-      totalPoint = fetchedPoint as String;
+      totalPoint = fetchedPoint;
     });
   }
 
@@ -82,8 +85,8 @@ class _PointDetailPageState extends State<PointDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.center, // 가로로 가운데 정렬
               children: [
                 Text(
-                  '${totalPoint} 포인트',
-                  style: TextStyle(
+                  '$totalPoint 포인트',
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: AppColors.green,
@@ -92,17 +95,22 @@ class _PointDetailPageState extends State<PointDetailPage> {
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    // 버튼 클릭 시 처리 로직
+                    // 버튼 클릭 시 클릭 시 모달 호출
+                    AgreeModal.showConversionDialog(context, () {
+                      // 동의 시 처리할 로직
+                      print('전환 동의가 완료되었습니다.');
+                      // 동의 후 수행할 추가 로직이 있으면 여기서 처리
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
-                      side: BorderSide(color: AppColors.green, width: 1),
+                      side: const BorderSide(color: AppColors.green, width: 1),
                     ),
                     elevation: 0, // 그림자 효과 제거
                   ),
-                  child: Text(
+                  child: const Text(
                     '전환하기',
                     style: TextStyle(
                       color: AppColors.green,
@@ -137,7 +145,7 @@ class _PointDetailPageState extends State<PointDetailPage> {
         children: [
           Text(
             date, // 날짜 표시
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -208,7 +216,7 @@ class _PointDetailPageState extends State<PointDetailPage> {
                 ),
                 Text(
                   '+${point}P',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

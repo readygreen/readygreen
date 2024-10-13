@@ -5,17 +5,21 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:readygreen/api/main_api.dart';
+import 'package:readygreen/api/user_api.dart';
 import 'package:readygreen/background/background_service.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
+import 'package:readygreen/screens/mypage/badge.dart';
+import 'package:readygreen/screens/mypage/notice.dart';
+import 'package:readygreen/screens/mypage/watch.dart';
 import 'package:readygreen/widgets/common/bgcontainer_home.dart';
+import 'package:readygreen/widgets/common/minisquarecardbox.dart';
 import 'package:readygreen/widgets/common/squarecardbox.dart';
 import 'package:readygreen/constants/appcolors.dart';
+import 'package:readygreen/widgets/common/squarecardbox_subtitle.dart';
 import 'package:readygreen/widgets/modals/weather_modal.dart';
 import 'package:readygreen/widgets/modals/fortune_modal.dart';
 import 'package:intl/intl.dart';
 import 'package:readygreen/widgets/place/cardbox_home.dart';
-// import 'package:readygreen/widgets/place/cardbox_home.dart';
-import 'package:readygreen/widgets/place/cardbox_place.dart'; // CardBoxPlace 임포트
 import 'package:readygreen/api/place_api.dart'; // Place API 임포트
 import 'package:readygreen/provider/current_location.dart';
 import 'package:provider/provider.dart';
@@ -38,19 +42,21 @@ class _HomePageState extends State<HomePage> {
 
 class HomePageContent extends StatefulWidget {
   const HomePageContent({super.key});
-  
 
   @override
   _HomePageContentState createState() => _HomePageContentState();
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-  static final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static final FlutterLocalNotificationsPlugin
+      _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   final NewMainApi api = NewMainApi();
   final PlaceApi placeApi = PlaceApi();
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
+  final NewUserApi userApi = NewUserApi();
+  int title = 0;
   bool isLoadingFortune = false; // 운세 로딩중
   Map<String, dynamic>? routeRecords;
   List<Map<String, dynamic>> _bookmarks = [];
@@ -68,6 +74,7 @@ class _HomePageContentState extends State<HomePageContent> {
     _storeWeather();
     _loadWeatherInfo();
     _fetchNearbyPlaces();
+    _getTitleBadge();
   }
 
   Future<void> _notiPermission() async {
@@ -294,7 +301,6 @@ class _HomePageContentState extends State<HomePageContent> {
       destinationName.substring(index + '대한민국 대전광역시'.length).trim();
     }
 
-
     return destinationName;
   }
 
@@ -359,6 +365,29 @@ class _HomePageContentState extends State<HomePageContent> {
     return '알 수 없음';
   }
 
+  Future<void> _getTitleBadge() async {
+    final data = await userApi.getBadgeTitle();
+    if (mounted) {
+      setState(() {
+        title = data;
+      });
+    }
+  }
+
+  String _getBadge(int title) {
+    if (title == 0) {
+      return "assets/images/signupcong.png";
+    } else if (title == 1) {
+      return "assets/images/badge.png";
+    } else if (title == 2) {
+      return "assets/images/trophy.png";
+    } else if (title == 3) {
+      return "assets/images/coinpig.png";
+    } else {
+      return "assets/images/default.png"; // 예외적인 경우 기본 이미지를 반환
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BgContainerHome(
@@ -386,7 +415,7 @@ class _HomePageContentState extends State<HomePageContent> {
                 )
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -400,7 +429,7 @@ class _HomePageContentState extends State<HomePageContent> {
                         },
                       );
                     },
-                    child: SquareCardBox(
+                    child: SubSquareCardBox(
                       title: '현재 날씨',
                       textColor: Colors.black,
                       imageUrl: currentWeatherImage, // 날씨 아이콘 변경
@@ -414,7 +443,33 @@ class _HomePageContentState extends State<HomePageContent> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => WatchPage()),
+                      );
+                    },
+                    child: const SquareCardBox(
+                      title: '워치 연결하기',
+                      backgroundGradient: const LinearGradient(
+                        colors: [AppColors.watch, AppColors.white],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                      ),
+                      textColor: AppColors.black,
+                      imageUrl: 'assets/images/watch.png',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -425,17 +480,66 @@ class _HomePageContentState extends State<HomePageContent> {
                         },
                       );
                     },
-                    child: const SquareCardBox(
+                    child: const MiniSquareCardBox(
                       title: '오늘의 운세',
-                      backgroundColor: AppColors.darkblue,
-                      textColor: AppColors.white,
+                      backgroundColor: Colors.white,
+                      textColor: AppColors.black,
                       imageUrl: 'assets/images/luck.png',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () async {
+                      // BadgePage로 이동하여 결과값 받기
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BadgePage(),
+                        ),
+                      );
+
+                      // result가 null이 아니면 title 업데이트
+                      if (result != null) {
+                        setState(() {
+                          title = result;
+                        });
+
+                        // 새로 선택한 뱃지를 저장하고 다시 로드
+                        // await _getTitleBadge();
+                        // _getBadge(title);
+                      }
+                    },
+                    child: MiniSquareCardBox(
+                      title: '뱃지',
+                      backgroundColor: Colors.white,
+                      textColor: AppColors.black,
+                      imageUrl: _getBadge(title), // 선택된 뱃지에 따른 이미지 변경
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => NoticePage()),
+                      );
+                    },
+                    child: const MiniSquareCardBox(
+                      title: '공지사항',
+                      backgroundColor: Colors.white,
+                      textColor: AppColors.black,
+                      imageUrl: 'assets/images/notice.png',
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+
+            const SizedBox(height: 12),
             Column(
               children: [
                 Container(
@@ -500,22 +604,26 @@ class _HomePageContentState extends State<HomePageContent> {
                                               ),
                                             ),
                                             Container(
-                                              width: MediaQuery.of(context).size.width * 0.6, // 화면 너비의 70%로 제한
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.6,
                                               child: Text(
-                                                formatDestinationName(bookmark['destinationName']),
+                                                formatDestinationName(bookmark[
+                                                    'destinationName']),
                                                 style: const TextStyle(
                                                   fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
+                                                  // fontWeight: FontWeight.w500,
                                                 ),
-                                                maxLines: 1, // 최대 1줄로 설정
-                                                overflow: TextOverflow.ellipsis, // 넘치는 텍스트는 '...'로 표시
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
                                           ],
                                         ),
                                         Column(
                                           children: [
-                                            const SizedBox(height: 10), // 여백 추가
+                                            const SizedBox(height: 10),
                                             ElevatedButton(
                                               onPressed: () {
                                                 Navigator.pushReplacement(
@@ -567,9 +675,8 @@ class _HomePageContentState extends State<HomePageContent> {
                                 const Text(
                                   '자주 가는 목적지가 없습니다.',
                                   style: TextStyle(
-                                    fontSize: 18, // 원하는 글씨 크기로 설정
-                                    fontWeight:
-                                        FontWeight.bold, // 필요한 경우, 글씨 굵기 추가
+                                    fontSize: 18,
+                                    // fontWeight: FontWeight.bold,
                                   ),
                                 ),
                               ],
@@ -577,9 +684,8 @@ class _HomePageContentState extends State<HomePageContent> {
                       if (_bookmarks.length > 2) const SizedBox(height: 5),
                       if (_bookmarks.length > 2)
                         const Divider(
-                          color: AppColors.grey, // You can adjust the color
-                          thickness:
-                              1, // Adjust thickness for a more prominent line
+                          color: AppColors.grey,
+                          thickness: 1,
                         ),
                       if (_bookmarks.length > 2)
                         Center(
@@ -601,7 +707,7 @@ class _HomePageContentState extends State<HomePageContent> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
               ],
             ),
             Container(
@@ -630,14 +736,13 @@ class _HomePageContentState extends State<HomePageContent> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              // 텍스트를 Flexible로 감싸서 공간 확보
                               Flexible(
                                 child: Text(
                                   formatDestinationName(
                                       routeRecords?['endName']),
                                   style: const TextStyle(
                                     fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                    // fontWeight: FontWeight.bold,
                                   ),
                                   maxLines: 1, // 최대 2줄로 설정
                                   overflow: TextOverflow
@@ -696,7 +801,7 @@ class _HomePageContentState extends State<HomePageContent> {
                               '최근 목적지가 없습니다.',
                               style: TextStyle(
                                 fontSize: 18, // 글씨 크기
-                                fontWeight: FontWeight.bold, // 글씨 굵기
+                                // fontWeight: FontWeight.bold, // 글씨 굵기
                               ),
                             ),
                           ],
@@ -705,7 +810,7 @@ class _HomePageContentState extends State<HomePageContent> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             // 주변 장소 출력
             if (isLoadingPlaces)
               const Center(child: CircularProgressIndicator())
