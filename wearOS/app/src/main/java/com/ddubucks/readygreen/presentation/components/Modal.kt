@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ddubucks.readygreen.presentation.theme.Black
-import com.ddubucks.readygreen.presentation.theme.Gray
+import com.ddubucks.readygreen.presentation.theme.Grey
 import com.ddubucks.readygreen.presentation.theme.White
 import com.ddubucks.readygreen.presentation.theme.Primary
 import com.ddubucks.readygreen.presentation.theme.Secondary
@@ -70,7 +70,7 @@ fun Modal(
                 Button(
                     onClick = onCancel,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Gray,
+                        containerColor = Grey,
                         contentColor = White
                     )
                 ) {

@@ -21,11 +21,14 @@ class BookmarkViewModel : ViewModel() {
     private val _bookmark = MutableStateFlow<List<BookmarkResponse>>(emptyList())
     val bookmark: StateFlow<List<BookmarkResponse>> = _bookmark
     val apiKey = BuildConfig.MAPS_API_KEY
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
 
     fun getBookmarks() {
         val bookmarkApi = RestClient.createService(BookmarkApi::class.java)
 
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val response = withContext(Dispatchers.IO) {
                     bookmarkApi.getBookmarks().awaitResponse()
@@ -35,14 +38,19 @@ class BookmarkViewModel : ViewModel() {
                     val bookmarkList = response.body()?.bookmarkDTOs ?: emptyList()
 
                     val updatedBookmarks = bookmarkList.map { bookmark ->
-                        val placeName = getPlaceName(bookmark.destinationName)
-                        if (placeName != null) {
-                            bookmark.copy(destinationName = placeName)
-                        } else {
-                            bookmark
+                        val cleanedName = bookmark.destinationName.let { name ->
+                            if (name.startsWith("대한민국 대전광역시")) {
+                                name.removePrefix("대한민국 대전광역시").trim()
+                            } else if (name.startsWith("대전")) {
+                                name.removePrefix("대전").trim()
+                            }else {
+                                name
+                            }
                         }
+                        bookmark.copy(destinationName = cleanedName)
                     }
 
+                    _isLoading.value = false
                     _bookmark.value = updatedBookmarks
                 } else {
                     Log.e("BookmarkViewModel", "북마크 요청 실패: ${response.code()} - ${response.message()}")
@@ -52,32 +60,6 @@ class BookmarkViewModel : ViewModel() {
                 Log.e("BookmarkViewModel", "북마크 요청 중 오류 발생: ${e.localizedMessage}", e)
                 _bookmark.value = emptyList()
             }
-        }
-    }
-
-
-    private suspend fun getPlaceName(address: String): String? {
-        val placeNameApi = GoogleRestClient.create(PlaceNameApi::class.java)
-
-        return try {
-            val response = withContext(Dispatchers.IO) {
-                placeNameApi.getPlaceName(address, apiKey).awaitResponse()
-            }
-
-            if (response.isSuccessful && response.body() != null) {
-                val results = response.body()?.results
-                if (results != null && results.isNotEmpty()) {
-                    results[0].formattedAddress
-                } else {
-                    null
-                }
-            } else {
-                Log.e("BookmarkViewModel", "Geocoding 요청 실패: ${response.code()} - ${response.message()}")
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("BookmarkViewModel", "Geocoding 요청 중 오류 발생: ${e.localizedMessage}", e)
-            null
         }
     }
 }

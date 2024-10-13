@@ -628,7 +628,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                             const SizedBox(height: 10),
                                             ElevatedButton(
                                               onPressed: () {
-                                                Navigator.pushReplacement(
+                                                Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
@@ -760,7 +760,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                       routeRecords?['endName']));
                                   print(routeRecords?['endLatitude']);
                                   print(routeRecords?['endLongitude']);
-                                  Navigator.pushReplacement(
+                                  Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => MapDirectionPage(

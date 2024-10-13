@@ -83,7 +83,7 @@ class _ArriveButtonState extends State<ArriveButton> {
               print(
                   '도착지 버튼이 눌렸습니다: ${widget.placeName} (위도: $_lat, 경도: $_lng)');
               // 위도, 경도, 장소 이름을 MapDirectionPage로 전달
-              Navigator.pushReplacement(
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => MapDirectionPage(
