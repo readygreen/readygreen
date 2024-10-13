@@ -154,12 +154,10 @@ class _MyPageState extends State<MyPage> {
                         Expanded(
                           child: GestureDetector(
                             onTap: () async {
-                              // 페이지 이동을 위한 네비게이션
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      const BadgePage(), // 이동할 페이지
+                                  builder: (context) => const BadgePage(),
                                 ),
                               );
                               if (result != null) {
@@ -170,7 +168,7 @@ class _MyPageState extends State<MyPage> {
                               }
                             },
                             child: SquareCardMypage(
-                              title: '내 배지',
+                              title: '내 뱃지',
                               imageUrl: _getBadge(title),
                               subtitle: '설정하기',
                             ),

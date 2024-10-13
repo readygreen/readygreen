@@ -5,6 +5,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:readygreen/api/main_api.dart';
+import 'package:readygreen/api/user_api.dart';
 import 'package:readygreen/background/background_service.dart';
 import 'package:readygreen/screens/map/mapdirection.dart';
 import 'package:readygreen/screens/mypage/badge.dart';
@@ -54,6 +55,8 @@ class _HomePageContentState extends State<HomePageContent> {
   final FlutterSecureStorage storage = const FlutterSecureStorage();
   final String apiKey =
       'AIzaSyDVYVqfY084OtbRip4DjOh6s3HUrFyTp1M'; // Google API Key 추가
+  final NewUserApi userApi = NewUserApi();
+  int title = 0;
   bool isLoadingFortune = false; // 운세 로딩중
   Map<String, dynamic>? routeRecords;
   List<Map<String, dynamic>> _bookmarks = [];
@@ -71,6 +74,7 @@ class _HomePageContentState extends State<HomePageContent> {
     _storeWeather();
     _loadWeatherInfo();
     _fetchNearbyPlaces();
+    _getTitleBadge();
   }
 
   Future<void> _notiPermission() async {
@@ -361,6 +365,29 @@ class _HomePageContentState extends State<HomePageContent> {
     return '알 수 없음';
   }
 
+  Future<void> _getTitleBadge() async {
+    final data = await userApi.getBadgeTitle();
+    if (mounted) {
+      setState(() {
+        title = data;
+      });
+    }
+  }
+
+  String _getBadge(int title) {
+    if (title == 0) {
+      return "assets/images/signupcong.png";
+    } else if (title == 1) {
+      return "assets/images/badge.png";
+    } else if (title == 2) {
+      return "assets/images/trophy.png";
+    } else if (title == 3) {
+      return "assets/images/coinpig.png";
+    } else {
+      return "assets/images/default.png"; // 예외적인 경우 기본 이미지를 반환
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return BgContainerHome(
@@ -464,17 +491,31 @@ class _HomePageContentState extends State<HomePageContent> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      // BadgePage로 이동하여 결과값 받기
+                      final result = await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => BadgePage()),
+                        MaterialPageRoute(
+                          builder: (context) => BadgePage(),
+                        ),
                       );
+
+                      // result가 null이 아니면 title 업데이트
+                      if (result != null) {
+                        setState(() {
+                          title = result;
+                        });
+
+                        // 새로 선택한 뱃지를 저장하고 다시 로드
+                        // await _getTitleBadge();
+                        // _getBadge(title);
+                      }
                     },
-                    child: const MiniSquareCardBox(
+                    child: MiniSquareCardBox(
                       title: '뱃지',
                       backgroundColor: Colors.white,
                       textColor: AppColors.black,
-                      imageUrl: 'assets/images/badge.png',
+                      imageUrl: _getBadge(title), // 선택된 뱃지에 따른 이미지 변경
                     ),
                   ),
                 ),
