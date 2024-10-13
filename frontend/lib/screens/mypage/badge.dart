@@ -128,13 +128,14 @@ class _BadgePageState extends State<BadgePage> {
     setState(() {
       selectedIndex = index;
     });
+
+    Navigator.pop(context, selectedIndex);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // 배경색을 흰색으로 설정
-
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0), // 전체 여백 추가
@@ -161,15 +162,13 @@ class _BadgePageState extends State<BadgePage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 20), // 상단 여백
-              // 선택된 뱃지 이미지
+              const SizedBox(height: 20),
               Image.asset(
                 badges[selectedIndex].image,
                 width: 150,
                 height: 150,
               ),
               const SizedBox(height: 16),
-              // 선택된 뱃지 이름
               Text(
                 badges[selectedIndex].title,
                 style: const TextStyle(
@@ -180,7 +179,6 @@ class _BadgePageState extends State<BadgePage> {
                 ),
               ),
               const SizedBox(height: 8),
-              // 선택된 뱃지 설명
               Text(
                 badges[selectedIndex].subtitle,
                 style: const TextStyle(
@@ -189,7 +187,6 @@ class _BadgePageState extends State<BadgePage> {
                 ),
               ),
               const SizedBox(height: 25),
-              // 배지 리스트
               Column(
                 children: badges.asMap().entries.map((entry) {
                   int index = entry.key;
@@ -207,7 +204,6 @@ class _BadgePageState extends State<BadgePage> {
     );
   }
 
-  // 배지 카드 빌드 함수
 // 배지 카드 빌드 함수
   Widget _buildBadgeCard(
     BuildContext context,
