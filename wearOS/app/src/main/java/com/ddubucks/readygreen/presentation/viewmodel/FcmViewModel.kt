@@ -22,6 +22,7 @@ class FcmViewModel : ViewModel() {
                 return@addOnCompleteListener
             }
             val deviceToken = task.result
+            Log.d("FCM", "device 토큰 : ${deviceToken}")
 
             val formBody = FormBody.Builder()
                 .add("deviceToken", deviceToken)

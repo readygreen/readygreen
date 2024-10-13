@@ -152,8 +152,8 @@ fun NavigationScreen(
 
 @Composable
 fun NavigationInfo(navigationState: NavigationState, isTimerActive: Boolean) {
-    var remainingTime by remember { mutableStateOf(navigationState.currentBlinkerInfo?.remainingTime ?: 0) }
-    var currentBlinkerState by remember { mutableStateOf(navigationState.currentBlinkerInfo?.currentState ?: "RED") }
+    var remainingTime by remember { mutableStateOf(navigationState.trafficLightRemainingTime ?: 0) }
+    var currentBlinkerState by remember { mutableStateOf(navigationState.trafficLightColor ?: "RED") }
 
     LaunchedEffect(remainingTime, isTimerActive) {
         if (isTimerActive) {
