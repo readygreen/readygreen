@@ -32,7 +32,7 @@ class _BadgePageState extends State<BadgePage> {
     BadgeDTO(
       title: '언제그린 가족',
       subtitle: '회원 가입을 축하해요',
-      image: 'assets/images/signupcong.png',
+      image: 'assets/images/gift.png',
       hasBadge: true,
     ),
     BadgeDTO(
