@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
-import com.ddubucks.readygreen.presentation.theme.Gray
+import com.ddubucks.readygreen.presentation.theme.Grey
 import com.ddubucks.readygreen.presentation.theme.Black
 
 @Composable
@@ -38,7 +38,7 @@ fun TextInput(
         placeholder = {
             Text(
                 text = placeholderText,
-                color = Gray,
+                color = Grey,
                 modifier = Modifier.fillMaxWidth(),
                 style = TextStyle(
                     textAlign = TextAlign.Center

@@ -200,6 +200,7 @@ class NavigationViewModel : ViewModel() {
                     trafficLightColor = state,
                     trafficLightRemainingTime = remainingTime
                 )
+                Log.d("NavigationViewModel", "계산한 TrafficLightRemainingTime:${remainingTime}")
             }
         } else {
             // 신호등 정보 없음
@@ -219,6 +220,11 @@ class NavigationViewModel : ViewModel() {
 
         // 신호 주기
         val totalDuration = blinker.greenDuration + blinker.redDuration
+
+        // 신호 주기가 0이면 에러 처리
+        if (totalDuration == 0) {
+            return Pair("GREY", 0)
+        }
 
         // startTime으로부터 경과한 시간(초)
         val elapsedTime = (currentTime.time - startDate.time) / 1000
