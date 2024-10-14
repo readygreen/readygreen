@@ -18,6 +18,7 @@ public class ScheduleController {
     private final FcmService fcmService;
     @Scheduled(fixedRate = 60000) // 1초마다 실행
     public void fixedDelayJob() throws InterruptedException, FirebaseMessagingException {
+        System.out.println("");
         List<AlarmDTO> alarms = bookmarkRepository.findSmartphonesByAlertTime();
         for (AlarmDTO alarm : alarms) {
             fcmService.sendMessageAlarm(alarm);

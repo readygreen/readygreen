@@ -51,7 +51,7 @@ public class ReportController {
             reportService.updatePeriod(reportBlinkerRequestDTO);
             // 포인트 추가
             PointRequestDTO pointRequestDTO = PointRequestDTO.builder()
-                    .point(300)
+                    .point(3000)
                     .description("제보 신호등 제보")
                     .build();
             pointService.addPoint(userDetails.getUsername(), pointRequestDTO);

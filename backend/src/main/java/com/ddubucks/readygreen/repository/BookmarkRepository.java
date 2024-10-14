@@ -27,12 +27,13 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Integer> {
 
     Optional<Bookmark> findByIdAndMember(int id, Member member);
 
-    @Query("SELECT m.smartphone, b FROM Bookmark b " +
-            "JOIN Member m ON b.member.id = m.id " +
+    @Query("SELECT new com.ddubucks.readygreen.dto.AlarmDTO(m.smartphone, b) " +
+            "FROM Bookmark b JOIN Member m ON b.member.id = m.id " +
             "WHERE FUNCTION('MINUTE', b.alertTime) = FUNCTION('MINUTE', CURRENT_TIME) " +
             "AND FUNCTION('HOUR', b.alertTime) = FUNCTION('HOUR', CURRENT_TIME) " +
             "AND b.isAlarm = true")
     List<AlarmDTO> findSmartphonesByAlertTime();
+
 
 
 }

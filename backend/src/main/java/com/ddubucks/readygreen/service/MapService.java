@@ -373,6 +373,7 @@ public class MapService {
                             .longitude(bookmark.getDestinationCoordinate().getX())
                             .alertTime(bookmark.getAlertTime())
                             .placeId(bookmark.getPlaceId())
+                            .isAlarm(bookmark.isAlarm())
                             .build()
             );
         }
