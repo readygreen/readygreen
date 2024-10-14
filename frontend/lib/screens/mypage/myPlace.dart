@@ -34,10 +34,11 @@ class _MyPlacePageState extends State<MyPlacePage> {
           latitude: bookmark['latitude'],
           longitude: bookmark['longitude'],
           placeId: bookmark['placeId'],
+          isAlarm: bookmark['alarm'],
         );
       }).toList();
 
-      // 집 > 회사 > 기타 순으로 정렬
+      // 집 > 회사 > 기정렬
       fetchedBookmarks.sort((a, b) {
         const priority = {'집': 0, '회사': 1, '기타': 2};
         return priority[a.name]!.compareTo(priority[b.name]!);
@@ -95,7 +96,8 @@ class _MyPlacePageState extends State<MyPlacePage> {
                         bookmark.destinationName, // 목적지 이름
                         Icons.place,
                         bookmark.placeId,
-                        bookmark.id),
+                        bookmark.id,
+                        bookmark.isAlarm),
                   ],
                 );
               },
@@ -104,12 +106,14 @@ class _MyPlacePageState extends State<MyPlacePage> {
   }
 
   // 장소 아이템 빌드 함수
-  Widget _buildPlaceItem(BuildContext context, String title, String placeName,
-      IconData icon, String placeId, int id) {
-    return ListTile(
+ Widget _buildPlaceItem(BuildContext context, String title, String placeName,IconData icon,
+    String placeId, int id, bool? isAlarmOn) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 0.0),
+    child: ListTile(
       leading: Container(
-        width: 50, // 고정된 너비
-        height: 50, // 고정된 높이
+        width: 35, // 고정된 너비
+        height: 35, // 고정된 높이
         decoration: BoxDecoration(
           color: title == "기타"
               ? AppColors.green // 기타일 경우 배경색 설정
@@ -126,7 +130,7 @@ class _MyPlacePageState extends State<MyPlacePage> {
                 : title == "집"
                     ? Icons.home_rounded
                     : Icons.business_rounded,
-            size: title == "집" ? 40 : 35, // 집 아이콘만 크기 40, 나머지는 35로 설정
+            size: title == "집" ? 25 : 20, // 집 아이콘만 크기 40, 나머지는 35로 설정
             color: Colors.white, // 아이콘 색상 흰색으로 설정
           ),
         ),
@@ -135,27 +139,90 @@ class _MyPlacePageState extends State<MyPlacePage> {
         placeName.contains('대전광역시')
             ? placeName.substring(placeName.indexOf('대전광역시') + '대전광역시'.length)
             : placeName,
-        overflow: TextOverflow.ellipsis, // 글자가 길면 말줄임표(...) 처리
+        // overflow: TextOverflow.ellipsis, // 글자가 길면 말줄임표(...) 처리
       ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
-            icon: const Icon(size: 20, Icons.edit),
-            onPressed: () {
-              _showEditModal(context, title, placeName, id);
-            },
+          // 종모양 알림 이미지로 변경
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우로만 8.0 패딩 추가
+              child: GestureDetector(
+              onTap: () {
+                // 알림 설정 상태 변경 로직 추가
+                toggleAlarm(id, !(isAlarmOn ?? false)); // 현재 상태 반전
+              },
+              child: Image.asset(
+                isAlarmOn == true
+                    ? 'assets/icon/bookmark_bell.png' // 알림 켜짐 상태 이미지
+                    : 'assets/icon/bookmark_bell_slash.png', // 알림 꺼짐 상태 이미지
+                width: 18,
+                height: 18,
+              ),
+            ),
           ),
-          IconButton(
-            icon: const Icon(size: 20, Icons.delete),
-            onPressed: () {
-              _showDeleteModal(context, placeName, placeId);
-            },
+          SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우로만 8.0 패딩 추가
+              child: GestureDetector(
+              onTap: () {
+                _showEditModal(context, title, placeName, id);
+              },
+              child: Image.asset(
+                'assets/icon/bookmark_pencil.png', // 편집 이미지
+                width: 18,
+                height: 18,
+              ),
+            ),
           ),
+          SizedBox(width: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0), // 좌우로만 8.0 패딩 추가
+            child: GestureDetector(
+              onTap: () {
+                _showDeleteModal(context, placeName, placeId);
+              },
+              child: Image.asset(
+                'assets/icon/bookmark_trash.png', // 삭제 이미지
+                width: 18,
+                height: 18,
+              ),
+            ),
+          )
+
         ],
       ),
-    );
+    ),
+  );
+}
+
+
+
+
+
+
+
+void toggleAlarm(int id, bool value) async {
+  // API 호출
+  bool success = await mapStartAPI.updateBookmarkAlarm(
+    id: id,
+    alarmStatus: value,
+  );
+  // 호출 결과 처리
+  if (success) {
+    print('알람 설정이 성공적으로 업데이트되었습니다.');
+    setState(() {
+      // 북마크 리스트에서 해당 북마크의 알람 상태만 업데이트
+      final bookmarkIndex = _bookmarks.indexWhere((bookmark) => bookmark.id == id);
+      if (bookmarkIndex != -1) {
+        _bookmarks[bookmarkIndex].isAlarm = value; // 해당 북마크의 알람 상태를 직접 변경
+      }
+    });
+
+  } else {
+    print('알람 설정 업데이트 실패');
   }
+}
 
   // 수정 모달
   void _showEditModal(

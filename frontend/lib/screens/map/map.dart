@@ -32,6 +32,7 @@ class BookmarkDTO {
   final double longitude;
   final String? alertTime;
   final String placeId;
+  bool isAlarm;
 
   BookmarkDTO({
     required this.id,
@@ -41,6 +42,7 @@ class BookmarkDTO {
     required this.longitude,
     this.alertTime,
     required this.placeId,
+    required this.isAlarm,
   });
 }
 
@@ -92,6 +94,7 @@ class _MapPageState extends State<MapPage> {
           latitude: bookmark['latitude'],
           longitude: bookmark['longitude'],
           placeId: bookmark['placeId'],
+          isAlarm: bookmark['alarm']
         );
       }).toList();
 
@@ -112,7 +115,7 @@ class _MapPageState extends State<MapPage> {
 
   Future<void> _checkIsGuide() async {
     if (await mapStartAPI.checkIsGuide()) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const MapDirectionPage()),
       );

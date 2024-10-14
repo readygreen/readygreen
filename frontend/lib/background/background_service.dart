@@ -73,10 +73,10 @@ void onStart(ServiceInstance service) async {
       }
 
       // 현재 위치 정보 가져오기
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.bestForNavigation);
 
       // API에서 'blinkerDTOs' 정보 다시 가져오기
-      Map<String, dynamic>? mapData = await mapStartAPI.fetchGuideInfo();
+      // Map<String, dynamic>? mapData = await mapStartAPI.fetchGuideInfo();
       List<dynamic>? blinkerDTOs = mapData?['blinkerDTOs'];
 
       if (blinkerDTOs != null && blinkerDTOs.isNotEmpty) {

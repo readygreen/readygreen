@@ -38,6 +38,7 @@ class _DraggableFavoritesState extends State<DraggableFavorites> {
           latitude: bookmark['latitude'],
           longitude: bookmark['longitude'],
           placeId: bookmark['placeId'],
+          isAlarm: bookmark['alarm'],
         );
       }).toList();
 
