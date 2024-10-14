@@ -595,6 +595,7 @@ class TrafficLightService {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
           ),
+          backgroundColor: AppColors.white,
           child: Padding(
             padding: const EdgeInsets.all(30.0),
             child: Column(
@@ -615,7 +616,7 @@ class TrafficLightService {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  '포인트 300점을 얻었습니다!',
+                  '포인트 3000점을 얻었습니다!',
                   style: TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 30),

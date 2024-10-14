@@ -628,6 +628,7 @@ class _HomePageContentState extends State<HomePageContent> {
                                             const SizedBox(height: 10),
                                             ElevatedButton(
                                               onPressed: () {
+                                                mapStartAPI.putBookmarkTime(id: bookmark['id']);
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(

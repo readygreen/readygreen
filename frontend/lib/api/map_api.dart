@@ -74,7 +74,7 @@ class MapStartAPI {
 
       // 응답에서 JSON 데이터를 디코드
       final data = jsonDecode(utf8.decode(response.bodyBytes));
-
+      print(data);
       // bookmarkDTOs 배열을 추출하여 반환
       if (data != null && data.containsKey('bookmarkDTOs')) {
         return data['bookmarkDTOs'];
@@ -440,4 +440,60 @@ class MapStartAPI {
       return false;
     }
   }
+
+
+  Future<bool> updateBookmarkAlarm({
+    required int id,
+    required bool alarmStatus,
+  }) async {
+    // 저장된 액세스 토큰 읽기
+    String? accessToken = await storage.read(key: 'accessToken');
+
+    // 쿼리 파라미터로 bookmarkId와 alarmStatus 전달
+    print(id);
+    print(alarmStatus);
+    final response = await http.put(
+      Uri.parse('$baseUrl/map/bookmark/alarm?bookmarkId=$id&alarmStatus=$alarmStatus'),
+      headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken', // Bearer 토큰 인증
+      },
+    );
+
+    // API 응답 처리
+    if (response.statusCode == 200) {
+      print('Bookmark alarm update successful');
+      return true;
+    } else {
+      print('Failed to update bookmark alarm: ${response.statusCode}, ${response.body}');
+      return false;
+    }
+  }
+
+  Future<bool> putBookmarkTime({required int id}) async {
+    // 저장된 액세스 토큰 읽기
+    String? accessToken = await storage.read(key: 'accessToken');
+    print(id);
+
+    // POST 요청에 빈 body 추가
+    final response = await http.post(
+      Uri.parse('$baseUrl/map/bookmark/time?bookmarkId=$id'),
+      headers: {
+        'accept': '*/*',
+        'Authorization': 'Bearer $accessToken', // Bearer 토큰 인증
+      },
+      body: '',  // 빈 body 전달
+    );
+
+    // API 응답 처리
+    if (response.statusCode == 200) {
+      print('북마크 시간 수정 성공');
+      return true;
+    } else {
+      print('북마크 시간 수정 실패: ${response.statusCode}, ${response.body}');
+      return false;
+    }
+  }
+
+
 }
