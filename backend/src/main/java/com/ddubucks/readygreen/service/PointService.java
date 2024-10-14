@@ -69,6 +69,13 @@ public class PointService {
         return groupedPoints;
     }
 
+    public boolean hasReceivedPointToday(String username, String description) {
+        LocalDate today = LocalDate.now();
+        return pointRepository.existsByMemberEmailAndDescriptionAndCreateDate(username, description, today);
+    }
+
+
+
 //    public List<Step> getStepsByMember(String email){
 //        Member member = memberRepository.findMemberByEmail(email)
 //                .orElseThrow(() -> new RuntimeException("User not found"));

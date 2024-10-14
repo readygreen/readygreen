@@ -1,8 +1,10 @@
 package com.ddubucks.readygreen.controller;
 
 import com.ddubucks.readygreen.dto.*;
+import com.ddubucks.readygreen.model.bookmark.Bookmark;
 import com.ddubucks.readygreen.model.member.Member;
 import com.ddubucks.readygreen.model.Step;
+import com.ddubucks.readygreen.repository.BookmarkRepository;
 import com.ddubucks.readygreen.repository.MemberRepository;
 import com.ddubucks.readygreen.repository.StepRepository;
 import com.ddubucks.readygreen.service.*;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -22,6 +25,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,6 +40,7 @@ public class MapController {
     private final PointService pointService;
     private final StepRepository stepRepository;
     private final MemberRepository memberRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     @PostMapping("start")
     public ResponseEntity<MapResponseDTO> getDestinationGuide(@Valid @RequestBody RouteRequestDTO routeRequestDTO, @AuthenticationPrincipal UserDetails userDetails) throws FirebaseMessagingException {
@@ -140,12 +145,15 @@ public class MapController {
     }
 
     @GetMapping
-    public ResponseEntity<BlinkerResponseDTO> getNearbyBlinker(@RequestParam(required = false) double latitude,
-                                              @RequestParam(required = false) double longitude,
-                                              @RequestParam(required = false) int radius) {
+    public ResponseEntity<BlinkerResponseDTO> getNearbyBlinker(
+            @RequestParam(name = "latitude", required = false) double latitude,
+            @RequestParam(name = "longitude", required = false) double longitude,
+            @RequestParam(name = "radius", required = false) int radius) {
+
         BlinkerResponseDTO blinkerResponseDTO = mapService.getNearbyBlinker(latitude, longitude, radius);
         return ResponseEntity.ok(blinkerResponseDTO);
     }
+
 
     @GetMapping("blinker")
     public ResponseEntity<BlinkerResponseDTO> getBlinker(@RequestParam(required = false) List<Integer> blinkerIDs) {
@@ -176,6 +184,27 @@ public class MapController {
                                             @AuthenticationPrincipal UserDetails userDetails) {
         mapService.deleteBookmark(placeId, userDetails.getUsername());
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("bookmark/alarm")
+    public ResponseEntity<String> setBookmarkAlarm(@AuthenticationPrincipal UserDetails userDetails,
+                                                   @RequestParam(name = "bookmarkId") int bookmarkId,
+                                                   @RequestParam(name = "alarmStatus") boolean alarmStatus) {
+        // 현재 로그인한 사용자의 이름 또는 ID를 가져옴
+        Member member = memberService.getMemberInfo(userDetails.getUsername());
+
+        // bookmarkId로 북마크를 찾음
+        Bookmark bookmark = bookmarkRepository.findByIdAndMember(bookmarkId, member).orElse(null);
+
+        // 북마크가 존재하는지 확인
+        if (bookmark != null) {
+            // 알람 상태 업데이트
+            bookmark.setAlarm(alarmStatus);
+            bookmarkRepository.save(bookmark);  // DB에 저장
+            return ResponseEntity.ok("Bookmark alarm set to " + alarmStatus + ".");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bookmark not found.");
+        }
     }
 
 

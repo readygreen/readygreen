@@ -81,12 +81,19 @@ public class MainController {
         if (member.getBirth() == null) {
             return ResponseEntity.badRequest().body("생일 정보가 없습니다.");
         }
+        boolean hasReceivedToday = pointService.hasReceivedPointToday(userDetails.getUsername(), "운세 운세 확인");
+        int luckyNumber = 0;
         Random random = new Random();
-        int luckyNumber = random.nextInt(100) + 1;
-        PointRequestDTO pointRequestDTO = PointRequestDTO.builder().point(luckyNumber).description("운세 운세 확인").build();
-        pointService.addPoint(userDetails.getUsername(), pointRequestDTO);
-        System.out.println(luckyNumber);
-
+        luckyNumber = random.nextInt(100) + 1;
+        if (!hasReceivedToday) {
+            // 랜덤 행운 번호 생성
+            // 포인트 추가
+            PointRequestDTO pointRequestDTO = PointRequestDTO.builder()
+                    .point(luckyNumber)
+                    .description("운세 운세 확인")
+                    .build();
+            pointService.addPoint(userDetails.getUsername(), pointRequestDTO);
+        }
         // 프롬프트 생성
         String prompt = String.format("저의 이름은 %s이고, 생일은 %s입니다. 오늘의 운세를 알려주세요. 운세는 반드시 다음 형식을 따르세요: \n" +
                         "일: 일 관련된 운세 \n" +

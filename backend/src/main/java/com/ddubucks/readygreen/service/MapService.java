@@ -228,10 +228,20 @@ public class MapService {
 
     private int getBlinkerTime(LocalTime startTime, LocalTime nowTime, int greenDuration, int redDuration) {
 
+        // greenDuration과 redDuration이 0이면 바로 0을 리턴
+        if (greenDuration == 0 && redDuration == 0) {
+            return 0;
+        }
+
         // 시작 시간으로부터 현재까지 경과한 시간 (초 단위)
         long elapsedSeconds = Duration.between(startTime, nowTime).getSeconds();
 
         int totalCycle = greenDuration + redDuration;
+
+        // totalCycle이 0이면 0을 리턴 (이 경우도 고려)
+        if (totalCycle == 0) {
+            return 0;
+        }
 
         // 현재 주기 내에서 경과한 시간 계산
         int currentCycleElapsedTime = (int) (elapsedSeconds % totalCycle);
@@ -243,7 +253,13 @@ public class MapService {
         return totalCycle - currentCycleElapsedTime; // 빨간불에서 초록불로 바뀌기까지 남은 시간
     }
 
+
     private String getBlinkerState(LocalTime startTime, LocalTime nowTime, int greenDuration, int redDuration) {
+
+        // greenDuration과 redDuration이 0이면 GREY를 리턴
+        if (greenDuration == 0 && redDuration == 0) {
+            return "GREY";
+        }
 
         // 시작 시간으로부터 현재까지 경과한 시간 (초 단위)
         long elapsedSeconds = Duration.between(startTime, nowTime).getSeconds();
@@ -259,6 +275,7 @@ public class MapService {
         }
         return "RED";
     }
+
 
     private List<Point> getBlinkerCoordinate(RouteDTO routeDTO) {
 
@@ -356,6 +373,7 @@ public class MapService {
                             .longitude(bookmark.getDestinationCoordinate().getX())
                             .alertTime(bookmark.getAlertTime())
                             .placeId(bookmark.getPlaceId())
+                            .isAlarm(bookmark.isAlarm())
                             .build()
             );
         }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.time.Duration;
 
@@ -98,32 +99,49 @@ public class ReportService {
     }
 
 
-    public void updatePeriod(ReportBlinkerRequestDTO reportBlinkerRequestDTO) {
-        LocalTime startTime = reportBlinkerRequestDTO.getStartTime();
-        LocalTime middleTime = reportBlinkerRequestDTO.getMiddleTime();
-        LocalTime endTime = reportBlinkerRequestDTO.getEndTime();
+        public void updatePeriod(ReportBlinkerRequestDTO reportBlinkerRequestDTO) {
 
-        // startTime과 middleTime의 차이를 초 단위로 계산
-        long startToMiddleInSeconds = Duration.between(startTime, middleTime).getSeconds();
+            LocalTime startTime = reportBlinkerRequestDTO.getStartTime();
+            LocalTime middleTime = reportBlinkerRequestDTO.getMiddleTime();
+            LocalTime endTime = reportBlinkerRequestDTO.getEndTime();
 
-        // middleTime과 endTime의 차이를 초 단위로 계산
-        long middleToEndInSeconds = Duration.between(middleTime, endTime).getSeconds();
 
-        // 데이터베이스 업데이트 로직 예시
-        // 예시로 신호등 정보가 Blinker라는 엔티티에 저장된다고 가정하고, 해당 값을 업데이트
-        Blinker blinker1 = blinkerRepository.findById(reportBlinkerRequestDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 신호등이 존재하지 않습니다."));
-//        Blinker blinker2 = blinkerRepository.findById(reportBlinkerRequestDTO.getId2())
-//                .orElseThrow(() -> new IllegalArgumentException("해당 신호등이 존재하지 않습니다."));
-        // 새로운 기간을 업데이트
-        blinker1.setStartTime(startTime);
-        blinker1.setGreenDuration((int) startToMiddleInSeconds); // 초 단위로 업데이트
-        blinker1.setRedDuration((int) middleToEndInSeconds);
-//        blinker2.setGreenDuration((int) startToMiddleInSeconds); // 초 단위로 업데이트
-//        blinker2.setRedDuration((int) middleToEndInSeconds);  // 초 단위로 업데이트
-        // 변경된 값 저장
-        blinkerRepository.save(blinker1);
-//        blinkerRepository.save(blinker2);
+            Blinker blinker1 = blinkerRepository.findById(reportBlinkerRequestDTO.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 신호등이 존재하지 않습니다."));
+
+
+            // 녹색 신호 시간 계산
+            long greenDurationInSeconds = Duration.between(startTime, middleTime).getSeconds();
+            // 적색 신호 시간 계산
+            long redDurationInSeconds = Duration.between(middleTime, endTime).getSeconds();
+
+
+
+            long totalCycleInSeconds = greenDurationInSeconds + redDurationInSeconds;
+            LocalTime midnight = LocalTime.of(0, 0, 0); // 00:00:00 생성
+            long remainTime = Duration.between(midnight, startTime).getSeconds();
+            remainTime = remainTime % totalCycleInSeconds;
+            startTime = midnight.plusSeconds(remainTime);
+
+
+            // 근처에 있는 신호등 찾기
+        //     Blinker blinker2 = blinkerRepository.findAllNear(blinker1.getName(), String.valueOf(blinker1.getCoordinate()));
+
+
+            // 신호등 시간 업데이트
+            blinker1.setStartTime(startTime);
+            blinker1.setGreenDuration((int) greenDurationInSeconds);
+            blinker1.setRedDuration((int) redDurationInSeconds);
+
+        //     blinker2.setStartTime(startTime);
+        //     blinker2.setGreenDuration((int) greenDurationInSeconds);
+        //     blinker2.setRedDuration((int) redDurationInSeconds);
+
+            // 변경된 값 저장 (주석 해제 시 데이터베이스 저장 가능)
+             blinkerRepository.save(blinker1);
+        //      blinkerRepository.save(blinker2);
+
+
     }
 
 
