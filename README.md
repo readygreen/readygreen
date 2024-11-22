@@ -182,6 +182,8 @@
 	<img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white">
 	<img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=Flutter&logoColor=white">
 	<img src="https://img.shields.io/badge/Provider-FF6F00?style=for-the-badge&logo=Provider&logoColor=white">
+	<img src="https://img.shields.io/badge/Google%20Maps-4285F4?style=for-the-badge&logo=Google-Maps&logoColor=white">
+	<img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=black">
 </div>
 <br/>
 
@@ -189,10 +191,11 @@
 ### 🦊 WearOS
 <div>
 	<img src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=Kotlin&logoColor=white">
+	<img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=Android&logoColor=white">
 	<img src="https://img.shields.io/badge/Retrofit-FF6F00?style=for-the-badge&logo=Retrofit&logoColor=white">
 	<img src="https://img.shields.io/badge/Google%20Maps-4285F4?style=for-the-badge&logo=Google-Maps&logoColor=white">
-	<img src="https://img.shields.io/badge/Lottie-8DD6F9?style=for-the-badge&logo=Lottie&logoColor=white">
 	<img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=black">	
+	<img src="https://img.shields.io/badge/Lottie-8DD6F9?style=for-the-badge&logo=Lottie&logoColor=white">
 </div>
 <br/>
 
