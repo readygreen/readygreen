@@ -261,13 +261,8 @@ sdk: flutter
 언제그린 팀원들의 원활한 `Gitlab`, `Jira` 사용을 위한 [✨컨벤션✨](https://obsidian-boar-5f3.notion.site/bfbb93c1ebbb412fa1b9bb03042f4ebc?pvs=74) 입니다 :)
 
 ## 👥 팀원 소개
-
-### 팀원 1
-## 👥 팀원 소개
-
 <table>
   <tbody>
-    <!-- 첫 번째 줄: BE 팀 -->
     <tr>
       <td align="center">
         <a href="">
@@ -295,7 +290,6 @@ sdk: flutter
       </td>
     </tr>
 
-    <!-- 두 번째 줄: FE 팀 -->
     <tr>
       <td align="center">
         <a href="">
