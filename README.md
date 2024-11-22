@@ -267,27 +267,27 @@ sdk: flutter
     <!-- 첫 번째 줄: BE 팀 -->
     <tr>
       <td align="center">
-        <a href="">
+        <a href="https://github.com/USERNAME">
           <img src="https://via.placeholder.com/100" width="100px;" alt="이소민"/><br />
           <sub><b>이소민</b></sub><br />
           백엔드, 팀장<br />
-          <a href="https://github.com/USERNAME"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge"></a>
+          <img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge">
         </a>
       </td>
       <td align="center">
-        <a href="">
+        <a href="https://github.com/USERNAME">
           <img src="https://via.placeholder.com/100" width="100px;" alt="김용원"/><br />
           <sub><b>김용원</b></sub><br />
           인프라, 풀스택<br />
-          <a href="https://github.com/USERNAME"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge"></a>
+          <img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge">
         </a>
       </td>
       <td align="center">
-        <a href="">
+        <a href="https://github.com/USERNAME">
           <img src="https://via.placeholder.com/100" width="100px;" alt="서두나"/><br />
           <sub><b>서두나</b></sub><br />
           백엔드<br />
-          <a href="https://github.com/USERNAME"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge"></a>
+          <img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge">
         </a>
       </td>
     </tr>
@@ -295,30 +295,29 @@ sdk: flutter
     <!-- 두 번째 줄: FE 팀 -->
     <tr>
       <td align="center">
-        <a href="">
+        <a href="https://github.com/USERNAME">
           <img src="https://via.placeholder.com/100" width="100px;" alt="이승민"/><br />
           <sub><b>이승민</b></sub><br />
           프론트(앱)<br />
-          <a href="https://github.com/USERNAME"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge"></a>
+          <img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge">
         </a>
       </td>
       <td align="center">
-        <a href="">
+        <a href="https://github.com/USERNAME">
           <img src="https://via.placeholder.com/100" width="100px;" alt="진아영"/><br />
           <sub><b>진아영</b></sub><br />
           프론트(워치)<br />
-          <a href="https://github.com/USERNAME"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge"></a>
+          <img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge">
         </a>
       </td>
       <td align="center">
-        <a href="">
+        <a href="https://github.com/USERNAME">
           <img src="https://via.placeholder.com/100" width="100px;" alt="차유림"/><br />
           <sub><b>차유림</b></sub><br />
           프론트(앱)<br />
-          <a href="https://github.com/USERNAME"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge"></a>
+          <img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white" alt="GitHub Badge">
         </a>
       </td>
     </tr>
   </tbody>
 </table>
-
