@@ -264,6 +264,7 @@ sdk: flutter
 
 ### 팀원 1
 ## 👥 팀원 소개
+
 <table>
   <tbody>
     <!-- 첫 번째 줄: BE 팀 -->
@@ -323,3 +324,4 @@ sdk: flutter
     </tr>
   </tbody>
 </table>
+
