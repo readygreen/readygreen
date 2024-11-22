@@ -269,9 +269,9 @@ sdk: flutter
       <td align="center"><a href="https://github.com/yongwonkim1"><img src="https://avatars.githubusercontent.com/u/104666191?v=4" width="100px;" alt=""/><br /><sub><b>인프라, 풀스택 : 김용원</b></sub></a><br /></td>
       <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>백엔드 : 서두나 </b></sub></a><br /></td>
      <tr/>
-      <td align="center"<a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(앱) : 이승민</b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(앱) : 이승민</b></sub></a><br /></td>
       <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(워치) : 진아영</b></sub></a><br /></td>
-      <td align="center"<a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(앱) : 차유림</b></sub></a><br /></td>
+      <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(앱) : 차유림</b></sub></a><br /></td>
     </tr>
   </tbody>
 </table>
