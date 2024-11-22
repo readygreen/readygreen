@@ -262,16 +262,91 @@ sdk: flutter
 
 ## 👥 팀원 소개
 
+<div>
 <table>
-  <tbody>
     <tr>
-      <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b> 팀장,백엔드 : 이소민 </b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/yongwonkim1"><img src="https://avatars.githubusercontent.com/u/104666191?v=4" width="100px;" alt=""/><br /><sub><b>인프라, 풀스택 : 김용원</b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>백엔드 : 서두나 </b></sub></a><br /></td>
-     <tr/>
-      <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(앱) : 이승민</b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(워치) : 진아영</b></sub></a><br /></td>
-      <td align="center"><a href="https://github.com/"><img src="" width="100px;" alt=""/><br /><sub><b>프론트(앱) : 차유림</b></sub></a><br /></td>
-    </tr>
-  </tbody>
+        <td align="center">
+        <a href="https://github.com/sommnee">
+          <img src="https://avatars.githubusercontent.com/sommnee" width="120px;" alt="wooqqq">
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/yongwonkim1">
+          <img src="https://avatars.githubusercontent.com/yongwonkim1" width="120px;" alt="Basaeng">
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/ensk26">
+          <img src="https://avatars.githubusercontent.com/ensk26" width="120px;" alt="jiwon718">
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/seungminleeee">
+          <img src="https://avatars.githubusercontent.com/seungminleeee" width="120px;" alt="KBG1">
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/JinAyeong">
+          <img src="https://avatars.githubusercontent.com/JinAyeong" width="120px;" alt="taessong">
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/chajoyhoi">
+          <img src="https://avatars.githubusercontent.com/chajoyhoi" width="120px;" alt="hhsssu">
+        </a>
+      </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/sommnee">
+        이소민
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/yongwonkim1">
+        김용원
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/wnsk26">
+        서두나
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/seungminleeee">
+        이승민
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/JinAyeong">
+        진아영
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/chajoyhoi">
+        차유림
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+        팀장, BE
+    </td>
+    <td align="center">
+      풀스택
+    </td>
+    <td align="center">
+      BE
+    </td>
+    <td align="center">
+      FE
+    </td>
+    <td align="center">
+      FE
+    </td>
+    <td align="center">
+      FE
+    </td>
+  </tr>
 </table>
+</div>
