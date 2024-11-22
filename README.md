@@ -259,3 +259,10 @@ sdk: flutter
 
 # ✨ Conventions 
 언제그린 팀원들의 원활한 `Gitlab`, `Jira` 사용을 위한 [✨컨벤션✨](https://obsidian-boar-5f3.notion.site/bfbb93c1ebbb412fa1b9bb03042f4ebc?pvs=74) 입니다 :)
+
+## 👥 팀원 소개
+
+### 팀원 1
+<img src="https://img.shields.io/badge/이름-김용원-0078D4?style=for-the-badge&logo=GitHub&logoColor=white">
+<img src="https://img.shields.io/badge/GitHub-이메일:qwsa522%40naver.com-181717?style=for-the-badge&logo=Gmail&logoColor=white">
+<img src="https://img.shields.io/badge/역할-infra%20fullstack%20Developer-FF6F00?style=for-the-badge&logo=JavaScript&logoColor=white">
