@@ -1,6 +1,15 @@
-# 🚦 언제그린
+# 🚦 언제그린 🚦 
+보행자를 위한 실시간 횡단보도 잔여시간 제공 서비스 
+<br> 
 
-### 📜 Contents
+## 📄 프로젝트 개요
+삼성 청년 SW 아카데미 11기 특화 프로젝트 (빅데이터 분산) 우수상 🏆
+
+기간 : 2024.08.19 ~ 2024.10.11
+
+<br> 
+
+## 📜 Contents
  1. [Overview](#-overview)
  2. [서비스 화면](#-서비스-화면)
  3. [주요 기능](#-주요-기능)
@@ -336,10 +345,10 @@
   </tr>
   <tr>
     <td align="center">
-        팀장, BE
+        팀장, BE, Data
     </td>
     <td align="center">
-      풀스택
+      Infra, BE, FE
     </td>
     <td align="center">
       BE
