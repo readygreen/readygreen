@@ -185,31 +185,37 @@ sdk: flutter
   confetti: ^0.8.0
 ```
  
-**🦊WearOS**
-- Kotlin `1.8`
-- Retrofit `2.9.0`
-- Google Maps `4.4.1`
-- Lottie ` 6.0.0`
-- Firebase Messaging
- 
+### 🦊 WearOS
+<img src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=Kotlin&logoColor=white">
+<img src="https://img.shields.io/badge/Retrofit-FF6F00?style=for-the-badge&logo=Retrofit&logoColor=white">
+<img src="https://img.shields.io/badge/Google%20Maps-4285F4?style=for-the-badge&logo=Google-Maps&logoColor=white">
+<img src="https://img.shields.io/badge/Lottie-8DD6F9?style=for-the-badge&logo=Lottie&logoColor=white">
+<img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=Firebase&logoColor=black">
 
-**🗂️ DB**
-- MySQL `8.0.30`
-- MongoDB
-- Redis
+---
 
-**🌐 Server**
-- Ubuntu `20.0.4`
-- Nginx `1.23`
-- PuTTY `0.77`
-- Docker `20.10.18`
-- Jenkins `Jenkins/jenkins:lts-jdk11`
+### 🗂️ DB
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">
+<img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=MongoDB&logoColor=white">
+<img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white">
 
-**🔨 IDE**
-- IntelliJ `2024.2.1`
-- MySQL Workbench `8.0.29`
-- VSCode `1.69.2`
-- Android Studio `2024.1.2`
+---
+
+### 🌐 Server
+<img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=Ubuntu&logoColor=white">
+<img src="https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=Nginx&logoColor=white">
+<img src="https://img.shields.io/badge/PuTTY-023161?style=for-the-badge&logo=PuTTY&logoColor=white">
+<img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=Docker&logoColor=white">
+<img src="https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white">
+
+---
+
+### 🔨 IDE
+<img src="https://img.shields.io/badge/IntelliJ%20IDEA-000000?style=for-the-badge&logo=IntelliJ-IDEA&logoColor=white">
+<img src="https://img.shields.io/badge/MySQL%20Workbench-4479A1?style=for-the-badge&logo=MySQL&logoColor=white">
+<img src="https://img.shields.io/badge/VSCode-007ACC?style=for-the-badge&logo=Visual-Studio-Code&logoColor=white">
+<img src="https://img.shields.io/badge/Android%20Studio-3DDC84?style=for-the-badge&logo=Android-Studio&logoColor=white">
+
 
 ## 💫 시스템 아키텍처
 
