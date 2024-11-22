@@ -263,6 +263,14 @@ sdk: flutter
 ## 👥 팀원 소개
 
 ### 팀원 1
-<img src="https://img.shields.io/badge/이름-김용원-0078D4?style=for-the-badge&logo=GitHub&logoColor=white">
-<img src="https://img.shields.io/badge/GitHub-이메일:qwsa522%40naver.com-181717?style=for-the-badge&logo=Gmail&logoColor=white">
-<img src="https://img.shields.io/badge/역할-infra%20fullstack%20Developer-FF6F00?style=for-the-badge&logo=JavaScript&logoColor=white">
+## 👥 팀원 소개
+## 👥 팀원 소개
+
+|--------|---------------|---------------------|
+| 이소민 | 백엔드, 팀장  | ![GitHub Badge](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white) |
+| 김용원 | 인프라, 풀스택 | ![GitHub Badge](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white) |
+| 서두나 | 백엔드        | ![GitHub Badge](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white) |
+| 이승민 | 프론트(앱)    | ![GitHub Badge](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white) |
+| 진아영 | 프론트(워치)  | ![GitHub Badge](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white) |
+| 차유림 | 프론트(앱)    | ![GitHub Badge](https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=GitHub&logoColor=white) |
+
