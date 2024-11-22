@@ -148,19 +148,22 @@
 
 ## 🖥️ 개발 환경
 
-**🐳 Backend**
-- Java `17`
-- Ubutu `20.1.0`
-- SpringBoot `3.3.3`
-- Gradle `7.5`
-- Swagger
-- Spring Security
-- spark `3.4.0`
+### 🐳 Backend
+<img src="https://img.shields.io/badge/Java-007396?style=for-the-badge&logo=Java&logoColor=white">
+<img src="https://img.shields.io/badge/Ubuntu-20.1.0-E95420?style=for-the-badge&logo=Ubuntu&logoColor=white">
+<img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=for-the-badge&logo=Spring-Boot&logoColor=white">
+<img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=Gradle&logoColor=white">
+<img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=Swagger&logoColor=black">
+<img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=Spring-Security&logoColor=white">
+<img src="https://img.shields.io/badge/Apache%20Spark-E25A1C?style=for-the-badge&logo=Apache-Spark&logoColor=white">
 
-**🦊 Frontend**
-- lang: dart `16.16.0`
-- framework: flutter `3.24.3`
-- 상태관리 : provider `6.1.2`
+---
+
+### 🦊 Frontend
+<img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=Dart&logoColor=white">
+<img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=Flutter&logoColor=white">
+<img src="https://img.shields.io/badge/Provider-FF6F00?style=for-the-badge&logo=Provider&logoColor=white">
+
 
 ```
 sdk: flutter
