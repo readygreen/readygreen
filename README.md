@@ -65,7 +65,7 @@
 |  <img src="https://github.com/user-attachments/assets/7c2ace1f-88cf-4cf7-aab2-57aac93754df" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/482aea7f-2f0c-47a6-8da9-92cc06314b93" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/1a570796-09a3-49db-8c70-776c76462702" style="width: 300px;"> | 
 |:--------:|:--------:|:--------:|
 |   **장소 클릭 화면**  |   **경고창**  |   **길 찾기 진행 중 화면**  |  
-|   장소에 대한 자세한 정보 제공  |  실제 상황과 다를 수 있음을 알림으로서<br> 사용자의 안전을 지킬 수 있음  |   경로 설명을 통해 간편한 길 찾기 제공  | 
+|   장소에 대한 자세한 정보 제공  |  실제 상황과 다를 수 있음을 알림으로서<br>사용자의 안전을 지킬 수 있음  |   경로 설명을 통해 간편한 길 찾기 제공  | 
  </div>
 </br>   
 
@@ -146,7 +146,7 @@
 
 ## WearOS 길안내🚶‍♂️ </br>  
 - text to speech 기능을 사용한 길안내 제공
-- GPS에 따른 길안내 네비게이션 제공
+- GPS에 따른 길안내 네비게이션과 신호등 정보 제공
 - 모바일 어플과 실시간 연동
 
 |  <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치길안내-1.png" width="150px"/> | <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치길안내-2.png" width="150px"/> |   <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치길안내-3.png" width="150px"/> |
