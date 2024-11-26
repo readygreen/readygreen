@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="150px" src="img/green.png" />
+<img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/green.png" alt="Green Image" width="150px">
 
 # 🚦 언제그린 🚦
 **삼성 청년 SW 아카데미 11기 특화 프로젝트 - 빅데이터 분산 우수상 🏆**
@@ -12,149 +12,168 @@
 
 </div>
 
+<div>  
 
-## 📜 Contents
- 1. [Overview](#-overview)
- 2. [서비스 화면](#-서비스-화면)
- 3. [주요 기능](#-주요-기능)
- 4. [개발 환경](#%EF%B8%8F-개발-환경)
- 5. [시스템 아키텍처](#-시스템-아키텍처)
- 6. [기술 특이점](#-기술-특이점)
- 7. [추후 고도화](#-추후-고도화)
- 8. [기획 및 설계 산출물](#-기획-및-설계-산출물)
- 9. [Conventions](#-conventions)
- 10. [팀원 소개](#-팀원-소개)
+  <div style="flex: 1; margin-right: 20px;">
+    <h2>📜 Contents</h2>
+      1. <a href="#-서비스-화면">서비스 화면</a> </br> 
+      2. <a href="#-주요-기능">주요 기능</a> </br> 
+      3. <a href="#%EF%B8%8F-개발-환경">개발 환경</a> </br> 
+      4. <a href="#-시스템-아키텍처">시스템 아키텍처</a> </br> 
+      5. <a href="#-기술-특이점">기술 특이점</a> </br> 
+      6. <a href="#-기획-및-설계-산출물">기획 및 설계 산출물</a> </br> 
+	7. <a href="#-팀원-소개">팀원 소개</a> </br> 
+  </div>  
+  </br>   
 
-<br/>   
- 
+  <div>  
+    <h2>🚶언제그린 개요🚶</h2></br>     
+	  
+보행자에게 신호등 잔여 시간을 제공함으로서 보행할 때의 편리함을 높여주며, </br>   
+	  
+현재 날씨, 오늘의 운세, 포인트과 같은 데일리 컨텐츠도 함께 제공함으로서 사용자가 앱을 더욱 자주 이용할 수 있도록 독려합니다.  </br>   
+  
+기존 자동차 중심의 네비게이션을 완전히 보행자 중심으로 제공하여 효율적인 길 안내를 제공합니다.  </br>   
+   
+보행자 신호 잔여 시간 및 변경 알림을 제공하고 </br>  사용자가 북마크한 장소를 가는 시간에 길 안내를 알림으로 제공함으로서 개인화된 서비스도 제공합니다.</br>   
+   
+  </div>
 
-## ✨ 언제그린의 목적
-- 초행길에서 효율적인 경로 제안
-- 사용자의 편의성을 위한 신호 변경 알림
-- 보행자 신호등 잔여 시간을 제공 
+</div>  
 
-<br/>   
-
-## 📱 서비스 화면
+</br>   
+	
+# 📱 서비스 화면
 **`모바일`, `웨어러블 기기(갤럭시 워치)` 지원**
-</br>  
-
+</br>    
+ 
+	
 ## 지도 화면 🗺️ </br>  
-
+<div>   
+	
 | <img src="https://github.com/user-attachments/assets/27f88c23-d9ce-4299-af4e-5da3d800650b" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/ab57242c-fb50-4754-a209-fc20b93c8975" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/3d94ddd5-19f1-4cc9-940f-dea8f8f33338" style="width: 300px;"> |
 |:--------:|:--------:|:--------:|
 |   **지도 메인 화면**  |   **장소 검색 화면**  |   **장소 추천 화면**  | 
 |   신호 잔여 시간 제공  |   주변 장소 검색 가능  |  주변 장소를 카테고리 별 제공  |  
+</div>
+</br>   
 
----
 
 ## 길 찾기🧭 </br>  
-
+<div>   
+	
 |  <img src="https://github.com/user-attachments/assets/7c2ace1f-88cf-4cf7-aab2-57aac93754df" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/482aea7f-2f0c-47a6-8da9-92cc06314b93" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/1a570796-09a3-49db-8c70-776c76462702" style="width: 300px;"> | 
 |:--------:|:--------:|:--------:|
 |   **장소 클릭 화면**  |   **경고창**  |   **길 찾기 진행 중 화면**  |  
-|   장소에 대한 자세한 정보 제공  |  실제 상황과 다를 수 있음을 알림으로서 사용자의 안전을 지킬 수 있음  |   경로 설명을 통해 간편한 길 찾기 제공  | 
- 
----  
+|   장소에 대한 자세한 정보 제공  |  실제 상황과 다를 수 있음을 알림으로서<br> 사용자의 안전을 지킬 수 있음  |   경로 설명을 통해 간편한 길 찾기 제공  | 
+ </div>
+</br>   
+
 
 ## 메인화면📲 </br>  
-
+<div>   
+	
 |  <img src="https://github.com/user-attachments/assets/a65581f6-8664-4e9d-a774-50d2a1647881" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/b1d62a36-06b9-4a70-a46c-403ba0869442" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/f308e00e-e9d0-4fbd-bd39-48f6ffbca36c" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/5ddf3767-e3f7-4b62-a6ca-f82fa2153aaf" style="width: 300px;"> | 
 |:--------:|:--------:|:--------:|:--------:|
 |   **메인 화면**  |   **현재 날씨**  |  **오늘의 운세**  |   **로그인 화면**  |
-|   한 눈에 모든 기능을 제공  |   보행자에게 날씨를 제공함으로서 편리함 강화  |   사용자의 생년월일을 통해 운세 제공 |   카카오 소셜 로그인을 제공  |  
-</br>
-
-### 지도 페이지
-- 주변 보행자 신호등 정보 표시
-- 장소 검색 제공
-- 웨어러블 기기 연동
-<div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/130f6497-90e6-4ef5-802f-b00179871371" width="10%">
+|   한 눈에 모든 기능을 제공  |   보행자에게 날씨를 제공함으로서 편리함 강화  |   사용자의 생년월일을 통해 운세 제공 |   카카오 소셜 로그인을 제공  |    
 </div>
+</br>  
 
+## 👩마이 페이지🧑 </br>  
+<div>   
+	
+|  <img src="https://github.com/user-attachments/assets/c9194c23-d7b2-4528-afd7-0f1120eed7ec" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/c9c01386-dad6-4add-b786-c78fa7fbbdde" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/7b4126aa-f154-49bf-82ae-edad71311f31" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/5ddf3767-e3f7-4b62-a6ca-f82fa2153aaf" style="width: 300px;"> | 
+|:--------:|:--------:|:--------:|:--------:|
+|   **마이페이지 메인 화면**  |   **뱃지**  |  **북마크**  |   **알림**  |
+|   계정 관리 기능들을 한 번에 제공 |   지금까지 얻은 뱃지 조회 가능 및 최애 뱃지 선정 가능  |   북마크를 통해 알림 설정 및 메인페이지 장소 설정 |   신호 변경 알림 제공  |    
+</div>
+</br>  
 
-### 길안내
-- `tts`를 이용한 도착지 검색 기능
-- 목적지 길안내 제공
-- 웨어러블 기기 연동
-<div margin: 10px>
+## 포인트⭐ </br>  
+<div>   
+	
+|  <img src="https://github.com/user-attachments/assets/79e1d1da-3b98-4094-9771-665e297f8422" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/4379dd0f-a9f4-41bd-b333-864928248483" style="width: 300px;"> |
+|:--------:|:--------:|
+|   **포인트 메인 화면**  |   **포인트 내역 조회**  |
+|   걸음수 측정 및 포인트 전환  |  운세 조회, 걸음수, 길찾기 이용 등을 통해 <br>얻은 포인트 내역 조회 가능  | 
+ </div>
+</br>    
+
+## 고객지원👤 </br>  
+<div>   
+	
+|  <img src="https://github.com/user-attachments/assets/f154afc2-883e-4e36-aae2-5cc6033081db" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/91d419a6-13fe-4f42-8fd9-b345d75a3c1d" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/9f4cc153-da88-4861-aa21-375c00f85518" style="width: 300px;"> | 
+|:--------:|:--------:|:--------:|
+|   **공지사항**  |   **건의사항 조회**  |   **건의 등록**  |  
+|   관리자가 게시한 공지사항<br> 간편하게 볼 수 있음  |  사용자가 보낸 건의사항에 대한 <br> 답변과 진행 상태 조회 가능 |   직접 다양한 건의 등록 가능  | 
  
-    <img src="https://github.com/user-attachments/assets/15e9406c-8ada-4b90-81e2-a159fe434d5a" width="10%">
-        <img src="https://github.com/user-attachments/assets/4c830ac4-2482-49cc-aef4-728101c662c2" width="10%">
-            <img src="https://github.com/user-attachments/assets/6158e134-5864-499f-97b1-58126e1286be" width="10%">
-                
-</div>
+</br>  
 
-### 주변 장소 추천
-- 주변 장소 데이터 `분산 처리`
-
-<div>
-  <img src="https://github.com/user-attachments/assets/3d94ddd5-19f1-4cc9-940f-dea8f8f33338" width="20%">
-</div>
-
-### 메인화면
-- 오늘의 날씨, 운제를 제공
-- 자주가는 목적지와 최근 목적지 바로 길찾기 제공
-
-<div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/a65581f6-8664-4e9d-a774-50d2a1647881" width="20%">
-  <img src="https://github.com/user-attachments/assets/b1d62a36-06b9-4a70-a46c-403ba0869442" width="20%">
-  <img src="https://github.com/user-attachments/assets/f308e00e-e9d0-4fbd-bd39-48f6ffbca36c" width="20%">
-  <img src="https://github.com/user-attachments/assets/51f4eb3e-1685-4dfa-86f4-943fa9e71661" width="10%">
-</div>
-
-### 로그인
-- `카카오 소셜` 로그인
-<div margin: 10px>
-<img src="https://github.com/user-attachments/assets/5ddf3767-e3f7-4b62-a6ca-f82fa2153aaf" width="20%">
-</div>
-  
-### 마이페이지
-- `대표 뱃지 설정`
-- `생일 등록 및 변경`
-- `자주가는 목적지` 등록 및 수정
-<div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/c9194c23-d7b2-4528-afd7-0f1120eed7ec" width="20%">
-  <img src="https://github.com/user-attachments/assets/c9c01386-dad6-4add-b786-c78fa7fbbdde" width="20%">
-  <img src="https://github.com/user-attachments/assets/7b4126aa-f154-49bf-82ae-edad71311f31" width="20%">
 </div>
 
 
 
-### 포인트 페이지
-- `걸음 수`, `총 걸음수` 측정 제공
-- `총 포인트`, `포인트 상세 내역` 조회
-- `걸음 수`, `운세`, `제보`에 대한 포인트 부여
-<div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/79e1d1da-3b98-4094-9771-665e297f8422" width="20%">
-  <img src="https://github.com/user-attachments/assets/4379dd0f-a9f4-41bd-b333-864928248483" width="20%">
-</div>
-
-
-### 고객지원
-- `관리자`의 공지사항
-- 사용자의 `건의사항들`을 조회
-- `잘못된 데이터`를 제보하는 건의 등록
-<div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/f154afc2-883e-4e36-aae2-5cc6033081db" width="20%">
-  <img src="https://github.com/user-attachments/assets/91d419a6-13fe-4f42-8fd9-b345d75a3c1d" width="20%">
-  <img src="https://github.com/user-attachments/assets/9f4cc153-da88-4861-aa21-375c00f85518" width="20%">
-</div>
-
-  
-### 워치 연동
+## WearOS 모바일 연동⌚ </br>  
 - `웨어러블` 연결
 - 이메일과 모바일에서 제공하는 `인증번호` 입력시 연동
-<div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/40794819-58d4-42e2-a3dd-6ac40aac3a52" width="20%"/>
-  <img src="https://github.com/user-attachments/assets/dc3edb0f-9d09-4dc2-91de-90cb26fc530e" width="10%"/>
-  <img src="https://github.com/user-attachments/assets/1a610dd0-2afb-445c-9ac2-916fe20828ee" width="10%"/>
-</div>
+
+
+|  <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치인증-1.png" width="150px"/> | <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치인증-2.png" width="150px"/> |   <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치인증-3.png" width="150px"/> |
+|:--------:|:--------:|:--------:|
+|   **이메일 입력**  |   **이메일 입력**  |  **인증번호 입력**  |
+
+</br>  
+
+## WearOS 메인⌚ </br>
+- 자주가는 목적지, 주변신호등 지도, SST 목적지 검색, TTS 길안내 제공
+- 워치 연결해제 기능
+
+| <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치메인-1.png" width="150px"> | <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치연결해제.png" width="150px"> |
+|:--------:|:--------:|
+|   **메인 화면**  |   **워치 연결 해제**  |
+
+</br>  
+
+## WearOS 음성검색🗣 </br>
+- speech to text 기능을 사용한 목적지 음성검색 제공
+
+|  <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치음성인식-1.png" width="150px"/> | <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치음성인식-2.png" width="150px"/> |   <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치음성인식-3.png" width="150px"/> |
+|:--------:|:--------:|:--------:|
+|   **음성 인식**  |   **검색 결과**  |  **길안내 시작**  |
+
+</br>  
+
+## WearOS 길안내🚶‍♂️ </br>  
+- text to speech 기능을 사용한 길안내 제공
+- GPS에 따른 길안내 네비게이션 제공
+- 모바일 어플과 실시간 연동
+
+|  <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치길안내-1.png" width="150px"/> | <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치길안내-2.png" width="150px"/> |   <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치길안내-3.png" width="150px"/> |
+|:--------:|:--------:|:--------:|
+|   **길안내**  |   **목적지 도착**  |  **길안내 없음**  |
+
+</br>  
+
+## WearOS 주변 신호등🗺 </br>   
+- 현재 위치 주변의 신호등 정보 제공
+
+|  <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치지도.png" width="150px"/> |
+|:--------:|
+|   **주변 신호등 지도**  |
+
+</br>  
+
+## WearOS 자주가는 목적지🚩 </br>  
+- 모바일 어플에 등록된 자주가는 목적지 제공
+
+|  <img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/워치북마크.png" width="150px"/> |
+|:--------:|
+|   **자주가는 목적지**  |
 
 <br/>   
 
-## ✨ 주요 기능
+## 📌 주요 기능
 
 - `경로 안내`
     - 신호등 시간 분석을 통해 최적의 경로 제공
@@ -182,6 +201,17 @@
 - `신호등 데이터 개선을 위한 제보`
 	- 사용자의 제보로 지속적인 데이터 개선
    
+
+## ✨ 기술 특이점
+- 신호등 대기 시간을 적용한 최적 경로 제공
+- 서브 서버에서 주변 장소 추천을 위한 `스파크`를 활용해 장소 데이터 수집
+- 사용자 편의성을 위한 웨어러블 연동
+- 음성인식으로 목적지 검색 제공
+- 사용자 제보로 데이터 개선
+- 오늘의 날씨, 운세, 걸음 수 등 데일리 컨텐츠 제공
+- 포인트와 뱃지 기능으로 유저 유입 증가 목적
+
+<br/>   
 <br/>   
 
 
@@ -250,24 +280,39 @@
 </div>
 <br/>
 
-
+<div>    
+	
 ## 💫 시스템 아키텍처
 
 <img src="https://github.com/user-attachments/assets/0132b0bc-10ed-4246-aa8e-cdba38da28d0" alt="시스템 아키텍처" width="80%">
 
+</div>  
 
 <br/>     
 
-## ✨ 기술 특이점
-- 신호등 대기 시간을 적용한 최적 경로 제공
-- 서브 서버에서 주변 장소 추천을 위한 `스파크`를 활용해 장소 데이터 수집
-- 사용자 편의성을 위한 웨어러블 연동
-- 음성인식으로 목적지 검색 제공
-- 사용자 제보로 데이터 개선
-- 오늘의 날씨, 운세, 걸음 수 등 데일리 컨텐츠 제공
-- 포인트와 뱃지 기능으로 유저 유입 증가 목적
+<div>  
+	
+# 📂 기획 및 설계 산출물  
+	
+### [🎨 화면 설계서](https://www.figma.com/design/P73jaKuUZsdERNRuDRBdtm/%EC%96%B8%EC%A0%9C%EA%B7%B8%EB%A6%B0?node-id=301-1535&node-type=canvas&t=tXJLJwuCp1h2XQ3D-0)
 
-<br/>   
+### 📱 앱 
+<img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/화면설계서-앱.png" /><br>
+<br>
+
+### ⌚ 워치
+<img src="https://raw.githubusercontent.com/readygreen/readygreen/master/img/화면설계서-워치.png" /><br>
+
+</div>
+
+<br>
+<div>
+
+### [✨ ER Diagram](https://www.erdcloud.com/d/57wJHqjZPLPw7w2ve)
+
+<img width="100%" alt="erd" src="https://github.com/user-attachments/assets/9de9eeba-8fba-4930-a9a1-8b2b3bfc3844" ><br>
+
+</div>
 
 ## ✨ 추후 고도화 
 - 유저의 속도를 분석후 속도에 맞는 맞춤형 경로 안내 제공
@@ -277,34 +322,7 @@
 - 삼성웰렛과 연동
 
 <br/>   
-
-# 📂 기획 및 설계 산출물
-
-<div align="center">
-
-### [🎨 화면 설계서](https://www.figma.com/design/P73jaKuUZsdERNRuDRBdtm/%EC%96%B8%EC%A0%9C%EA%B7%B8%EB%A6%B0?node-id=301-1535&node-type=canvas&t=tXJLJwuCp1h2XQ3D-0)
-<br>
-
-### 📱 앱 
-<img src="img/화면설계서-앱.png" /><br>
-<br>
-
-### ⌚ 워치
-<img src="img/화면설계서-워치.png" /><br>
-
-</div>
-
-<br>
-<div align="center">
-
----
-### [✨ ER Diagram](https://www.erdcloud.com/d/57wJHqjZPLPw7w2ve)
-
-<img width="100%" alt="erd" src="https://github.com/user-attachments/assets/9de9eeba-8fba-4930-a9a1-8b2b3bfc3844" ><br>
-
-</div>
-
-<br/>   
+ 
 
 ## 👥 팀원 소개
 
@@ -375,6 +393,26 @@
     </td>
   </tr>
   <tr>
+    <td align="center">
+        팀장, BE, Data
+    </td>
+    <td align="center">
+      Infra, BE, FE
+    </td>
+    <td align="center">
+      BE
+    </td>
+    <td align="center">
+      FE
+    </td>
+    <td align="center">
+      FE
+    </td>
+    <td align="center">
+      FE
+    </td>
+  </tr>
+	<tr>
     <td align="center">
         팀장, BE, Data
     </td>
