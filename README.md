@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="150px" src="green.png" />
+<img width="150px" src="img/green.png" />
 
 # 🚦 언제그린 🚦
 **삼성 청년 SW 아카데미 11기 특화 프로젝트 - 빅데이터 분산 우수상 🏆**
@@ -280,15 +280,29 @@
 
 # 📂 기획 및 설계 산출물
 
+<div align="center">
 
 ### [🎨 화면 설계서](https://www.figma.com/design/P73jaKuUZsdERNRuDRBdtm/%EC%96%B8%EC%A0%9C%EA%B7%B8%EB%A6%B0?node-id=301-1535&node-type=canvas&t=tXJLJwuCp1h2XQ3D-0)
+<br>
 
+### 📱 앱 
+<img src="img/화면설계서-앱.png" /><br>
+<br>
 
-<img width="100%" alt="화면설계서" src="https://github.com/user-attachments/assets/1c31c32a-8187-42c8-8f9e-624bf4da41b3"><br>
+### ⌚ 워치
+<img src="img/화면설계서-워치.png" /><br>
 
+</div>
+
+<br>
+<div align="center">
+
+---
 ### [✨ ER Diagram](https://www.erdcloud.com/d/57wJHqjZPLPw7w2ve)
 
 <img width="100%" alt="erd" src="https://github.com/user-attachments/assets/9de9eeba-8fba-4930-a9a1-8b2b3bfc3844" ><br>
+
+</div>
 
 <br/>   
 
