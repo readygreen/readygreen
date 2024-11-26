@@ -13,11 +13,6 @@
 </div>
 
 
-
-</div>
-
-<br> 
-
 ## 📜 Contents
  1. [Overview](#-overview)
  2. [서비스 화면](#-서비스-화면)
@@ -40,16 +35,41 @@
 
 <br/>   
 
-## 👀 서비스 화면
-### ✨ `모바일`, `웨어러블 기기(갤럭시 워치)` 지원
+## 📱 서비스 화면
+**`모바일`, `웨어러블 기기(갤럭시 워치)` 지원**
+</br>  
+
+## 지도 화면 🗺️ </br>  
+
+| <img src="https://github.com/user-attachments/assets/27f88c23-d9ce-4299-af4e-5da3d800650b" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/ab57242c-fb50-4754-a209-fc20b93c8975" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/3d94ddd5-19f1-4cc9-940f-dea8f8f33338" style="width: 300px;"> |
+|:--------:|:--------:|:--------:|
+|   **지도 메인 화면**  |   **장소 검색 화면**  |   **장소 추천 화면**  | 
+|   신호 잔여 시간 제공  |   주변 장소 검색 가능  |  주변 장소를 카테고리 별 제공  |  
+
+---
+
+## 길 찾기🧭 </br>  
+
+|  <img src="https://github.com/user-attachments/assets/7c2ace1f-88cf-4cf7-aab2-57aac93754df" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/482aea7f-2f0c-47a6-8da9-92cc06314b93" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/1a570796-09a3-49db-8c70-776c76462702" style="width: 300px;"> | 
+|:--------:|:--------:|:--------:|
+|   **장소 클릭 화면**  |   **경고창**  |   **길 찾기 진행 중 화면**  |  
+|   장소에 대한 자세한 정보 제공  |  실제 상황과 다를 수 있음을 알림으로서 사용자의 안전을 지킬 수 있음  |   경로 설명을 통해 간편한 길 찾기 제공  | 
+ 
+---  
+
+## 메인화면📲 </br>  
+
+|  <img src="https://github.com/user-attachments/assets/a65581f6-8664-4e9d-a774-50d2a1647881" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/b1d62a36-06b9-4a70-a46c-403ba0869442" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/f308e00e-e9d0-4fbd-bd39-48f6ffbca36c" style="width: 300px;"> | <img src="https://github.com/user-attachments/assets/5ddf3767-e3f7-4b62-a6ca-f82fa2153aaf" style="width: 300px;"> | 
+|:--------:|:--------:|:--------:|:--------:|
+|   **메인 화면**  |   **현재 날씨**  |  **오늘의 운세**  |   **로그인 화면**  |
+|   한 눈에 모든 기능을 제공  |   보행자에게 날씨를 제공함으로서 편리함 강화  |   사용자의 생년월일을 통해 운세 제공 |   카카오 소셜 로그인을 제공  |  
+</br>
 
 ### 지도 페이지
 - 주변 보행자 신호등 정보 표시
 - 장소 검색 제공
 - 웨어러블 기기 연동
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/27f88c23-d9ce-4299-af4e-5da3d800650b" width="20%">
-  <img src="https://github.com/user-attachments/assets/ab57242c-fb50-4754-a209-fc20b93c8975" width="20%">
   <img src="https://github.com/user-attachments/assets/130f6497-90e6-4ef5-802f-b00179871371" width="10%">
 </div>
 
@@ -59,9 +79,7 @@
 - 목적지 길안내 제공
 - 웨어러블 기기 연동
 <div margin: 10px>
-  <img src="https://github.com/user-attachments/assets/7c2ace1f-88cf-4cf7-aab2-57aac93754df" width="20%">
-  <img src="https://github.com/user-attachments/assets/482aea7f-2f0c-47a6-8da9-92cc06314b93" width="20%">
-  <img src="https://github.com/user-attachments/assets/1a570796-09a3-49db-8c70-776c76462702" width="20%">
+ 
     <img src="https://github.com/user-attachments/assets/15e9406c-8ada-4b90-81e2-a159fe434d5a" width="10%">
         <img src="https://github.com/user-attachments/assets/4c830ac4-2482-49cc-aef4-728101c662c2" width="10%">
             <img src="https://github.com/user-attachments/assets/6158e134-5864-499f-97b1-58126e1286be" width="10%">
