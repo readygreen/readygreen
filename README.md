@@ -280,9 +280,6 @@
 
 # 📂 기획 및 설계 산출물
 
-### [💭 기능 명세](https://obsidian-boar-5f3.notion.site/0de7338d07c045e584d3879cbac76a44?pvs=74)
-
-<img width="100%" alt="기능 명세" src="https://github.com/user-attachments/assets/4913b826-8ebe-49e1-81ae-76b7463548a2"><br>
 
 ### [🎨 화면 설계서](https://www.figma.com/design/P73jaKuUZsdERNRuDRBdtm/%EC%96%B8%EC%A0%9C%EA%B7%B8%EB%A6%B0?node-id=301-1535&node-type=canvas&t=tXJLJwuCp1h2XQ3D-0)
 
@@ -292,11 +289,6 @@
 ### [✨ ER Diagram](https://www.erdcloud.com/d/57wJHqjZPLPw7w2ve)
 
 <img width="100%" alt="erd" src="https://github.com/user-attachments/assets/9de9eeba-8fba-4930-a9a1-8b2b3bfc3844" ><br>
-
-<br/>   
-
-# ✨ Conventions 
-언제그린 팀원들의 원활한 `Gitlab`, `Jira` 사용을 위한 [✨컨벤션✨](https://obsidian-boar-5f3.notion.site/bfbb93c1ebbb412fa1b9bb03042f4ebc?pvs=74) 입니다 :)
 
 <br/>   
 
