@@ -1,6 +1,6 @@
 <div align="center">
 
-<img width="300px" src="./assets/green.png" />
+<img width="150px" src="green.png" />
 
 # 🚦 언제그린 🚦
 **삼성 청년 SW 아카데미 11기 특화 프로젝트 - 빅데이터 분산 우수상 🏆**
