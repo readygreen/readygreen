@@ -412,25 +412,5 @@
       FE
     </td>
   </tr>
-	<tr>
-    <td align="center">
-        팀장, BE, Data
-    </td>
-    <td align="center">
-      Infra, BE, FE
-    </td>
-    <td align="center">
-      BE
-    </td>
-    <td align="center">
-      FE
-    </td>
-    <td align="center">
-      FE
-    </td>
-    <td align="center">
-      FE
-    </td>
-  </tr>
 </table>
 </div>
